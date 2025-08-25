@@ -4,8 +4,8 @@
             <!-- Logo & Desc -->
             <div>
                 <div class="flex items-center mb-4">
-                    <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/1599d0a1-729e-40c8-9ab2-3a18b90899d2.png" alt="Logo GovInnovate" class="h-8 mr-2">
-                    <span class="text-xl font-bold bg-gradient-to-r from-blue-400 to-green-400 bg-clip-text text-transparent">GovInnovate</span>
+                    <img src="{{ asset('images/logo.png') }}" alt="Logo Digital Innovation Hub" class="h-8 mr-2">
+                    <span class="text-xl font-bold bg-gradient-to-r from-blue-400 to-green-400 bg-clip-text text-transparent">Digital Innovation Hub</span>
                 </div>
                 <p class="text-gray-400 mb-6">Platform kolaborasi pemerintah dan akademisi untuk percepatan inovasi daerah.</p>
                 <div class="flex space-x-4">
@@ -54,8 +54,8 @@
                 <address class="text-gray-400 not-italic">
                     <div class="mb-3">
                         <i class="fas fa-map-marker-alt mr-3 text-blue-400"></i>
-                        Gedung Inovasi, Jl. Pemuda No.123<br>
-                        <span class="pl-7">Kota Anda</span>
+                        Jalan apa yaa, jalani ajaaa<br>
+                        <span class="pl-7">Pekanbaru</span>
                     </div>
                     <div class="mb-3">
                         <i class="fas fa-phone-alt mr-3 text-blue-400"></i>
@@ -63,14 +63,14 @@
                     </div>
                     <div class="mb-3">
                         <i class="fas fa-envelope mr-3 text-blue-400"></i>
-                        hello@govinnovate.id
+                        DigitalInnovatioHub@gmail.com
                     </div>
                 </address>
             </div>
         </div>
         
         <div class="pt-8 border-t border-gray-800 text-center text-gray-500 text-sm">
-            <p>© 2023 GovInnovate. Seluruh hak cipta dilindungi undang-undang.</p>
+            <p>© 2025 Digital Innovation Hub. Seluruh hak cipta dilindungi undang-undang.</p>
         </div>
     </div>
 </footer>
