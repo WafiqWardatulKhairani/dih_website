@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.akademisi.app')
 
 @section('content')
 <div class="container mx-auto p-8">
