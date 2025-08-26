@@ -9,5 +9,7 @@ Route::get('/', [LandingPageController::class, 'index'])->name('landing-page');
 
 Route::get('/pemerintah', [PemerintahController::class, 'index'])->name('pemerintah.index');
 Route::get('/akademisi', [AkademisiController::class, 'index'])->name('akademisi.index');
+Route::get('/innovation-hub', [LandingPageController::class, 'index'])
+    ->name('innovation.hub');
 
 
