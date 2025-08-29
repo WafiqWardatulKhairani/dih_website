@@ -33,7 +33,7 @@
         @yield('content')
     </main>
     
-    @include('components.layout.footer')
+    @include('components.layout.footer_akademisi')
 
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}"></script>
