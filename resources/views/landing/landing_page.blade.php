@@ -25,7 +25,7 @@
 
             <div class="lg:w-1/2 flex justify-center">
                 <div class="relative">
-                    <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/09304d37-f57b-44ef-840e-71a2fdae3e1d.png" alt="Ilustrasi kolaborasi digital" class="rounded-xl shadow-2xl floating relative z-10">
+                    <img src="{{ asset('images/hero-image.jpeg') }}" alt="Ilustrasi kolaborasi digital" class="rounded-xl shadow-2xl floating relative z-10">
                     <div class="absolute -bottom-5 -right-5 w-full h-full border-2 border-blue-300 rounded-xl"></div>
                 </div>
             </div>
