@@ -28,4 +28,10 @@ Route::prefix('akademisi')->name('akademisi.')->group(function () {
 
     Route::get('/innovation/{innovation}', [PostInnovationController::class, 'show'])
         ->name('post_inovasi.show');
+        // Halaman Akademisi (beranda akademisi)
+Route::get('/akademisi', [AkademisiController::class, 'index'])->name('akademisi.index');
+
+// Alias/URL tambahan agar sesuai dengan nama route di navbar
+Route::get('/akademisi/beranda', [AkademisiController::class, 'index'])
+    ->name('akademisi.index.create');
 });

@@ -6,7 +6,7 @@
         </div>
 
         <div class="hidden md:flex items-center space-x-8">
-            <a href="#home" class="font-medium hover:text-blue-600 transition-colors">Beranda</a>
+            <a href="{{ route('akademisi.index')}}" class="font-medium hover:text-blue-600 transition-colors">Beranda</a>
             <a href="{{ route('akademisi.post_inovasi.create') }}" class="font-medium hover:text-blue-600 transition-colors">Posting Inovasi</a>
             <a href="#solusi" class="font-medium hover:text-blue-600 transition-colors">Media Diskusi Publik</a>
             <a href="{{ route('innovation.hub') }}" class="font-medium text-blue-600">Innovation Hub</a>
