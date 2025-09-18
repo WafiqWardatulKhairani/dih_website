@@ -1,5 +1,3 @@
-@extends('layouts.app')
-
-@section('content')
+<x-layouts.app>
     <h1>Halaman Pemerintah</h1>
-@endsection
+</x-layouts.app>

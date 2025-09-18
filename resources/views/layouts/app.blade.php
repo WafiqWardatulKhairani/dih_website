@@ -1,42 +1,135 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Digital Innovation Hub</title>
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    <title>{{ config('app.name', 'Digital Innovation Hub') }}</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Styles CSS -->
+
+    <!-- Custom CSS (jika masih dipakai) -->
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
-    
-    <!-- Livewire Styles -->
+
+    <!-- Vite -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    {{-- Livewire Style --}}
     @livewireStyles
+
+    @stack('styles')
 </head>
-<body class="text-gray-800 font-poppins">
-    <!-- Floating Background Elements -->
-    <div class="fixed inset-0 overflow-hidden -z-10">
-        <div class="absolute top-20 left-10 w-32 h-32 rounded-full bg-blue-100 opacity-20 blur-xl"></div>
-        <div class="absolute bottom-20 right-10 w-40 h-40 rounded-full bg-green-100 opacity-20 blur-xl"></div>
+
+<body class="font-sans antialiased">
+    <div class="min-h-screen bg-gray-100">
+        {{-- Navigation --}}
+        @if(isset($customNavigation) && $customNavigation)
+            {{ $customNavigation }}
+        @else
+            @include('components.layout.navigation')
+        @endif
+
+        {{-- Page Content --}}
+        <main>
+            @yield('content')
+        </main>
+
+        {{-- Footer --}}
+        @if(isset($customFooter) && $customFooter)
+            {{ $customFooter }}
+        @else
+            @include('components.layout.footer')
+        @endif
     </div>
 
-    @include('components.layout.navigation')
-    
-    <main>
-        @yield('content')
-    </main>
-    
-    @include('components.layout.footer')
+    @stack('scripts')
 
-    <!-- Scripts -->
-    <script src="{{ asset('js/app.js') }}"></script>
+    {{-- SweetAlert --}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    {{-- Livewire Script --}}
     @livewireScripts
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // data dari backend
+        const errors  = @json($errors->all());
+        const success = @json(session('success'));
+        const error   = @json(session('error'));
+
+        // tampilkan error validasi
+        if (errors && errors.length > 0) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                html: errors.join('<br>'),
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'Mengerti'
+            });
+        }
+
+        // pesan sukses
+        if (success) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: success,
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'Oke'
+            });
+        }
+
+        // pesan gagal
+        if (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal!',
+                text: error,
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'Coba Lagi'
+            });
+        }
+    });
+
+    // Handle Livewire events untuk v3
+    document.addEventListener('livewire:initialized', () => {
+        Livewire.on('swal:success', (data) => {
+            Swal.fire({
+                icon: 'success',
+                title: data.title || 'Berhasil!',
+                text: data.message || '',
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'Oke',
+                timer: data.timer || 10000,
+                timerProgressBar: true,
+                willClose: () => {
+                    if (data.redirect) {
+                        window.location.href = data.redirect;
+                    }
+                }
+            }).then((result) => {
+                if (data.redirect && (result.dismiss === Swal.DismissReason.timer || result.isConfirmed)) {
+                    window.location.href = data.redirect;
+                }
+            });
+        });
+
+        Livewire.on('swal:error', (data) => {
+            Swal.fire({
+                icon: 'error',
+                title: data.title || 'Gagal!',
+                text: data.message || '',
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'Coba Lagi'
+            });
+        });
+    });
+    </script>
 </body>
 </html>

@@ -3,6 +3,7 @@
 @section('content')
 <!-- Hero Section -->
 <section id="home" class="gradient-bg text-white pt-20 pb-32 relative overflow-hidden">
+    <!-- Konten hero section -->
     <div class="absolute top-10 right-10 w-64 h-64 rounded-full bg-white opacity-10"></div>
     <div class="absolute bottom-20 left-10 w-80 h-80 rounded-full bg-white opacity-5"></div>
 
@@ -35,6 +36,7 @@
 
 <!-- Stats Section -->
 <section class="py-16 bg-white">
+    <!-- Konten stats section yang sudah ada -->
     <div class="container mx-auto px-4">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
             <div class="bg-gray-50 p-6 rounded-xl text-center">
@@ -65,82 +67,48 @@
                 <span class="relative z-10">Program Prioritas Daerah</span>
                 <span class="absolute bottom-0 left-0 w-full h-2 bg-yellow-200 opacity-50 -z-0" style="bottom: 5px;"></span>
             </h2>
-            <p class="text-gray-600 max-w-2xl mx-auto">Temukan program-program unggulan yang membutuhkan solusi inovatif dari para peneliti dan akademisi.</p>
+            <p class="text-gray-600 max-w-2xl mx-auto">
+                Temukan program-program unggulan yang membutuhkan solusi inovatif dari para peneliti dan akademisi.
+            </p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <!-- Program Card 1 -->
+            @foreach ($programs as $program)
             <div class="bg-white rounded-xl overflow-hidden shadow-sm card-hover">
                 <div class="relative h-48 overflow-hidden">
-                    <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/180ad712-a625-41e1-a549-50ec90d0c53e.png" alt="Smart city dengan teknologi IoT" class="w-full h-full object-cover">
-                    <div class="absolute top-3 left-3 bg-white/90 text-xs font-bold px-3 py-1 rounded-full shadow-sm">
-                        <span class="text-blue-600">BARU</span>
-                    </div>
-                </div>
-                <div class="p-6">
-                    <div class="flex justify-between items-start mb-2">
-                        <span class="bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full">Digital Governance</span>
-                        <span class="text-xs text-gray-500">2 hari lalu</span>
-                    </div>
-                    <h3 class="text-xl font-bold mb-3">Transformasi Digital Pelayanan Publik</h3>
-                    <p class="text-gray-600 mb-4">Mencari solusi untuk meningkatkan kualitas pelayanan publik melalui transformasi digital.</p>
-                    <div class="flex justify-between items-center">
-                        <span class="text-sm font-medium text-gray-500">OPD: Dinas Kominfo</span>
-                        <a href="#" class="text-blue-600 hover:text-blue-800 font-medium flex items-center">
-                            Lihat Detail <i class="fas fa-arrow-right ml-1 text-sm"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
+                    <img src="{{ $program->image ?? 'https://via.placeholder.com/400x300' }}"
+                        alt="{{ $program->title }}"
+                        class="w-full h-full object-cover">
 
-            <!-- Program Card 2 -->
-            <div class="bg-white rounded-xl overflow-hidden shadow-sm card-hover">
-                <div class="relative h-48 overflow-hidden">
-                    <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/d296459c-8660-4f16-b03b-a773d1b178e3.png" alt="Pengelolaan sampah modern" class="w-full h-full object-cover">
+                    @if($program->status)
                     <div class="absolute top-3 left-3 bg-white/90 text-xs font-bold px-3 py-1 rounded-full shadow-sm">
-                        <span class="text-green-600">POPULER</span>
+                        <span class="text-blue-600">{{ $program->status }}</span>
                     </div>
+                    @endif
                 </div>
                 <div class="p-6">
                     <div class="flex justify-between items-start mb-2">
-                        <span class="bg-green-100 text-green-800 text-xs font-bold px-3 py-1 rounded-full">Lingkungan</span>
-                        <span class="text-xs text-gray-500">1 minggu lalu</span>
+                        <span class="bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full">
+                            {{ $program->category }}
+                        </span>
+                        <span class="text-xs text-gray-500">{{ $program->created_at->diffForHumans() }}</span>
                     </div>
-                    <h3 class="text-xl font-bold mb-3">Smart Waste Management System</h3>
-                    <p class="text-gray-600 mb-4">Pengembangan sistem cerdas untuk optimalisasi pengelolaan sampah perkotaan.</p>
+                    <h3 class="text-xl font-bold mb-3">{{ $program->title }}</h3>
+                    <p class="text-gray-600 mb-4">{{ $program->description }}</p>
                     <div class="flex justify-between items-center">
-                        <span class="text-sm font-medium text-gray-500">OPD: DLH</span>
+                        <span class="text-sm font-medium text-gray-500">OPD: {{ $program->opd }}</span>
                         <a href="#" class="text-blue-600 hover:text-blue-800 font-medium flex items-center">
                             Lihat Detail <i class="fas fa-arrow-right ml-1 text-sm"></i>
                         </a>
                     </div>
                 </div>
             </div>
-
-            <!-- Program Card 3 -->
-            <div class="bg-white rounded-xl overflow-hidden shadow-sm card-hover">
-                <div class="relative h-48 overflow-hidden">
-                    <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/eb77ec2a-8708-4759-af39-20657719ecbf.png" alt="Petani digital" class="w-full h-full object-cover">
-                </div>
-                <div class="p-6">
-                    <div class="flex justify-between items-start mb-2">
-                        <span class="bg-yellow-100 text-yellow-800 text-xs font-bold px-3 py-1 rounded-full">Pertanian</span>
-                        <span class="text-xs text-gray-500">3 minggu lalu</span>
-                    </div>
-                    <h3 class="text-xl font-bold mb-3">Modernisasi Pertanian Perkotaan</h3>
-                    <p class="text-gray-600 mb-4">Mengembangkan model pertanian perkotaan berbasis teknologi untuk ketahanan pangan.</p>
-                    <div class="flex justify-between items-center">
-                        <span class="text-sm font-medium text-gray-500">OPD: Dinas Pertanian</span>
-                        <a href="#" class="text-blue-600 hover:text-blue-800 font-medium flex items-center">
-                            Lihat Detail <i class="fas fa-arrow-right ml-1 text-sm"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
+            @endforeach
         </div>
 
         <div class="text-center mt-16">
-            <a href="#" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-500 text-white font-bold rounded-lg shadow-md hover:shadow-lg transition-all">
+            <a href="{{ route('program.list') }}"
+                class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-500 text-white font-bold rounded-lg shadow-md hover:shadow-lg transition-all">
                 Jelajahi Semua Program
                 <i class="fas fa-arrow-right ml-2"></i>
             </a>
@@ -148,8 +116,10 @@
     </div>
 </section>
 
+
 <!-- Innovation Hub Section -->
 <section id="hub" class="py-20 bg-white">
+    <!-- Konten innovation hub section yang sudah ada -->
     <div class="container mx-auto px-4">
         <div class="text-center mb-16">
             <h2 class="text-3xl font-bold mb-4 relative inline-block">
@@ -167,10 +137,19 @@
                 </div>
                 <h3 class="text-xl font-bold mb-4 text-blue-800">Untuk OPD</h3>
                 <p class="text-gray-600 mb-6">Publikasikan tantangan dan program prioritas Anda, dapatkan solusi berbasis penelitian dari para ahli.</p>
-                <a href="{{ route('pemerintah.index') }}" class="text-blue-600 font-medium flex items-center group">
+                <a
+                    @auth
+                    href="{{ auth()->user()->role === 'pemerintah'
+                 ? route('pemerintah.index')
+                 : route('login') }}"
+                    @else
+                    href="{{ route('login') }}"
+                    @endauth
+                    class="text-blue-600 font-medium flex items-center group">
                     Pelajari Lebih Lanjut
                     <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
                 </a>
+
             </div>
             <!-- Akademisi Card -->
             <div class="bg-gradient-to-br from-green-50 to-white rounded-xl p-8 shadow-sm card-hover">
@@ -179,7 +158,15 @@
                 </div>
                 <h3 class="text-xl font-bold mb-4 text-green-800">Untuk Akademisi</h3>
                 <p class="text-gray-600 mb-6">Temukan masalah nyata sebagai bahan penelitian dan pengabdian masyarakat, bangun kolaborasi dengan OPD dan UMKM.</p>
-                <a href="{{ route('akademisi.index') }}" class="text-blue-600 font-medium flex items-center group">
+                <a
+                    @auth
+                    href="{{ auth()->user()->role === 'akademisi'
+                 ? route('akademisi.index')
+                 : route('login') }}"
+                    @else
+                    href="{{ route('login') }}"
+                    @endauth
+                    class="text-blue-600 font-medium flex items-center group">
                     Pelajari Lebih Lanjut
                     <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
                 </a>
@@ -292,3 +279,30 @@
     </div>
 </section>
 @endsection
+
+@push('scripts')
+<script>
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            const targetId = this.getAttribute('href');
+            if (targetId === '#') return;
+
+            const targetElement = document.querySelector(targetId);
+            if (targetElement) {
+                targetElement.scrollIntoView({
+                    behavior: 'smooth'
+                });
+
+                // Close mobile menu if open
+                const mobileMenu = document.getElementById('mobile-menu');
+                if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+                    mobileMenu.classList.add('hidden');
+                }
+            }
+        });
+    });
+</script>
+@endpush

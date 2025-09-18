@@ -3,17 +3,19 @@
 namespace App\Http\Middleware;
 
 use Closure;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth; // tambahkan ini
-use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Auth;
 
 class CheckRole
 {
-    public function handle(Request $request, Closure $next, ...$roles): Response
+    public function handle($request, Closure $next, ...$roles)
     {
-        if (!Auth::check() || !in_array(Auth::user()->role, $roles)) {
-            return redirect('/')
-                ->with('error', 'Akses ditolak! Role tidak sesuai.');
+        if (!Auth::check()) {
+            return redirect()->route('login');
+        }
+
+        if (!in_array(Auth::user()->role, $roles)) {
+            return redirect()->route('landing-page')
+                             ->with('error', 'Akses ditolak! Anda tidak memiliki role yang sesuai.');
         }
 
         return $next($request);
