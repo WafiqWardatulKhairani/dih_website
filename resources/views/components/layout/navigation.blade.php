@@ -43,11 +43,11 @@ use Illuminate\Support\Facades\Storage;
 
             @guest
             <div class="flex items-center space-x-3 ml-6">
-                <a href="{{ route('login') }}"
-                    class="px-5 py-2 rounded-full border-2 border-blue-600 text-blue-600 font-semibold 
-                          hover:bg-blue-600 hover:text-white transition">
+                <!-- Tombol login diubah jadi trigger modal -->
+                <button class="px-5 py-2 rounded-full border-2 border-blue-600 text-blue-600 font-semibold 
+                        hover:bg-blue-600 hover:text-white transition open-login-modal">
                     Login
-                </a>
+                </button>
                 <a href="{{ route('user.register') }}"
                     class="px-5 py-2 rounded-full bg-gradient-to-r from-blue-600 to-green-500 
                           text-white font-semibold shadow-md hover:opacity-90 transition">
@@ -75,13 +75,11 @@ use Illuminate\Support\Facades\Storage;
         <div class="mt-3 flex flex-col space-y-2 items-start">
             <!-- Avatar -->
             <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-300 mb-2">
-                <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-300">
-                    <img src="{{ auth()->user()->avatar 
-                        ? asset('storage/' . auth()->user()->avatar) 
-                        : asset('images/default-avatar.png') }}"
-                        alt="Avatar"
-                        class="w-full h-full object-cover">
-                </div>
+                <img src="{{ auth()->user()->avatar 
+                    ? asset('storage/' . auth()->user()->avatar) 
+                    : asset('images/default-avatar.png') }}"
+                    alt="Avatar"
+                    class="w-full h-full object-cover">
             </div>
             <!-- Logout -->
             <form method="POST" action="{{ route('logout') }}" class="w-full">
@@ -97,11 +95,10 @@ use Illuminate\Support\Facades\Storage;
 
         @guest
         <div class="mt-3 flex flex-col space-y-2">
-            <a href="{{ route('login') }}"
-                class="w-full text-center px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-green-500 
-                      text-white font-semibold shadow-md hover:opacity-90 transition">
+            <button class="w-full text-center px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-green-500 
+                    text-white font-semibold shadow-md hover:opacity-90 transition open-login-modal">
                 Login
-            </a>
+            </button>
             <a href="{{ route('user.register') }}"
                 class="w-full text-center px-4 py-2 rounded-lg border-2 border-blue-600 text-blue-600 font-semibold 
                       hover:bg-blue-600 hover:text-white transition">
@@ -112,10 +109,72 @@ use Illuminate\Support\Facades\Storage;
     </div>
 </nav>
 
+<!-- LOGIN MODAL -->
+<div id="loginModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-xl shadow-lg w-full max-w-md p-6 relative">
+        <button id="closeModal" class="absolute top-3 right-3 text-gray-500 hover:text-gray-800">&times;</button>
+        <h2 class="text-2xl font-bold mb-6 text-center text-blue-600">Login Akun</h2>
+
+        <form method="POST" action="{{ route('login') }}" class="space-y-4">
+            @csrf
+            <div>
+                <input type="email" name="email" placeholder="Email" required
+                       class="w-full border border-gray-300 px-4 py-3 rounded-lg">
+            </div>
+            <div>
+                <input type="password" name="password" placeholder="Password" required
+                       class="w-full border border-gray-300 px-4 py-3 rounded-lg">
+            </div>
+            <div class="flex items-center justify-between">
+                <label class="flex items-center text-sm text-gray-600">
+                    <input type="checkbox" name="remember" class="mr-2 rounded"> Remember me
+                </label>
+                <a href="{{ route('password.request') }}" class="text-sm text-blue-600 hover:underline">Lupa password?</a>
+            </div>
+            <button type="submit"
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold">
+                Login
+            </button>
+        </form>
+
+        <p class="text-center mt-4 text-gray-600">
+            Belum Punya Akun? 
+            <a href="{{ route('user.register') }}" class="text-blue-600 font-medium hover:underline">
+                Daftar Sekarang
+            </a>
+        </p>
+    </div>
+</div>
+
 <script>
     // Toggle mobile menu
     document.getElementById('mobile-menu-toggle').addEventListener('click', function() {
         const menu = document.getElementById('mobile-menu');
         menu.classList.toggle('hidden');
+    });
+
+    // Login modal
+    const modal = document.getElementById('loginModal');
+    const openButtons = document.querySelectorAll('.open-login-modal');
+    const closeBtn = document.getElementById('closeModal');
+
+    openButtons.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        });
+    });
+
+    closeBtn.addEventListener('click', function() {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    });
+
+    window.addEventListener('click', function(e) {
+        if (e.target == modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
     });
 </script>
