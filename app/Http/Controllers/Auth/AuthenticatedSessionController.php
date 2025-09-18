@@ -39,7 +39,7 @@ class AuthenticatedSessionController extends Controller
             return back()->with('error', 'Akun Anda ditolak. Silahkan hubungi administrator untuk informasi lebih lanjut.');
         }
         
-        if ($user->status !== 'approved') {
+        if ($user->status !== 'verified') {
             Auth::logout();
             return back()->with('error', 'Status akun tidak valid. Silahkan hubungi administrator.');
         }

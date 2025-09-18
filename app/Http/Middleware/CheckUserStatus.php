@@ -34,7 +34,7 @@ class CheckUserStatus
             }
             
             // Jika status bukan 'approved', logout
-            if ($user->status !== 'approved') {
+            if ($user->status !== 'verified') {
                 Auth::logout();
                 return redirect()->route('login')
                     ->with('error', 'Status akun tidak valid. Silahkan hubungi administrator.');
