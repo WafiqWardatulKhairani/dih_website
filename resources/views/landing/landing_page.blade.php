@@ -137,20 +137,12 @@
                 </div>
                 <h3 class="text-xl font-bold mb-4 text-blue-800">Untuk OPD</h3>
                 <p class="text-gray-600 mb-6">Publikasikan tantangan dan program prioritas Anda, dapatkan solusi berbasis penelitian dari para ahli.</p>
-                <a
-                    @auth
-                    href="{{ auth()->user()->role === 'pemerintah'
-                 ? route('pemerintah.index')
-                 : route('login') }}"
-                    @else
-                    href="{{ route('login') }}"
-                    @endauth
-                    class="text-blue-600 font-medium flex items-center group">
+                <a href="#" class="text-blue-600 font-medium flex items-center open-login-modal">
                     Pelajari Lebih Lanjut
                     <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
                 </a>
-
             </div>
+
             <!-- Akademisi Card -->
             <div class="bg-gradient-to-br from-green-50 to-white rounded-xl p-8 shadow-sm card-hover">
                 <div class="bg-green-600 text-white w-16 h-16 rounded-xl flex items-center justify-center mb-6 shadow-md">
@@ -158,129 +150,201 @@
                 </div>
                 <h3 class="text-xl font-bold mb-4 text-green-800">Untuk Akademisi</h3>
                 <p class="text-gray-600 mb-6">Temukan masalah nyata sebagai bahan penelitian dan pengabdian masyarakat, bangun kolaborasi dengan OPD dan UMKM.</p>
-                <a
-                    @auth
-                    href="{{ auth()->user()->role === 'akademisi'
-                 ? route('akademisi.index')
-                 : route('login') }}"
-                    @else
-                    href="{{ route('login') }}"
-                    @endauth
-                    class="text-blue-600 font-medium flex items-center group">
+                <a href="#" class="text-blue-600 font-medium flex items-center open-login-modal">
                     Pelajari Lebih Lanjut
                     <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
                 </a>
-            </div>
-        </div>
-        <!-- Baris kedua: 2 card -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
-            <!-- UMKM Card -->
-            <div class="bg-gradient-to-br from-orange-50 to-white rounded-xl p-8 shadow-sm card-hover">
-                <div class="bg-orange-600 text-white w-16 h-16 rounded-xl flex items-center justify-center mb-6 shadow-md">
-                    <i class="fas fa-store text-2xl"></i>
-                </div>
-                <h3 class="text-xl font-bold mb-4 text-orange-800">Untuk UMKM</h3>
-                <p class="text-gray-600 mb-6">Ajukan permasalahan bisnis yang dihadapi, dapatkan solusi inovatif dari akademisi dan dukungan kebijakan dari pemerintah.</p>
-                <a href="#" class="text-orange-600 font-medium flex items-center group">
-                    Pelajari Lebih Lanjut
-                    <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
-                </a>
-            </div>
-            <!-- Kolaborasi Card -->
-            <div class="bg-gradient-to-br from-purple-50 to-white rounded-xl p-8 shadow-sm card-hover">
-                <div class="bg-purple-600 text-white w-16 h-16 rounded-xl flex items-center justify-center mb-6 shadow-md">
-                    <i class="fas fa-users text-2xl"></i>
-                </div>
-                <h3 class="text-xl font-bold mb-4 text-purple-800">Proses Kolaborasi</h3>
-                <p class="text-gray-600 mb-6">Temukan bagaimana kolaborasi antara pemerintah, akademisi, dan UMKM dapat menghasilkan solusi yang berdampak.</p>
-                <a href="#" class="text-purple-600 font-medium flex items-center group">
-                    Pelajari Lebih Lanjut
-                    <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
-                </a>
-            </div>
-        </div>
-        <!-- How It Works -->
-        <div class="bg-gray-50 rounded-2xl p-8 lg:p-12 mb-16">
-            <h3 class="text-2xl font-bold text-center mb-12">Bagaimana Platform Ini Bekerja?</h3>
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-                <!-- Step 1 -->
-                <div class="text-center">
-                    <div class="bg-white w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg pulse">
-                        <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold text-2xl">1</div>
-                    </div>
-                    <h4 class="font-bold mb-2">Identifikasi Masalah</h4>
-                    <p class="text-gray-600 text-sm">OPD dan UMKM mendaftarkan masalah atau program prioritas yang membutuhkan solusi inovatif.</p>
-                </div>
-                <!-- Step 2 -->
-                <div class="text-center">
-                    <div class="bg-white w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-                        <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center text-green-600 font-bold text-2xl">2</div>
-                    </div>
-                    <h4 class="font-bold mb-2">Eksplorasi Solusi</h4>
-                    <p class="text-gray-600 text-sm">Akademisi mengeksplorasi masalah dan mengajukan proposal solusi berbasis penelitian.</p>
-                </div>
-                <!-- Step 3 -->
-                <div class="text-center">
-                    <div class="bg-white w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-                        <div class="w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center text-yellow-600 font-bold text-2xl">3</div>
-                    </div>
-                    <h4 class="font-bold mb-2">Diskusi Kolaboratif</h4>
-                    <p class="text-gray-600 text-sm">Terjadi diskusi mendalam antara OPD, akademisi, dan UMKM untuk menyempurnakan solusi.</p>
-                </div>
-                <!-- Step 4 -->
-                <div class="text-center">
-                    <div class="bg-white w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-                        <div class="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 font-bold text-2xl">4</div>
-                    </div>
-                    <h4 class="font-bold mb-2">Implementasi</h4>
-                    <p class="text-gray-600 text-sm">Solusi diimplementasikan dan dimonitor dampaknya terhadap masyarakat dan dunia usaha.</p>
-                </div>
-            </div>
-        </div>
-        <!-- Testimonials -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <!-- Testimonial 1 -->
-            <div class="bg-blue-50 rounded-xl p-8">
-                <div class="flex items-start mb-6">
-                    <img src="{{ asset('images/testimonial-1.jpeg') }}" alt="Kepala Dinas Kesehatan" class="h-16 w-16 rounded-full object-cover mr-4 border-2 border-white shadow-sm">
-                    <div>
-                        <div class="flex items-center mb-1">
-                            <i class="fas fa-star text-yellow-400 mr-1"></i>
-                            <i class="fas fa-star text-yellow-400 mr-1"></i>
-                            <i class="fas fa-star text-yellow-400 mr-1"></i>
-                            <i class="fas fa-star text-yellow-400 mr-1"></i>
-                            <i class="fas fa-star text-yellow-400"></i>
-                        </div>
-                        <h4 class="font-bold text-blue-800">dr. Rina Septiani, M.Kes</h4>
-                        <p class="text-sm text-gray-600">Kepala Dinas Kesehatan Kota</p>
-                    </div>
-                </div>
-                <p class="text-gray-700 italic">"Kolaborasi dengan tim peneliti melalui platform ini telah membantu kami mengembangkan sistem pemantauan kesehatan digital yang sangat bermanfaat di masa pandemi."</p>
-            </div>
-            <!-- Testimonial 2 -->
-            <div class="bg-green-50 rounded-xl p-8">
-                <div class="flex items-start mb-6">
-                    <img src="{{ asset('images/testimonial-2.jpeg') }}" alt="Dosen Teknik Informatika" class="h-16 w-16 rounded-full object-cover mr-4 border-2 border-white shadow-sm">
-                    <div>
-                        <div class="flex items-center mb-1">
-                            <i class="fas fa-star text-yellow-400 mr-1"></i>
-                            <i class="fas fa-star text-yellow-400 mr-1"></i>
-                            <i class="fas fa-star text-yellow-400 mr-1"></i>
-                            <i class="fas fa-star text-yellow-400 mr-1"></i>
-                            <i class="fas fa-star text-yellow-400"></i>
-                        </div>
-                        <h4 class="font-bold text-green-800">Prof. Andi Wijaya, Ph.D</h4>
-                        <p class="text-sm text-gray-600">Dosen Teknik Informatika</p>
-                    </div>
-                </div>
-                <p class="text-gray-700 italic">"Platform ini memberikan akses langsung ke masalah nyata di masyarakat, membuat penelitian kami lebih relevan dan berdampak nyata bagi pembangunan daerah."</p>
             </div>
         </div>
     </div>
+    <!-- Baris kedua: 2 card -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+        <!-- UMKM Card -->
+        <div class="bg-gradient-to-br from-orange-50 to-white rounded-xl p-8 shadow-sm card-hover">
+            <div class="bg-orange-600 text-white w-16 h-16 rounded-xl flex items-center justify-center mb-6 shadow-md">
+                <i class="fas fa-store text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-4 text-orange-800">Untuk UMKM</h3>
+            <p class="text-gray-600 mb-6">Ajukan permasalahan bisnis yang dihadapi, dapatkan solusi inovatif dari akademisi dan dukungan kebijakan dari pemerintah.</p>
+            <a href="#" class="text-orange-600 font-medium flex items-center group">
+                Pelajari Lebih Lanjut
+                <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
+            </a>
+        </div>
+        <!-- Kolaborasi Card -->
+        <div class="bg-gradient-to-br from-purple-50 to-white rounded-xl p-8 shadow-sm card-hover">
+            <div class="bg-purple-600 text-white w-16 h-16 rounded-xl flex items-center justify-center mb-6 shadow-md">
+                <i class="fas fa-users text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-4 text-purple-800">Proses Kolaborasi</h3>
+            <p class="text-gray-600 mb-6">Temukan bagaimana kolaborasi antara pemerintah, akademisi, dan UMKM dapat menghasilkan solusi yang berdampak.</p>
+            <a href="#" class="text-purple-600 font-medium flex items-center group">
+                Pelajari Lebih Lanjut
+                <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
+            </a>
+        </div>
+    </div>
+    <!-- How It Works -->
+    <div class="bg-gray-50 rounded-2xl p-8 lg:p-12 mb-16">
+        <h3 class="text-2xl font-bold text-center mb-12">Bagaimana Platform Ini Bekerja?</h3>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <!-- Step 1 -->
+            <div class="text-center">
+                <div class="bg-white w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg pulse">
+                    <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold text-2xl">1</div>
+                </div>
+                <h4 class="font-bold mb-2">Identifikasi Masalah</h4>
+                <p class="text-gray-600 text-sm">OPD dan UMKM mendaftarkan masalah atau program prioritas yang membutuhkan solusi inovatif.</p>
+            </div>
+            <!-- Step 2 -->
+            <div class="text-center">
+                <div class="bg-white w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                    <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center text-green-600 font-bold text-2xl">2</div>
+                </div>
+                <h4 class="font-bold mb-2">Eksplorasi Solusi</h4>
+                <p class="text-gray-600 text-sm">Akademisi mengeksplorasi masalah dan mengajukan proposal solusi berbasis penelitian.</p>
+            </div>
+            <!-- Step 3 -->
+            <div class="text-center">
+                <div class="bg-white w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                    <div class="w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center text-yellow-600 font-bold text-2xl">3</div>
+                </div>
+                <h4 class="font-bold mb-2">Diskusi Kolaboratif</h4>
+                <p class="text-gray-600 text-sm">Terjadi diskusi mendalam antara OPD, akademisi, dan UMKM untuk menyempurnakan solusi.</p>
+            </div>
+            <!-- Step 4 -->
+            <div class="text-center">
+                <div class="bg-white w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                    <div class="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 font-bold text-2xl">4</div>
+                </div>
+                <h4 class="font-bold mb-2">Implementasi</h4>
+                <p class="text-gray-600 text-sm">Solusi diimplementasikan dan dimonitor dampaknya terhadap masyarakat dan dunia usaha.</p>
+            </div>
+        </div>
+    </div>
+    <!-- Testimonials -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Testimonial 1 -->
+        <div class="bg-blue-50 rounded-xl p-8">
+            <div class="flex items-start mb-6">
+                <img src="{{ asset('images/testimonial-1.jpeg') }}" alt="Kepala Dinas Kesehatan" class="h-16 w-16 rounded-full object-cover mr-4 border-2 border-white shadow-sm">
+                <div>
+                    <div class="flex items-center mb-1">
+                        <i class="fas fa-star text-yellow-400 mr-1"></i>
+                        <i class="fas fa-star text-yellow-400 mr-1"></i>
+                        <i class="fas fa-star text-yellow-400 mr-1"></i>
+                        <i class="fas fa-star text-yellow-400 mr-1"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                    </div>
+                    <h4 class="font-bold text-blue-800">dr. Rina Septiani, M.Kes</h4>
+                    <p class="text-sm text-gray-600">Kepala Dinas Kesehatan Kota</p>
+                </div>
+            </div>
+            <p class="text-gray-700 italic">"Kolaborasi dengan tim peneliti melalui platform ini telah membantu kami mengembangkan sistem pemantauan kesehatan digital yang sangat bermanfaat di masa pandemi."</p>
+        </div>
+        <!-- Testimonial 2 -->
+        <div class="bg-green-50 rounded-xl p-8">
+            <div class="flex items-start mb-6">
+                <img src="{{ asset('images/testimonial-2.jpeg') }}" alt="Dosen Teknik Informatika" class="h-16 w-16 rounded-full object-cover mr-4 border-2 border-white shadow-sm">
+                <div>
+                    <div class="flex items-center mb-1">
+                        <i class="fas fa-star text-yellow-400 mr-1"></i>
+                        <i class="fas fa-star text-yellow-400 mr-1"></i>
+                        <i class="fas fa-star text-yellow-400 mr-1"></i>
+                        <i class="fas fa-star text-yellow-400 mr-1"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                    </div>
+                    <h4 class="font-bold text-green-800">Prof. Andi Wijaya, Ph.D</h4>
+                    <p class="text-sm text-gray-600">Dosen Teknik Informatika</p>
+                </div>
+            </div>
+            <p class="text-gray-700 italic">"Platform ini memberikan akses langsung ke masalah nyata di masyarakat, membuat penelitian kami lebih relevan dan berdampak nyata bagi pembangunan daerah."</p>
+        </div>
+    </div>
+    </div>
 </section>
+<!-- LOGIN MODAL -->
+<div id="loginModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-xl shadow-lg w-full max-w-md p-6 relative">
+        <button id="closeModal" class="absolute top-3 right-3 text-gray-500 hover:text-gray-800">&times;</button>
+        <h2 class="text-2xl font-bold mb-6 text-center text-blue-600">Login Akun</h2>
+
+        <form method="POST" action="{{ route('login') }}" class="space-y-4">
+            @csrf
+            <div>
+                <input type="email" name="email" placeholder="Email" required
+                    class="w-full border border-gray-300 px-4 py-3 rounded-lg">
+            </div>
+            <div>
+                <input type="password" name="password" placeholder="Password" required
+                    class="w-full border border-gray-300 px-4 py-3 rounded-lg">
+            </div>
+            <div class="flex items-center justify-between">
+                <label class="flex items-center text-sm text-gray-600">
+                    <input type="checkbox" name="remember" class="mr-2 rounded"> Remember me
+                </label>
+                <a href="{{ route('password.request') }}" class="text-sm text-blue-600 hover:underline">Lupa password?</a>
+            </div>
+            <button type="submit"
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold">
+                Login
+            </button>
+        </form>
+
+        <p class="text-center mt-4 text-gray-600">
+            Belum Punya Akun?
+            <a href="{{ route('user.register') }}" class="text-blue-600 font-medium hover:underline">
+                Daftar Sekarang
+            </a>
+        </p>
+    </div>
+</div>
 @endsection
 
+
+
+
 @push('scripts')
+<script>
+    // Smooth scrolling
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            if (targetId === '#') return;
+            const targetElement = document.querySelector(targetId);
+            if (targetElement) targetElement.scrollIntoView({
+                behavior: 'smooth'
+            });
+        });
+    });
+
+    // Login modal
+    const modal = document.getElementById('loginModal');
+    const openButtons = document.querySelectorAll('.open-login-modal');
+    const closeBtn = document.getElementById('closeModal');
+
+    openButtons.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        });
+    });
+
+    closeBtn.addEventListener('click', function() {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    });
+
+    window.addEventListener('click', function(e) {
+        if (e.target == modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+    });
+</script>
+
 <script>
     // Smooth scrolling for anchor links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
