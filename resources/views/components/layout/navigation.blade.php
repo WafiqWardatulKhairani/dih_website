@@ -1,17 +1,30 @@
 @php
 use Illuminate\Support\Facades\Storage;
+
+// tentukan home sesuai role
+$homeRoute = route('landing-page');
+if (auth()->check()) {
+    $homeRoute = match(auth()->user()->role) {
+        'pemerintah' => route('pemerintah.index'),
+        'akademisi'  => route('akademisi.index'),
+        'admin'      => route('admin.users.index'),
+        default      => route('landing-page'),
+    };
+}
 @endphp
 
 <nav class="bg-white shadow-sm sticky top-0 z-50">
     <div class="container mx-auto px-4 py-3 flex justify-between items-center">
         <!-- Logo -->
         <div class="flex items-center">
-            <img src="{{ asset('images/logo.png') }}" alt="Logo DIH" class="h-12 md:h-20">
+            <a href="{{ $homeRoute }}">
+                <img src="{{ asset('images/logo.png') }}" alt="Logo DIH" class="h-12 md:h-20">
+            </a>
         </div>
 
         <!-- Desktop Menu -->
         <div class="hidden md:flex items-center space-x-8">
-            <a href="#home" class="font-medium hover:text-blue-600 transition-colors">Beranda</a>
+            <a href="{{ $homeRoute }}" class="font-medium hover:text-blue-600 transition-colors">Beranda</a>
             <a href="#program" class="font-medium hover:text-blue-600 transition-colors">Program</a>
             <a href="#solusi" class="font-medium hover:text-blue-600 transition-colors">Solusi</a>
             <a href="#hub" class="font-medium text-blue-600">Innovation Hub</a>
@@ -20,16 +33,14 @@ use Illuminate\Support\Facades\Storage;
             <!-- Avatar + Logout -->
             @auth
             <div class="flex items-center space-x-3 ml-6">
-                <!-- Avatar -->
                 <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-300">
-                    <img src="{{ auth()->user()->avatar 
-                        ? asset('storage/' . auth()->user()->avatar) 
+                    <img src="{{ auth()->user()->avatar
+                        ? asset('storage/' . auth()->user()->avatar)
                         : asset('images/default-avatar.png') }}"
                         alt="Avatar"
                         class="w-full h-full object-cover">
                 </div>
 
-                <!-- Logout -->
                 <form method="POST" action="{{ route('logout') }}" class="inline">
                     @csrf
                     <button type="submit"
@@ -43,7 +54,6 @@ use Illuminate\Support\Facades\Storage;
 
             @guest
             <div class="flex items-center space-x-3 ml-6">
-                <!-- Tombol login diubah jadi trigger modal -->
                 <button class="px-5 py-2 rounded-full border-2 border-blue-600 text-blue-600 font-semibold 
                         hover:bg-blue-600 hover:text-white transition open-login-modal">
                     Login
@@ -65,7 +75,7 @@ use Illuminate\Support\Facades\Storage;
 
     <!-- Mobile Menu -->
     <div id="mobile-menu" class="hidden md:hidden bg-white py-2 px-4 border-t">
-        <a href="#home" class="block py-2 font-medium">Beranda</a>
+        <a href="{{ $homeRoute }}" class="block py-2 font-medium">Beranda</a>
         <a href="#program" class="block py-2 font-medium">Program</a>
         <a href="#solusi" class="block py-2 font-medium">Solusi</a>
         <a href="#hub" class="block py-2 font-medium text-blue-600">Innovation Hub</a>
@@ -73,15 +83,13 @@ use Illuminate\Support\Facades\Storage;
 
         @auth
         <div class="mt-3 flex flex-col space-y-2 items-start">
-            <!-- Avatar -->
             <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-300 mb-2">
-                <img src="{{ auth()->user()->avatar 
-                    ? asset('storage/' . auth()->user()->avatar) 
+                <img src="{{ auth()->user()->avatar
+                    ? asset('storage/' . auth()->user()->avatar)
                     : asset('images/default-avatar.png') }}"
                     alt="Avatar"
                     class="w-full h-full object-cover">
             </div>
-            <!-- Logout -->
             <form method="POST" action="{{ route('logout') }}" class="w-full">
                 @csrf
                 <button type="submit"
@@ -138,7 +146,7 @@ use Illuminate\Support\Facades\Storage;
         </form>
 
         <p class="text-center mt-4 text-gray-600">
-            Belum Punya Akun? 
+            Belum Punya Akun?
             <a href="{{ route('user.register') }}" class="text-blue-600 font-medium hover:underline">
                 Daftar Sekarang
             </a>

@@ -2,14 +2,18 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\PemerintahController;
 use App\Http\Controllers\AkademisiController;
-use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\Akademisi\PostInnovationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Pemerintah\ProgramController;
 
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
+
+
 // Livewire Components
+use App\Livewire\LandingPage;
 use App\Livewire\Auth\UserRegister;
 use App\Livewire\Auth\UserLogin;
 
@@ -51,6 +55,10 @@ Route::middleware('auth')->group(function () {
         Route::delete('/profile', 'destroy')->name('profile.destroy');
     });
 });
+
+Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
+        ->name('logout');
+
 
 // ================== ADMIN ==================
 Route::middleware(['auth', 'admin'])

@@ -102,7 +102,8 @@
 
             <div class="bg-white rounded-xl overflow-hidden shadow-sm card-hover">
                 <div class="relative h-48 overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d15?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&q=80"
+                    <!-- Ganti URL dengan yang benar untuk gambar kesehatan -->
+                    <img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&q=80"
                         alt="Program Kesehatan Digital"
                         class="w-full h-full object-cover">
                     <div class="absolute top-3 left-3 bg-white/90 text-xs font-bold px-3 py-1 rounded-full shadow-sm">
@@ -117,7 +118,7 @@
                         <span class="text-xs text-gray-500">1 minggu lalu</span>
                     </div>
                     <h3 class="text-xl font-bold mb-3">Sistem Kesehatan Digital</h3>
-                    <p class="text-gray-600 mb-4">Membangun platform digital untuk meningkatkan acess dan kualitas layanan kesehatan masyarakat.</p>
+                    <p class="text-gray-600 mb-4">Membangun platform digital untuk meningkatkan akses dan kualitas layanan kesehatan masyarakat.</p>
                     <div class="flex justify-between items-center">
                         <span class="text-sm font-medium text-gray-500">OPD: Dinas Kesehatan</span>
                         <a href="#" class="text-blue-600 hover:text-blue-800 font-medium flex items-center">
@@ -154,7 +155,6 @@
                 </div>
             </div>
         </div>
-
         <div class="text-center mt-16">
             <a href="#"
                 class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-500 text-white font-bold rounded-lg shadow-md hover:shadow-lg transition-all">
@@ -164,7 +164,6 @@
         </div>
     </div>
 </section>
-
 
 <!-- Innovation Hub Section -->
 <section id="hub" class="py-20 bg-white">

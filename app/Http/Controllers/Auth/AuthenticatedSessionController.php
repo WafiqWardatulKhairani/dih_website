@@ -25,48 +25,48 @@ class AuthenticatedSessionController extends Controller
     public function store(LoginRequest $request)
     {
         $request->authenticate();
-    
+
         $user = Auth::user();
-        
+
         // Cek status user sebelum login
         if ($user->status === 'pending') {
             Auth::logout();
             return back()->with('error', 'Akun Anda sedang menunggu verifikasi admin. Silahkan tunggu hingga akun Anda diverifikasi.');
         }
-        
+
         if ($user->status === 'rejected') {
             Auth::logout();
             return back()->with('error', 'Akun Anda ditolak. Silahkan hubungi administrator untuk informasi lebih lanjut.');
         }
-        
+
         if ($user->status !== 'verified') {
             Auth::logout();
             return back()->with('error', 'Status akun tidak valid. Silahkan hubungi administrator.');
         }
-    
+
         $request->session()->regenerate();
-    
+
         // Redirect berdasarkan role
         return redirect()->intended(
-            match($user->role) {
+            match ($user->role) {
                 'pemerintah' => route('pemerintah.index'),
                 'akademisi' => route('akademisi.index'),
                 'admin' => route('admin.users.index'),
-                default => route('dashboard')
+                default => route('landing-page')
             }
         );
     }
     /**
      * Destroy an authenticated session.
      */
-    public function destroy(Request $request): RedirectResponse
+    public function destroy(Request $request)
     {
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();
-
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        // setelah logout, arahkan ke landing page
+        return redirect()->route('landing-page');
     }
 }
