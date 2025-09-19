@@ -6,6 +6,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{{ config('app.name', 'Digital Innovation Hub') }}</title>
+    <link rel="icon" href="{{ asset('images/logo.png') }}" type="image/png">
+
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
