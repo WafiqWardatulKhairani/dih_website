@@ -1,7 +1,6 @@
 @php
 use Illuminate\Support\Facades\Storage;
 
-// tentukan home sesuai role
 $homeRoute = route('landing-page');
 if (auth()->check()) {
     $homeRoute = match(auth()->user()->role) {
@@ -13,53 +12,78 @@ if (auth()->check()) {
 }
 @endphp
 
-<nav class="bg-white shadow-sm sticky top-0 z-50">
-    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+<nav class="bg-white/90 backdrop-blur-md shadow-md sticky top-0 z-50 -mt-1">
+    <div class="max-w-6xl mx-auto px-4 py-1.5 flex justify-between items-center">
         <!-- Logo -->
-        <div class="flex items-center">
-            <a href="{{ $homeRoute }}">
-                <img src="{{ asset('images/logo.png') }}" alt="Logo DIH" class="h-12 md:h-20">
+        <div class="flex items-center ml-4">
+            <a href="{{ $homeRoute }}" class="flex items-center space-x-2">
+                <img src="{{ asset('images/logoKecil.png') }}"
+                     alt="Logo DIH"
+                     class="h-12 md:h-16 transition-transform duration-300 hover:scale-105">
             </a>
         </div>
 
         <!-- Desktop Menu -->
-        <div class="hidden md:flex items-center space-x-8">
-            <a href="{{ $homeRoute }}" class="font-medium hover:text-blue-600 transition-colors">Beranda</a>
-            <a href="#program" class="font-medium hover:text-blue-600 transition-colors">Program</a>
-            <a href="#solusi" class="font-medium hover:text-blue-600 transition-colors">Solusi</a>
-            <a href="#hub" class="font-medium text-blue-600">Innovation Hub</a>
-            <a href="#tentang" class="font-medium hover:text-blue-600 transition-colors">Tentang</a>
+        <div class="hidden md:flex items-center space-x-5">
+            @php
+            $navItems = [
+                ['href' => $homeRoute, 'label' => 'Beranda'],
+                ['href' => '#program', 'label' => 'Program & Inovasi'],
+                ['href' => '#solusi', 'label' => 'Solusi'],
+                ['href' => '#inkubasi', 'label' => 'Inkubasi'],
+                ['href' => '#diskusi', 'label' => 'Ruang Diskusi'],
+                ['href' => '#tentang', 'label' => 'Tentang'],
+            ];
+            @endphp
 
-            <!-- Avatar + Logout -->
+            @foreach($navItems as $item)
+                <a href="{{ $item['href'] }}"
+                   class="relative font-medium text-gray-700 hover:text-blue-600 transition-colors px-1
+                          after:content-[''] after:absolute after:left-0 after:-bottom-1
+                          after:w-0 after:h-[2px] after:bg-blue-600
+                          hover:after:w-full after:transition-all after:duration-300">
+                    {{ $item['label'] }}
+                </a>
+            @endforeach
+
+            <!-- Avatar / Auth -->
             @auth
-            <div class="flex items-center space-x-3 ml-6">
-                <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-300">
+            <div class="relative ml-5">
+                <button id="avatarBtn"
+                        class="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-300 focus:outline-none">
                     <img src="{{ auth()->user()->avatar
                         ? asset('storage/' . auth()->user()->avatar)
                         : asset('images/default-avatar.png') }}"
                         alt="Avatar"
                         class="w-full h-full object-cover">
-                </div>
+                </button>
 
-                <form method="POST" action="{{ route('logout') }}" class="inline">
-                    @csrf
-                    <button type="submit"
-                        class="px-5 py-2 rounded-full border-2 border-red-600 text-red-600 font-semibold 
-                                   hover:bg-red-600 hover:text-white transition">
-                        Logout
-                    </button>
-                </form>
+                <!-- Dropdown -->
+                <div id="avatarDropdown"
+                     class="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg border hidden">
+                    <a href="{{ route('profile.edit') }}"
+                       class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                        Edit Profile
+                    </a>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit"
+                            class="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100">
+                            Logout
+                        </button>
+                    </form>
+                </div>
             </div>
             @endauth
 
             @guest
-            <div class="flex items-center space-x-3 ml-6">
-                <button class="px-5 py-2 rounded-full border-2 border-blue-600 text-blue-600 font-semibold 
-                        hover:bg-blue-600 hover:text-white transition open-login-modal">
+            <div class="flex items-center space-x-3 ml-5">
+                <button class="px-4 py-1 rounded-full border-2 border-blue-600 text-blue-600 font-semibold
+                               hover:bg-blue-600 hover:text-white transition open-login-modal">
                     Login
                 </button>
                 <a href="{{ route('user.register') }}"
-                    class="px-5 py-2 rounded-full bg-gradient-to-r from-blue-600 to-green-500 
+                   class="px-4 py-1 rounded-full bg-gradient-to-r from-blue-600 to-green-500
                           text-white font-semibold shadow-md hover:opacity-90 transition">
                     Register
                 </a>
@@ -67,34 +91,42 @@ if (auth()->check()) {
             @endguest
         </div>
 
-        <!-- Mobile menu button -->
-        <button id="mobile-menu-toggle" class="md:hidden text-gray-700">
-            <i class="fas fa-bars text-xl"></i>
+        <!-- Mobile button -->
+        <button id="mobile-menu-toggle" class="md:hidden text-gray-700 focus:outline-none">
+            <i class="fas fa-bars text-2xl"></i>
         </button>
     </div>
 
     <!-- Mobile Menu -->
-    <div id="mobile-menu" class="hidden md:hidden bg-white py-2 px-4 border-t">
-        <a href="{{ $homeRoute }}" class="block py-2 font-medium">Beranda</a>
-        <a href="#program" class="block py-2 font-medium">Program</a>
-        <a href="#solusi" class="block py-2 font-medium">Solusi</a>
-        <a href="#hub" class="block py-2 font-medium text-blue-600">Innovation Hub</a>
-        <a href="#tentang" class="block py-2 font-medium">Tentang</a>
+    <div id="mobile-menu" class="hidden md:hidden bg-white border-t">
+        @foreach($navItems as $item)
+            <a href="{{ $item['href'] }}" class="block py-3 px-4 font-medium hover:bg-gray-100">
+                {{ $item['label'] }}
+            </a>
+        @endforeach
 
         @auth
-        <div class="mt-3 flex flex-col space-y-2 items-start">
-            <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-300 mb-2">
-                <img src="{{ auth()->user()->avatar
-                    ? asset('storage/' . auth()->user()->avatar)
-                    : asset('images/default-avatar.png') }}"
-                    alt="Avatar"
-                    class="w-full h-full object-cover">
+        <div class="border-t mt-2 p-4 flex flex-col space-y-2">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-300">
+                    <img src="{{ auth()->user()->avatar
+                        ? asset('storage/' . auth()->user()->avatar)
+                        : asset('images/default-avatar.png') }}"
+                        alt="Avatar"
+                        class="w-full h-full object-cover">
+                </div>
+                <div class="flex-1">
+                    <a href="{{ route('profile.edit') }}"
+                       class="block text-blue-600 font-medium hover:underline">
+                       Edit Profile
+                    </a>
+                </div>
             </div>
-            <form method="POST" action="{{ route('logout') }}" class="w-full">
+            <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit"
-                    class="w-full px-4 py-2 rounded-lg border-2 border-red-600 text-red-600 font-semibold 
-                               hover:bg-red-600 hover:text-white transition">
+                    class="w-full mt-2 px-4 py-2 rounded-lg border-2 border-red-600 text-red-600 font-semibold
+                           hover:bg-red-600 hover:text-white transition">
                     Logout
                 </button>
             </form>
@@ -102,13 +134,13 @@ if (auth()->check()) {
         @endauth
 
         @guest
-        <div class="mt-3 flex flex-col space-y-2">
-            <button class="w-full text-center px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-green-500 
-                    text-white font-semibold shadow-md hover:opacity-90 transition open-login-modal">
+        <div class="border-t mt-2 p-4 flex flex-col space-y-2">
+            <button class="w-full text-center px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-green-500
+                           text-white font-semibold shadow-md hover:opacity-90 transition open-login-modal">
                 Login
             </button>
             <a href="{{ route('user.register') }}"
-                class="w-full text-center px-4 py-2 rounded-lg border-2 border-blue-600 text-blue-600 font-semibold 
+               class="w-full text-center px-4 py-2 rounded-lg border-2 border-blue-600 text-blue-600 font-semibold
                       hover:bg-blue-600 hover:text-white transition">
                 Register
             </a>
@@ -125,14 +157,10 @@ if (auth()->check()) {
 
         <form method="POST" action="{{ route('login') }}" class="space-y-4">
             @csrf
-            <div>
-                <input type="email" name="email" placeholder="Email" required
-                       class="w-full border border-gray-300 px-4 py-3 rounded-lg">
-            </div>
-            <div>
-                <input type="password" name="password" placeholder="Password" required
-                       class="w-full border border-gray-300 px-4 py-3 rounded-lg">
-            </div>
+            <input type="email" name="email" placeholder="Email" required
+                   class="w-full border border-gray-300 px-4 py-3 rounded-lg">
+            <input type="password" name="password" placeholder="Password" required
+                   class="w-full border border-gray-300 px-4 py-3 rounded-lg">
             <div class="flex items-center justify-between">
                 <label class="flex items-center text-sm text-gray-600">
                     <input type="checkbox" name="remember" class="mr-2 rounded"> Remember me
@@ -140,7 +168,7 @@ if (auth()->check()) {
                 <a href="{{ route('password.request') }}" class="text-sm text-blue-600 hover:underline">Lupa password?</a>
             </div>
             <button type="submit"
-                    class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold">
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold">
                 Login
             </button>
         </form>
@@ -156,10 +184,10 @@ if (auth()->check()) {
 
 <script>
     // Toggle mobile menu
-    document.getElementById('mobile-menu-toggle').addEventListener('click', function() {
-        const menu = document.getElementById('mobile-menu');
-        menu.classList.toggle('hidden');
-    });
+    document.getElementById('mobile-menu-toggle')
+        .addEventListener('click', () => {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        });
 
     // Login modal
     const modal = document.getElementById('loginModal');
@@ -167,22 +195,39 @@ if (auth()->check()) {
     const closeBtn = document.getElementById('closeModal');
 
     openButtons.forEach(btn => {
-        btn.addEventListener('click', function(e) {
+        btn.addEventListener('click', e => {
             e.preventDefault();
             modal.classList.remove('hidden');
             modal.classList.add('flex');
         });
     });
 
-    closeBtn.addEventListener('click', function() {
+    closeBtn.addEventListener('click', () => {
         modal.classList.add('hidden');
         modal.classList.remove('flex');
     });
 
-    window.addEventListener('click', function(e) {
-        if (e.target == modal) {
+    window.addEventListener('click', e => {
+        if (e.target === modal) {
             modal.classList.add('hidden');
             modal.classList.remove('flex');
         }
     });
+
+    // Avatar dropdown click toggle
+    const avatarBtn = document.getElementById('avatarBtn');
+    const avatarDropdown = document.getElementById('avatarDropdown');
+
+    if (avatarBtn) {
+        avatarBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            avatarDropdown.classList.toggle('hidden');
+        });
+        // Klik luar menutup
+        document.addEventListener('click', (e) => {
+            if (!avatarDropdown.classList.contains('hidden') && !avatarDropdown.contains(e.target)) {
+                avatarDropdown.classList.add('hidden');
+            }
+        });
+    }
 </script>
