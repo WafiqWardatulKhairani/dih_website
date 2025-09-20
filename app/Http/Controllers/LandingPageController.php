@@ -14,4 +14,9 @@ class LandingPageController extends Controller
 
         return view('landing.landing_page', compact('programs'));
     }
+
+    public function tentang()
+    {
+        return view('landing.tentang');
+    }
 }

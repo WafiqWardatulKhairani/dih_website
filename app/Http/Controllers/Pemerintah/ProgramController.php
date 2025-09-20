@@ -13,4 +13,10 @@ class ProgramController extends Controller
         $programs = ProgramPemerintah::latest()->take(6)->get();
         return view('landing.landing_page', compact('programs'));
     }
+    
+    public function programPage()
+    {
+        $programs = ProgramPemerintah::latest()->paginate(9);
+        return view('pemerintah.program', compact('programs'));
+    }
 }
