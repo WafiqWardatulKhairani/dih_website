@@ -1,0 +1,136 @@
+/* pemerintah.css */
+body {
+    font-family: 'Poppins', sans-serif;
+    scroll-behavior: smooth;
+}
+
+.hero-bg {
+    background: linear-gradient(135deg, rgba(30, 64, 175, 0.9) 0%, rgba(14, 165, 233, 0.85) 100%), url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');
+    background-size: cover;
+    background-position: center;
+}
+
+.card-hover {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-hover:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.stat-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(30, 64, 175, 0.1) 0%, rgba(14, 165, 233, 0.1) 100%);
+    z-index: 0;
+}
+
+.program-card {
+    transition: all 0.3s ease;
+}
+
+.program-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.animate-count {
+    transition: all 1s ease-out;
+}
+
+/* Warna kustom untuk tema */
+.bg-primary {
+    background-color: #1e40af !important;
+}
+
+.bg-secondary {
+    background-color: #0ea5e9 !important;
+}
+
+.text-primary {
+    color: #1e40af !important;
+}
+
+.text-secondary {
+    color: #0ea5e9 !important;
+}
+
+.text-dark {
+    color: #1e293b !important;
+}
+
+.border-primary {
+    border-color: #1e40af !important;
+}
+
+.hover\:bg-primary:hover {
+    background-color: #1e40af !important;
+}
+
+.hover\:text-primary:hover {
+    color: #1e40af !important;
+}
+
+.from-primary {
+    --tw-gradient-from: #1e40af !important;
+    --tw-gradient-to: rgba(30, 64, 175, 0) !important;
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+
+.to-secondary {
+    --tw-gradient-to: #0ea5e9 !important;
+}
+
+.bg-white\/10 {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.border-white\/20 {
+    border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.bg-blue-50 {
+    background-color: rgba(239, 246, 255, 1) !important;
+}
+
+.bg-blue-100 {
+    background-color: rgba(219, 234, 254, 1) !important;
+}
+
+.bg-blue-500 {
+    background-color: rgba(59, 130, 246, 1) !important;
+}
+
+.text-blue-500 {
+    color: rgba(59, 130, 246, 1) !important;
+}
+
+.text-green-500 {
+    color: rgba(16, 185, 129, 1) !important;
+}
+
+.text-purple-500 {
+    color: rgba(139, 92, 246, 1) !important;
+}
+
+.text-blue-100 {
+    color: rgba(219, 234, 254, 1) !important;
+}
+
+.text-blue-200 {
+    color: rgba(191, 219, 254, 1) !important;
+}
+
+.bg-blue-50 {
+    background-color: rgba(239, 246, 255, 1) !important;
+}
