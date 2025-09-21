@@ -19,6 +19,8 @@ class UserSeeder extends Seeder
             'phone' => '081234567890',
             'address' => 'Jakarta',
             'avatar' => null,
+            'status' => 'verified', // Tambahkan ini
+            'email_verified_at' => now(), // Tambahkan ini
         ]);
 
         User::create([
@@ -30,6 +32,8 @@ class UserSeeder extends Seeder
             'phone' => '081111111111',
             'address' => 'Jakarta',
             'avatar' => null,
+            'status' => 'verified', // Tambahkan ini
+            'email_verified_at' => now(), // Tambahkan ini
         ]);
 
         User::create([
@@ -41,6 +45,8 @@ class UserSeeder extends Seeder
             'phone' => '082222222222',
             'address' => 'Bandung',
             'avatar' => null,
+            'status' => 'verified', // Tambahkan ini
+            'email_verified_at' => now(), // Tambahkan ini
         ]);
     }
 }

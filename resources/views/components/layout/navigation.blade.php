@@ -1,54 +1,37 @@
 @php
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 
+$currentRoute = Route::currentRouteName();
 $homeRoute = route('landing-page');
-$navItems = [];
 
-if (auth()->check()) {
-    $homeRoute = match(auth()->user()->role) {
-        'pemerintah' => route('pemerintah.index'),
-        'akademisi' => route('akademisi.index'),
-        'admin' => route('admin.users.index'),
-        default => route('landing-page'),
-    };
-    
-    // Navigasi berdasarkan role
-    $navItems = match(auth()->user()->role) {
-        'pemerintah' => [
-            ['href' => route('pemerintah.index'), 'label' => 'Beranda'],
-            ['href' => route('pemerintah.program'), 'label' => 'Program & Inovasi'],
-            ['href' => route('pemerintah.solusi'), 'label' => 'Solusi'],
-            ['href' => route('pemerintah.inkubasi'), 'label' => 'Inkubasi'],
-            ['href' => route('pemerintah.diskusi'), 'label' => 'Ruang Diskusi'],
-            ['href' => route('tentang'), 'label' => 'Tentang'],
-        ],
-        'akademisi' => [
-            ['href' => route('akademisi.index'), 'label' => 'Beranda'],
-            ['href' => route('akademisi.post-inovasi.create'), 'label' => 'Program & Inovasi'],
-            ['href' => '#', 'label' => 'Solusi'],
-            ['href' => '#', 'label' => 'Inkubasi'],
-            ['href' => '#', 'label' => 'Ruang Diskusi'],
-            ['href' => route('tentang'), 'label' => 'Tentang'],
-        ],
-        'admin' => [
-            ['href' => route('admin.users.index'), 'label' => 'Beranda'],
-            ['href' => '#', 'label' => 'Manajemen User'],
-            ['href' => '#', 'label' => 'Moderasi Konten'],
-            ['href' => route('tentang'), 'label' => 'Tentang'],
-        ],
-        default => [
-            ['href' => route('landing-page'), 'label' => 'Beranda'],
-            ['href' => route('tentang'), 'label' => 'Tentang'],
-        ]
-    };
-} else {
-    // Navigasi untuk guest (belum login) - HANYA Beranda dan Tentang
+if (in_array($currentRoute, ['landing-page','tentang'])) {
+    // pakai menu guest/umum
     $navItems = [
         ['href' => route('landing-page'), 'label' => 'Beranda'],
         ['href' => route('tentang'), 'label' => 'Tentang'],
     ];
+} else {
+    // logika lama (role-based)
+    if (auth()->check()) {
+        $homeRoute = match(auth()->user()->role) {
+            'pemerintah' => route('pemerintah.index'),
+            'akademisi'  => route('akademisi.index'),
+            'admin'      => route('admin.index'),
+            default      => route('landing-page'),
+        };
+        $navItems = match(auth()->user()->role) {
+            // …role-based navItems…
+        };
+    } else {
+        $navItems = [
+            ['href' => route('landing-page'), 'label' => 'Beranda'],
+            ['href' => route('tentang'), 'label' => 'Tentang'],
+        ];
+    }
 }
 @endphp
+
 
 <nav class="bg-white/90 backdrop-blur-md shadow-md sticky top-0 z-50 -mt-1">
     <div class="max-w-6xl mx-auto px-4 py-1.5 flex justify-between items-center">
@@ -78,11 +61,12 @@ if (auth()->check()) {
             <div class="relative ml-5">
                 <button id="avatarBtn"
                     class="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-300 focus:outline-none">
-                    <img src="{{ auth()->user()->avatar
-                        ? asset('storage/' . auth()->user()->avatar)
-                        : asset('images/default-avatar.png') }}"
-                        alt="Avatar"
-                        class="w-full h-full object-cover">
+                    <img src="{{ auth()->user()->avatar 
+            ? asset('storage/'.auth()->user()->avatar) 
+            : asset('images/default-avatar.png') }}"
+     alt="Avatar"
+     class="w-full h-full object-cover">
+
                 </button>
 
                 <!-- Dropdown -->
@@ -136,11 +120,12 @@ if (auth()->check()) {
         <div class="border-t mt-2 p-4 flex flex-col space-y-2">
             <div class="flex items-center space-x-3">
                 <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-300">
-                    <img src="{{ auth()->user()->avatar
-                        ? asset('storage/' . auth()->user()->avatar)
-                        : asset('images/default-avatar.png') }}"
-                        alt="Avatar"
-                        class="w-full h-full object-cover">
+                <img src="{{ auth()->user()->avatar 
+            ? asset('storage/'.auth()->user()->avatar) 
+            : asset('images/default-avatar.png') }}"
+     alt="Avatar"
+     class="w-full h-full object-cover">
+
                 </div>
                 <div class="flex-1">
                     <a href="{{ route('profile.edit') }}"

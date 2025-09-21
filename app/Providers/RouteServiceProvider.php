@@ -5,16 +5,14 @@ namespace App\Providers;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 
+// app/Providers/RouteServiceProvider.php
 class RouteServiceProvider extends ServiceProvider
 {
     /**
-     * Path untuk redirect user setelah login.
+     * Path default setelah login.
      */
-    public const HOME = '/dashboard';
+    public const HOME = '/dashboard'; // ganti sementara, tapi kita akan handle per role
 
-    /**
-     * Daftarkan service provider route.
-     */
     public function boot(): void
     {
         $this->routes(function () {
@@ -27,3 +25,4 @@ class RouteServiceProvider extends ServiceProvider
         });
     }
 }
+

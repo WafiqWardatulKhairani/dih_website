@@ -7,6 +7,7 @@ use Livewire\WithFileUploads;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rules;
 
 class UserRegister extends Component
 {
@@ -16,40 +17,41 @@ class UserRegister extends Component
         $email, $password, $password_confirmation,
         $role, $document, $avatar;
 
-    public function register()
+    protected function rules()
     {
-        // Validasi input & file
-        $validated = $this->validate([
+        return [
             'name'              => 'required|string|max:255',
             'institution_name'  => 'required|string|max:255',
             'phone'             => 'required|string|max:20',
             'address'           => 'required|string|max:255',
             'email'             => 'required|email|unique:users,email',
-            'password'          => 'required|confirmed|min:8',
-            'role'              => 'required|string',
-            'document' => 'required|file|mimes:pdf|max:2048',
-            'avatar' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+            'password'          => ['required', 'confirmed', Rules\Password::defaults()],
+            'role'              => 'required|in:pemerintah,akademisi',
+            'document'          => 'required|file|mimes:pdf|max:2048',
+            'avatar'            => 'required|image|mimes:jpg,jpeg,png|max:2048',
+        ];
+    }
 
-        ]);
+    public function register()
+    {
+        // Validasi input & file
+        $validated = $this->validate($this->rules());
 
         try {
             $docFolder = $validated['role']; // "akademisi" atau "pemerintah"
 
-            // Sanitasi nama instansi untuk nama file
-            $safeName = Str::slug($validated['institution_name'], '_');
+            // Sanitasi nama untuk nama file
+            $safeName = Str::slug($validated['name'], '_');
 
-            // Simpan dokumen dengan nama instansi
+            // Simpan avatar
+            $avatarExt = $this->avatar->getClientOriginalExtension();
+            $avatarName = $safeName . '_avatar.' . $avatarExt;
+            $avatarPath = $this->avatar->storeAs("avatars/{$docFolder}", $avatarName, 'public');
+
+            // Simpan dokumen
             $docExt = $this->document->getClientOriginalExtension();
             $documentName = $safeName . '_document.' . $docExt;
             $documentPath = $this->document->storeAs("documents/{$docFolder}", $documentName, 'public');
-
-            // Simpan avatar jika ada
-            $avatarPath = null;
-            if ($this->avatar) {
-                $avatarExt = $this->avatar->getClientOriginalExtension();
-                $avatarName = $safeName . '_avatar.' . $this->avatar->getClientOriginalExtension();
-                $avatarPath = $this->avatar->storeAs("avatars/{$docFolder}", $avatarName, 'public');
-            }
 
             // Simpan user ke database
             User::create([
@@ -87,8 +89,7 @@ class UserRegister extends Component
     public function render()
     {
         return view('livewire.auth.user-register')
-        ->extends('layouts.app') // <-- path baru sesuai app.blade.php
-        ->section('content');
-    
+            ->extends('layouts.app')
+            ->section('content');
     }
 }
