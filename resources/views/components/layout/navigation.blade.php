@@ -1,41 +1,62 @@
 @php
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Storage;
 
 $currentRoute = Route::currentRouteName();
 $homeRoute = route('landing-page');
 
+// Tentukan menu
 if (in_array($currentRoute, ['landing-page','tentang'])) {
-    // pakai menu guest/umum
-    $navItems = [
-        ['href' => route('landing-page'), 'label' => 'Beranda'],
-        ['href' => route('tentang'), 'label' => 'Tentang'],
-    ];
+$navItems = [
+['href' => route('landing-page'), 'label' => 'Beranda'],
+['href' => route('tentang'), 'label' => 'Tentang'],
+];
 } else {
-    // logika lama (role-based)
-    if (auth()->check()) {
-        $homeRoute = match(auth()->user()->role) {
-            'pemerintah' => route('pemerintah.index'),
-            'akademisi'  => route('akademisi.index'),
-            'admin'      => route('admin.index'),
-            default      => route('landing-page'),
-        };
-        $navItems = match(auth()->user()->role) {
-            // …role-based navItems…
-        };
-    } else {
-        $navItems = [
-            ['href' => route('landing-page'), 'label' => 'Beranda'],
-            ['href' => route('tentang'), 'label' => 'Tentang'],
-        ];
-    }
+if (auth()->check()) {
+$homeRoute = match(auth()->user()->role) {
+'pemerintah' => route('pemerintah.index'),
+'akademisi' => route('akademisi.index'),
+'admin' => route('admin.index'),
+default => route('landing-page'),
+};
+
+$navItems = match(auth()->user()->role) {
+'pemerintah' => [
+['href' => route('pemerintah.index'), 'label' => 'Dashboard'],
+['href' => route('pemerintah.program'), 'label' => 'Program & Inovasi'],
+['href' => route('pemerintah.solusi'), 'label' => 'Solusi'],
+['href' => route('pemerintah.inkubasi'), 'label' => 'Inkubasi'],
+['href' => route('pemerintah.diskusi'), 'label' => 'Diskusi'],
+],
+'akademisi' => [
+['href' => route('akademisi.index'), 'label' => 'Dashboard'],
+['href' => route('akademisi.post-inovasi.create'), 'label' => 'Post Inovasi'],
+['href' => route('akademisi.proyek-saya'), 'label' => 'Proyek Saya'],
+['href' => route('akademisi.kolaborasi'), 'label' => 'Kolaborasi'],
+['href' => route('akademisi.profil-akademik'), 'label' => 'Profil Akademik'],
+],
+'admin' => [
+['href' => route('admin.index'), 'label' => 'Dashboard'],
+['href' => route('admin.users.index'), 'label' => 'Manajemen User'],
+['href' => route('admin.moderasi-konten'), 'label' => 'Moderasi Konten'],
+['href' => route('admin.statistik'), 'label' => 'Statistik'],
+],
+default => [
+['href' => route('landing-page'), 'label' => 'Beranda'],
+['href' => route('tentang'), 'label' => 'Tentang'],
+],
+};
+} else {
+$navItems = [
+['href' => route('landing-page'), 'label' => 'Beranda'],
+['href' => route('tentang'), 'label' => 'Tentang'],
+];
+}
 }
 @endphp
 
-
 <nav class="bg-white/90 backdrop-blur-md shadow-md sticky top-0 z-50 -mt-1">
     <div class="max-w-6xl mx-auto px-4 py-1.5 flex justify-between items-center">
-        <!-- Logo -->
+        {{-- ===== Logo ===== --}}
         <div class="flex items-center ml-8 md:ml-12">
             <a href="{{ $homeRoute }}" class="flex items-center space-x-2">
                 <img src="{{ asset('images/logoKecil.png') }}"
@@ -44,7 +65,7 @@ if (in_array($currentRoute, ['landing-page','tentang'])) {
             </a>
         </div>
 
-        <!-- Desktop Menu -->
+        {{-- ===== Desktop Menu ===== --}}
         <div class="hidden md:flex items-center space-x-5">
             @foreach($navItems as $item)
             <a href="{{ $item['href'] }}"
@@ -56,38 +77,110 @@ if (in_array($currentRoute, ['landing-page','tentang'])) {
             </a>
             @endforeach
 
-            <!-- Avatar / Auth -->
+            {{-- ===== Avatar & Auth ===== --}}
             @auth
-            <div class="relative ml-5">
-                <button id="avatarBtn"
-                    class="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-300 focus:outline-none">
-                    <img src="{{ auth()->user()->avatar 
-            ? asset('storage/'.auth()->user()->avatar) 
-            : asset('images/default-avatar.png') }}"
-     alt="Avatar"
-     class="w-full h-full object-cover">
-
+            <div id="status-wrapper" class="ml-5">
+                @if(auth()->user()->status === 'pending')
+                {{-- tombol verifikasi sementara --}}
+                <button id="verifyBtn"
+                    class="px-4 py-1 rounded-full border-2 border-gray-400 text-gray-400 font-semibold cursor-not-allowed"
+                    disabled>
+                    Akun Anda Sedang Diverifikasi
                 </button>
-
-                <!-- Dropdown -->
-                <div id="avatarDropdown"
-                    class="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg border hidden">
-                    <a href="{{ route('profile.edit') }}"
-                        class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                        Edit Profile
-                    </a>
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit"
-                            class="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100">
-                            Logout
-                        </button>
-                    </form>
+                @else
+                {{-- Avatar normal --}}
+                <div id="avatar-block" class="relative">
+                    <button id="avatarBtn"
+                        class="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-300 focus:outline-none">
+                        <img src="{{ auth()->user()->avatar
+                                ? asset('storage/'.auth()->user()->avatar)
+                                : asset('images/default-avatar.png') }}"
+                            alt="Avatar"
+                            class="w-full h-full object-cover">
+                    </button>
+                    <div id="avatarDropdown"
+                        class="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg border hidden">
+                        <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                            Edit Profile
+                        </a>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100">
+                                Logout
+                            </button>
+                        </form>
+                    </div>
                 </div>
+                @endif
             </div>
+
+            {{-- === Polling script (hanya untuk user yang pending) === --}}
+            @if(auth()->user()->status === 'pending')
+            <script>
+                (function() {
+                    // gunakan string Blade biasa agar editor tidak memprotes
+                    const statusUrl = "{{ route('user.status') }}";
+                    const dashboardUrl = "{{ route('dashboard') }}"; // pakai route dashboard yang sudah ada
+
+                    // helper untuk menggantikan tombol verifikasi dengan link dashboard
+                    function showDashboardButton() {
+                        const wrapper = document.getElementById('status-wrapper');
+                        if (!wrapper) return;
+
+                        wrapper.innerHTML = `
+                        <a id="dashboardBtn" href="${dashboardUrl}"
+                           class="px-4 py-1 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-semibold">
+                           Akun Terverifikasi
+                        </a>
+                    `;
+                    }
+
+                    // tampilkan pesan akun ditolak
+                    function showRejectedNotice() {
+                        const wrapper = document.getElementById('status-wrapper');
+                        if (!wrapper) return;
+
+                        wrapper.innerHTML = `
+        <div class="px-4 py-1 rounded-full bg-red-600 text-white font-semibold">
+            Akun Anda Ditolak
+        </div>
+    `;
+                    }
+
+                    // polling function
+                    async function checkStatus() {
+                        try {
+                            const res = await fetch(statusUrl, {
+                                headers: {
+                                    'X-Requested-With': 'XMLHttpRequest'
+                                },
+                                credentials: 'same-origin'
+                            });
+                            if (!res.ok) return;
+                            const data = await res.json();
+                            if (data.status === 'verified') {
+                                showDashboardButton();
+                                clearInterval(window._userStatusInterval);
+                            } else if (data.status === 'rejected') {
+                                showRejectedNotice();
+                                clearInterval(window._userStatusInterval);
+                            }
+
+                        } catch (err) {
+                            // silent fail (network / auth)
+                        }
+                    }
+
+                    // jalankan segera lalu set interval
+                    checkStatus();
+                    window._userStatusInterval = setInterval(checkStatus, 5000); // cek tiap 5 detik
+                })();
+            </script>
+            @endif
             @endauth
 
             @guest
+            {{-- === LOGIN / REGISTER === --}}
             <div class="flex items-center space-x-3 ml-5">
                 <button class="px-4 py-1 rounded-full border-2 border-blue-600 text-blue-600 font-semibold
                                hover:bg-blue-600 hover:text-white transition open-login-modal">
@@ -102,13 +195,13 @@ if (in_array($currentRoute, ['landing-page','tentang'])) {
             @endguest
         </div>
 
-        <!-- Mobile button -->
+        {{-- ===== Mobile Toggle ===== --}}
         <button id="mobile-menu-toggle" class="md:hidden text-gray-700 focus:outline-none">
             <i class="fas fa-bars text-2xl"></i>
         </button>
     </div>
 
-    <!-- Mobile Menu -->
+    {{-- Mobile Menu --}}
     <div id="mobile-menu" class="hidden md:hidden bg-white border-t">
         @foreach($navItems as $item)
         <a href="{{ $item['href'] }}" class="block py-3 px-4 font-medium hover:bg-gray-100">
@@ -117,15 +210,19 @@ if (in_array($currentRoute, ['landing-page','tentang'])) {
         @endforeach
 
         @auth
-        <div class="border-t mt-2 p-4 flex flex-col space-y-2">
-            <div class="flex items-center space-x-3">
+        <div id="status-wrapper-mobile" class="border-t mt-2 p-4">
+            @if(auth()->user()->status === 'pending')
+            <button disabled
+                class="w-full text-center px-4 py-2 rounded-lg border-2 border-gray-400 text-gray-400 font-semibold cursor-not-allowed">
+                Akun Anda Sedang Diverifikasi
+            </button>
+            @elseif(auth()->user()->status === 'verified')
+            <div class="flex items-center space-x-3 mb-2">
                 <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-300">
-                <img src="{{ auth()->user()->avatar 
-            ? asset('storage/'.auth()->user()->avatar) 
-            : asset('images/default-avatar.png') }}"
-     alt="Avatar"
-     class="w-full h-full object-cover">
-
+                    <img src="{{ auth()->user()->avatar
+                                    ? asset('storage/'.auth()->user()->avatar)
+                                    : asset('images/default-avatar.png') }}"
+                        alt="Avatar" class="w-full h-full object-cover">
                 </div>
                 <div class="flex-1">
                     <a href="{{ route('profile.edit') }}"
@@ -138,10 +235,15 @@ if (in_array($currentRoute, ['landing-page','tentang'])) {
                 @csrf
                 <button type="submit"
                     class="w-full mt-2 px-4 py-2 rounded-lg border-2 border-red-600 text-red-600 font-semibold
-                           hover:bg-red-600 hover:text-white transition">
+                               hover:bg-red-600 hover:text-white transition">
                     Logout
                 </button>
             </form>
+            @elseif(auth()->user()->status === 'rejected')
+            <div class="w-full text-center px-4 py-2 rounded-lg bg-red-600 text-white font-semibold">
+                Akun Anda Ditolak
+            </div>
+            @endif
         </div>
         @endauth
 
@@ -153,13 +255,14 @@ if (in_array($currentRoute, ['landing-page','tentang'])) {
             </button>
             <a href="{{ route('user.register') }}"
                 class="w-full text-center px-4 py-2 rounded-lg border-2 border-blue-600 text-blue-600 font-semibold
-                      hover:bg-blue-600 hover:text-white transition">
+                     hover:bg-blue-600 hover:text-white transition">
                 Register
             </a>
         </div>
         @endguest
     </div>
 </nav>
+
 <!-- LOGIN MODAL -->
 <div id="loginModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
     <div class="bg-white rounded-xl shadow-lg w-full max-w-md p-6 relative">

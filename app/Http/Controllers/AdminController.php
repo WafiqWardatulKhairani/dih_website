@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 
@@ -38,6 +39,27 @@ class AdminController extends Controller
 
         return redirect()->back()->with('success', 'User berhasil diverifikasi!');
     }
+
+    public function reject($id)
+    {
+        $user = User::findOrFail($id);
+
+        // Tandai status ditolak (opsional kalau tetap mau simpan record)
+        $user->status = 'rejected';
+        $user->save();
+
+        // 🔑 Hapus semua session milik user ini
+        DB::table('sessions')->where('user_id', $user->id)->delete();
+
+        // ➜ kalau mau benar-benar hapus akun dari database, bisa juga:
+        // $user->delete();
+
+        // (opsional) kirim notifikasi/email ke user
+        // Mail::to($user->email)->send(new AccountRejectedMail($user));
+
+        return back()->with('success', 'User berhasil ditolak dan otomatis logout.');
+    }
+
 
     public function usersIndex()
     {

@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
@@ -87,11 +88,13 @@ Route::middleware(['auth', AdminMiddleware::class])
     ->prefix('admin')->name('admin.')
     ->group(function () {
         Route::get('/', [AdminController::class, 'index'])->name('index');
-        
+
         // Route untuk manajemen user - GUNAKAN usersIndex() BUKAN manajemenUser()
         Route::get('/users', [AdminController::class, 'usersIndex'])->name('users.index');
         Route::post('/users/{id}/verify', [AdminController::class, 'verify'])->name('users.verify');
-        
+        Route::delete('/users/{id}/reject', [AdminController::class, 'reject'])->name('users.reject');
+
+
         // Route lainnya (jika masih diperlukan)
         Route::get('/manajemen-user', [AdminController::class, 'manajemenUser'])->name('manajemen-user');
         Route::get('/moderasi-konten', [AdminController::class, 'moderasiKonten'])->name('moderasi-konten');
@@ -104,5 +107,15 @@ Route::middleware(['auth', AdminMiddleware::class])
         Route::put('/users/{id}', [AdminController::class, 'updateUser'])->name('users.update');
         Route::delete('/users/{id}', [AdminController::class, 'destroyUser'])->name('users.destroy');
     });
+
+// routes/web.php
+Route::get('/user/status', function () {
+    $user = Auth::user();
+    return response()->json([
+        'status' => $user ? $user->status : null,
+    ]);
+})->middleware('auth')->name('user.status');
+
+
 // =============== FALLBACK ====================
 Route::fallback(fn() => redirect()->route('landing-page'));
