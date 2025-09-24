@@ -23,16 +23,18 @@ $navItems = match(auth()->user()->role) {
 'pemerintah' => [
 ['href' => route('pemerintah.index'), 'label' => 'Dashboard'],
 ['href' => route('pemerintah.program'), 'label' => 'Program & Inovasi'],
+['href' => route('pemerintah.diskusi'), 'label' => 'Ruang Diskusi'],
+['href' => route('akademisi.kolaborasi'), 'label' => 'Kolaborasi'],
 ['href' => route('pemerintah.solusi'), 'label' => 'Solusi'],
 ['href' => route('pemerintah.inkubasi'), 'label' => 'Inkubasi'],
-['href' => route('pemerintah.diskusi'), 'label' => 'Diskusi'],
 ],
 'akademisi' => [
 ['href' => route('akademisi.index'), 'label' => 'Dashboard'],
-['href' => route('akademisi.post-inovasi.create'), 'label' => 'Post Inovasi'],
-['href' => route('akademisi.proyek-saya'), 'label' => 'Proyek Saya'],
+['href' => route('akademisi.post-inovasi.create'), 'label' => 'Posting Inovasi'],
+['href' => route('pemerintah.diskusi'), 'label' => 'Ruang Diskusi'],
 ['href' => route('akademisi.kolaborasi'), 'label' => 'Kolaborasi'],
-['href' => route('akademisi.profil-akademik'), 'label' => 'Profil Akademik'],
+['href' => route('akademisi.proyek-saya'), 'label' => 'Solusi'],
+['href' => route('pemerintah.solusi'), 'label' => 'Solusi'],
 ],
 'admin' => [
 ['href' => route('admin.index'), 'label' => 'Dashboard'],
