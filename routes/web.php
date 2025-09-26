@@ -8,7 +8,7 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AkademisiController;
-use App\Http\Controllers\Akademisi\PostInnovationController;
+use App\Http\Controllers\Akademisi\InnovationController;
 use App\Http\Controllers\PemerintahController;
 use App\Http\Controllers\Pemerintah\ProgramController;
 use App\Http\Controllers\Pemerintah\SolusiController;
@@ -52,16 +52,34 @@ Route::middleware('auth')->group(function () {
     // Akademisi
     Route::prefix('akademisi')->name('akademisi.')->group(function () {
         Route::get('/', [AkademisiController::class, 'index'])->name('index');
-        Route::get('/post-inovasi', [PostInnovationController::class, 'create'])->name('post-inovasi.create');
-        Route::post('/post-inovasi', [PostInnovationController::class, 'store'])->name('post-inovasi.store');
-        Route::get('/innovation/{innovation}', [PostInnovationController::class, 'show'])->name('post-inovasi.show');
+        
+        // Routes untuk inovasi
+        Route::prefix('inovasi')->name('inovasi.')->group(function () {
+            // Create
+            Route::get('/create', [InnovationController::class, 'create'])->name('create');
+            Route::post('/store', [InnovationController::class, 'store'])->name('store');
+            
+            // Read
+            Route::get('/{id}', [InnovationController::class, 'show'])->name('show');
+            
+            // Update
+            Route::get('/{id}/edit', [InnovationController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [InnovationController::class, 'update'])->name('update');
+            
+            // Delete (jika diperlukan)
+            // Route::delete('/{id}', [InnovationController::class, 'destroy'])->name('destroy');
+        });
+        
+        // Ajax subcategories
+        Route::get('/subcategories', [InnovationController::class, 'subcategories'])->name('subcategories');
 
+        // Menu lainnya
         Route::get('/proyek-saya', [AkademisiController::class, 'proyekSaya'])->name('proyek-saya');
         Route::get('/kolaborasi', [AkademisiController::class, 'kolaborasi'])->name('kolaborasi');
         Route::get('/profil-akademik', [AkademisiController::class, 'profilAkademik'])->name('profil-akademik');
         Route::get('/notifikasi', [AkademisiController::class, 'notifikasi'])->name('notifikasi');
     });
-
+    
     // Dashboard role-based
     Route::get('/dashboard', function () {
         return match (auth()->user()->role) {
