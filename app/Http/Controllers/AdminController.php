@@ -73,9 +73,16 @@ class AdminController extends Controller
     }
 
     public function statistik()
-    {
-        return view('admin.statistik');
-    }
+{
+    $stats = [
+        'totalUsers' => User::count(),
+        'pemerintahCount' => User::where('role', 'pemerintah')->count(),
+        'akademisiCount' => User::where('role', 'akademisi')->count(),
+        'verifiedCount' => User::whereNotNull('email_verified_at')->count()
+    ];
+
+    return view('admin.statistik', $stats);
+}
 
     public function pengaturanSistem()
     {
