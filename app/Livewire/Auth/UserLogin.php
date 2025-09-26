@@ -58,7 +58,7 @@ class UserLogin extends Component
 
     public function render()
     {
-        return view('livewire.auth.user-login')
+        return view('livewire.auth')
             ->extends('layouts.app')
             ->section('content');
     }

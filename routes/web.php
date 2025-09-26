@@ -15,7 +15,6 @@ use App\Http\Controllers\Pemerintah\SolusiController;
 use App\Http\Controllers\Pemerintah\InkubasiController;
 use App\Http\Controllers\Pemerintah\DiskusiController;
 use App\Livewire\Auth\UserRegister;
-use App\Livewire\Auth\UserLogin;
 
 require __DIR__ . '/auth.php';
 
@@ -29,7 +28,6 @@ Route::redirect('/home', '/')->name('home');
 Route::middleware('guest')->group(function () {
     Route::get('/daftar', UserRegister::class)->name('user.register');
     Route::get('/register', fn() => redirect()->route('user.register'))->name('register');
-    Route::get('/login', UserLogin::class)->name('login');
 });
 
 // =============== PUBLIC =====================
