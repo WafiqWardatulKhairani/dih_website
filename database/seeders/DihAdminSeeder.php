@@ -11,6 +11,7 @@ class DihAdminSeeder extends Seeder
     /**
      * Run the database seeds.
      */
+    //belum dijalankan seeder nya
     public function run(): void
     {
         $admins = [

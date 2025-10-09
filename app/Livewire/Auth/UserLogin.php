@@ -50,7 +50,6 @@ class UserLogin extends Component
                     return;
             }
         }
-
         // Gagal login
         $this->addError('email', 'Email atau password salah.');
     }

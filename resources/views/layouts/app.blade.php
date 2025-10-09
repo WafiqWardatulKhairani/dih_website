@@ -8,7 +8,6 @@
     <title>{{ config('app.name', 'Digital Innovation Hub') }}</title>
     <link rel="icon" href="{{ asset('images/logo.png') }}" type="image/png">
 
-
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
@@ -27,7 +26,6 @@
     @livewireStyles
 
     @stack('styles')
-    
 </head>
 
 <body class="font-sans antialiased">
@@ -61,79 +59,152 @@
     @livewireScripts
 
     <script>
+    // Track jika notif sudah ditampilkan
+    let notificationShown = false;
+
     document.addEventListener('DOMContentLoaded', function () {
-        // data dari backend
+        // Skip jika page di-load dari cache (back/forward button)
+        if (performance.navigation.type === 2 || window.performance.getEntriesByType("navigation")[0]?.type === 'back_forward') {
+            return;
+        }
+
+        // Skip jika notif sudah pernah ditampilkan di session ini
+        if (sessionStorage.getItem('notificationShown') === 'true') {
+            return;
+        }
+
+        // Data dari backend
         const errors  = @json($errors->all());
         const success = @json(session('success'));
         const error   = @json(session('error'));
 
-        // tampilkan error validasi
+        // Tampilkan error validasi
         if (errors && errors.length > 0) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                html: errors.join('<br>'),
-                confirmButtonColor: '#3085d6',
-                confirmButtonText: 'Mengerti'
-            });
+            showErrorAlert('Oops...', errors.join('<br>'));
+            markNotificationShown();
         }
 
-        // pesan sukses
-        if (success) {
-            Swal.fire({
-                icon: 'success',
-                title: 'Berhasil!',
-                text: success,
-                confirmButtonColor: '#3085d6',
-                confirmButtonText: 'Oke'
-            });
+        // Pesan sukses - AUTO CLOSE & CLEAR SESSION
+        if (success && !notificationShown) {
+            showSuccessAlert('Berhasil!', success);
+            markNotificationShown();
+            
+            // Clear session success setelah ditampilkan
+            setTimeout(() => {
+                clearSessionSuccess();
+            }, 100);
         }
 
-        // pesan gagal
-        if (error) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Gagal!',
-                text: error,
-                confirmButtonColor: '#d33',
-                confirmButtonText: 'Coba Lagi'
-            });
+        // Pesan gagal
+        if (error && !notificationShown) {
+            showErrorAlert('Gagal!', error);
+            markNotificationShown();
         }
     });
+
+    // Handle browser navigation
+    window.addEventListener('pageshow', function(event) {
+        if (event.persisted) {
+            // Page di-load dari cache (back button)
+            clearNotificationState();
+        }
+    });
+
+    // Handle sebelum page unload (refresh/tutup tab)
+    window.addEventListener('beforeunload', function() {
+        clearNotificationState();
+    });
+
+    // ========== FUNCTIONS ==========
+
+    function showSuccessAlert(title, message) {
+        Swal.fire({
+            icon: 'success',
+            title: title,
+            text: message,
+            confirmButtonColor: '#3085d6',
+            confirmButtonText: 'Oke',
+            timer: 4000, // Auto close setelah 4 detik
+            timerProgressBar: true,
+            allowOutsideClick: true,
+            allowEscapeKey: true,
+            didOpen: () => {
+                notificationShown = true;
+            },
+            didClose: () => {
+                clearNotificationState();
+            }
+        });
+    }
+
+    function showErrorAlert(title, message) {
+        Swal.fire({
+            icon: 'error',
+            title: title,
+            html: message,
+            confirmButtonColor: '#d33',
+            confirmButtonText: 'Mengerti',
+            allowOutsideClick: true,
+            allowEscapeKey: true,
+            didOpen: () => {
+                notificationShown = true;
+            }
+        });
+    }
+
+    function markNotificationShown() {
+        notificationShown = true;
+        sessionStorage.setItem('notificationShown', 'true');
+    }
+
+    function clearNotificationState() {
+        notificationShown = false;
+        sessionStorage.removeItem('notificationShown');
+    }
+
+    function clearSessionSuccess() {
+        // Clear session via AJAX (optional)
+        fetch('/clear-session-success', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({})
+        }).catch(err => console.log('Clear session error:', err));
+    }
 
     // Handle Livewire events untuk v3
     document.addEventListener('livewire:initialized', () => {
         Livewire.on('swal:success', (data) => {
-            Swal.fire({
-                icon: 'success',
-                title: data.title || 'Berhasil!',
-                text: data.message || '',
-                confirmButtonColor: '#3085d6',
-                confirmButtonText: 'Oke',
-                timer: data.timer || 10000,
-                timerProgressBar: true,
-                willClose: () => {
-                    if (data.redirect) {
-                        window.location.href = data.redirect;
-                    }
-                }
-            }).then((result) => {
-                if (data.redirect && (result.dismiss === Swal.DismissReason.timer || result.isConfirmed)) {
+            showSuccessAlert(data.title || 'Berhasil!', data.message || '');
+            
+            if (data.redirect) {
+                setTimeout(() => {
                     window.location.href = data.redirect;
-                }
-            });
+                }, data.timer || 4000);
+            }
         });
 
         Livewire.on('swal:error', (data) => {
-            Swal.fire({
-                icon: 'error',
-                title: data.title || 'Gagal!',
-                text: data.message || '',
-                confirmButtonColor: '#d33',
-                confirmButtonText: 'Coba Lagi'
-            });
+            showErrorAlert(data.title || 'Gagal!', data.message || '');
         });
     });
+
+    // Global function untuk manual trigger alert
+    window.showAlert = {
+        success: (message, title = 'Berhasil!') => showSuccessAlert(title, message),
+        error: (message, title = 'Gagal!') => showErrorAlert(title, message)
+    };
     </script>
+
+    {{-- Tambah route untuk clear session (optional) --}}
+    @php
+    // Ini bisa dipindah ke routes/web.php kalau mau permanen
+    if(request()->is('clear-session-success')) {
+        session()->forget('success');
+        session()->forget('error');
+    }
+    @endphp
 </body>
 </html>

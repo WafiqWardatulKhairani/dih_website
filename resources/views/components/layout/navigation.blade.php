@@ -23,9 +23,8 @@ $navItems = match(auth()->user()->role) {
 'pemerintah' => [
 ['href' => route('pemerintah.index'), 'label' => 'Dashboard'],
 ['href' => route('pemerintah.program'), 'label' => 'Program & Inovasi'],
-['href' => route('pemerintah.solusi'), 'label' => 'Solusi'],
-['href' => route('pemerintah.inkubasi'), 'label' => 'Inkubasi'],
-['href' => route('pemerintah.diskusi'), 'label' => 'Diskusi'],
+['href' => route('pemerintah.diskusi'), 'label' => 'Forum Diskusi'],
+['href' => route('pemerintah.kolaborasi'), 'label' => 'Ruang Kolaborasi'],
 ],
 'akademisi' => [
 ['href' => route('akademisi.index'), 'label' => 'Dashboard'],
