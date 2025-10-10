@@ -26,119 +26,199 @@
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
         .card-hover:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px -5px rgba(0, 0, 0, 0.1);
+        }
+        .compact-card {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
         }
     </style>
 @endsection
 
 @section('content')
-<!-- Hero Section -->
-<section class="hero-bg text-white py-24 md:py-32">
-    <div class="container mx-auto px-6 md:px-12 text-center">
-        <h1 class="text-4xl md:text-6xl font-extrabold mb-6 leading-tight">
-            Program & <span class="text-secondary">Inovasi</span>
-        </h1>
-        <p class="text-xl md:text-2xl max-w-3xl mx-auto mb-10 leading-relaxed">
-            Temukan program prioritas dan inovasi digital yang sedang dikembangkan oleh pemerintah daerah.
-        </p>
-    </div>
-</section>
 
-<!-- Filter Section -->
-<section class="bg-white py-12">
-    <div class="container mx-auto px-6 md:px-12">
-        <div class="flex flex-col md:flex-row justify-between items-center mb-8">
-            <h2 class="text-2xl font-bold text-dark mb-4 md:mb-0">Program Prioritas Daerah</h2>
-            <div class="flex flex-wrap gap-4">
-                <select class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
-                    <option>Semua Kategori</option>
-                    <option>Infrastruktur Digital</option>
-                    <option>Smart City</option>
-                    <option>Pelayanan Publik</option>
-                </select>
-                <select class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
-                    <option>Semua Status</option>
-                    <option>Perencanaan</option>
-                    <option>Berjalan</option>
-                    <option>Selesai</option>
-                </select>
-            </div>
+{{-- ========== HERO SECTION ========== --}}
+<section class="hero-bg text-white py-16 md:py-20">
+    <div class="container mx-auto px-6 md:px-12 text-center">
+        <h1 class="text-3xl md:text-4xl font-extrabold mb-4 leading-tight">
+            Program & <span class="text-yellow-300">Inovasi</span>
+        </h1>
+        <p class="text-lg max-w-2xl mx-auto mb-6 leading-relaxed">
+            Kelola program prioritas dan temukan inovasi digital untuk mendukung pembangunan daerah.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+            <a href="{{ route('pemerintah.program.create') }}" class="inline-flex items-center bg-green-500 text-white px-5 py-2.5 rounded-lg font-semibold hover:bg-green-600 transition text-sm">
+                📋 Posting Program Baru
+            </a>
+            <a href="{{ route('pemerintah.inovasi.create') }}" class="inline-flex items-center bg-purple-500 text-white px-5 py-2.5 rounded-lg font-semibold hover:bg-purple-600 transition text-sm">
+                💡 Posting Inovasi Baru
+            </a>
         </div>
     </div>
 </section>
 
-<!-- Program List -->
-<section class="bg-gray-50 py-16">
+
+{{-- ========== STATISTIK CEPAT ========== --}}
+<section class="bg-white py-8 border-t">
     <div class="container mx-auto px-6 md:px-12">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            @for ($i = 1; $i <= 6; $i++)
-            <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover">
-                <div class="h-48 bg-gradient-to-r from-primary to-secondary relative">
-                    <span class="absolute top-4 right-4 bg-white text-primary px-3 py-1 rounded-full text-sm font-semibold">
-                        @if($i % 3 == 0) Perencanaan
-                        @elseif($i % 3 == 1) Berjalan
-                        @else Selesai
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            <div>
+                <div class="text-2xl font-bold text-primary">{{ $totalPrograms }}</div>
+                <p class="text-sm text-gray-600">Total Program</p>
+            </div>
+            <div>
+                <div class="text-2xl font-bold text-green-600">{{ $totalInnovations }}</div>
+                <p class="text-sm text-gray-600">Total Inovasi</p>
+            </div>
+            <div>
+                <div class="text-2xl font-bold text-orange-600">{{ $programsOngoing }}</div>
+                <p class="text-sm text-gray-600">Program Berjalan</p>
+            </div>
+            <div>
+                <div class="text-2xl font-bold text-purple-600">{{ $innovationsReady }}</div>
+                <p class="text-sm text-gray-600">Inovasi Siap</p>
+            </div>
+        </div>
+    </div>
+</section>
+{{-- ========== PROGRAM PRIORITAS ========== --}}
+<section class="bg-white py-12">
+    <div class="container mx-auto px-6 md:px-12">
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h2 class="text-2xl font-bold text-dark mb-2">Program Prioritas</h2>
+                <p class="text-gray-600">Program unggulan pemerintah daerah yang sedang berjalan</p>
+            </div>
+            <a href="{{ route('program.list') }}" class="inline-flex items-center text-primary font-semibold hover:text-secondary transition">
+                Lihat Semua Program
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+            </a>
+        </div>
+
+        @if($programs->count() > 0)
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                @foreach($programs as $program)
+                <div class="bg-white rounded-lg border border-gray-200 overflow-hidden card-hover compact-card">
+                    <div class="h-20 bg-gradient-to-r from-primary to-secondary relative">
+                        @if($program->image)
+                            <img src="{{ asset('storage/' . $program->image) }}" alt="{{ $program->title }}" class="w-full h-full object-cover">
                         @endif
-                    </span>
-                </div>
-                <div class="p-6">
-                    <div class="flex items-center mb-4">
-                        <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-primary font-bold">
-                            D{{ $i }}
+                        <span class="absolute top-2 right-2 bg-white text-primary px-1.5 py-0.5 rounded-full text-xs font-medium shadow-sm">
+                            @if($program->status == 'planning') 📅
+                            @elseif($program->status == 'ongoing') 🚀
+                            @else ✅
+                            @endif
+                        </span>
+                    </div>
+                    <div class="p-3 flex-1">
+                        <h3 class="text-sm font-semibold text-dark mb-1 leading-tight">{{ Str::limit($program->title, 40) }}</h3>
+                        <p class="text-xs text-gray-600 mb-2">{{ Str::limit($program->description, 50) }}</p>
+                        
+                        <div class="flex items-center justify-between text-xs text-gray-500 mb-1">
+                            <span class="truncate">{{ Str::limit($program->opd_name, 12) }}</span>
+                            <span>{{ $program->progress }}%</span>
                         </div>
-                        <div class="ml-3">
-                            <p class="text-sm font-medium text-dark">Dinas Contoh {{ $i }}</p>
-                            <p class="text-xs text-gray-500">Pemkab Contoh</p>
+                        
+                        <!-- Progress Bar -->
+                        <div class="w-full bg-gray-200 rounded-full h-1.5">
+                            <div class="bg-green-500 h-1.5 rounded-full" style="width: {{ $program->progress }}%"></div>
                         </div>
                     </div>
-                    <h3 class="text-xl font-semibold text-dark mb-3">Program Infrastruktur Digital {{ $i }}</h3>
-                    <p class="text-gray-600 mb-6">Pengembangan infrastruktur digital untuk mendukung smart city dan pelayanan publik digital.</p>
-                    <div class="flex justify-between items-center">
-                        <div class="text-sm text-gray-500">
-                            <span class="flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
-                                {{ now()->subDays($i*10)->format('d M Y') }}
-                            </span>
+                    <div class="px-3 pb-3">
+                    <a href="{{ route('program.detail', $program->id) }}" class="block w-full text-center bg-gray-100 text-gray-700 hover:bg-gray-200 text-xs font-medium py-1.5 rounded transition">
+    Lihat Detail
+</a>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        @else
+            <div class="text-center py-8 bg-gray-50 rounded-lg border border-gray-200">
+                <div class="text-gray-400 text-3xl mb-2">📋</div>
+                <p class="text-gray-500 text-sm mb-3">Belum ada program yang diposting.</p>
+                <a href="{{ route('pemerintah.program.create') }}" class="inline-block bg-primary text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition text-xs">
+                    📋 Buat Program Pertama
+                </a>
+            </div>
+        @endif
+    </div>
+</section>
+
+{{-- ========== INOVASI DIGITAL ========== --}}
+<section class="bg-gray-50 py-12">
+    <div class="container mx-auto px-6 md:px-12">
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h2 class="text-2xl font-bold text-dark mb-2">Inovasi Digital</h2>
+                <p class="text-gray-600">Solusi teknologi inovatif untuk mendukung program daerah</p>
+            </div>
+            <a href="{{ route('program.innovation.list') }}" class="inline-flex items-center text-primary font-semibold hover:text-secondary transition">
+                Lihat Semua Inovasi
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+            </a>
+        </div>
+
+        @if($innovations->count() > 0)
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                @foreach($innovations as $innovation)
+                <div class="bg-white rounded-lg border border-gray-200 overflow-hidden card-hover compact-card">
+                    <div class="h-20 bg-gradient-to-r from-green-500 to-emerald-400 relative">
+                        @if($innovation->image)
+                            <img src="{{ asset('storage/' . $innovation->image) }}" alt="{{ $innovation->title }}" class="w-full h-full object-cover">
+                        @endif
+                        <span class="absolute top-2 right-2 bg-white text-green-600 px-1.5 py-0.5 rounded-full text-xs font-medium shadow-sm">
+                            @if($innovation->status == 'prototype') 🔧
+                            @elseif($innovation->status == 'ready') ✅
+                            @elseif($innovation->status == 'implemented') 🚀
+                            @else 🔬
+                            @endif
+                        </span>
+                    </div>
+                    <div class="p-3 flex-1">
+                        <h3 class="text-sm font-semibold text-dark mb-1 leading-tight">{{ Str::limit($innovation->title, 40) }}</h3>
+                        <p class="text-xs text-gray-600 mb-2">{{ Str::limit($innovation->description, 50) }}</p>
+                        
+                        <div class="flex items-center justify-between text-xs text-gray-500 mb-1">
+                            <span class="truncate">{{ Str::limit($innovation->institution, 12) }}</span>
+                            <div class="flex items-center">
+                                ⭐ {{ $innovation->rating }}
+                                @if($innovation->is_verified)
+                                    <span class="text-green-500 ml-0.5">✓</span>
+                                @endif
+                            </div>
                         </div>
-                        <a href="#" class="text-primary font-semibold hover:text-secondary transition flex items-center">
-                            Detail
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
-                            </svg>
+                        
+                        <div class="flex justify-between items-center text-xs text-gray-500">
+                            <span>{{ $innovation->research_duration }}bln</span>
+                            <span class="capitalize">{{ $innovation->innovation_type }}</span>
+                        </div>
+                    </div>
+                    <div class="px-3 pb-3">
+                        <a href="#" class="block w-full text-center bg-green-100 text-green-700 hover:bg-green-200 text-xs font-medium py-1.5 rounded transition">
+                            Ajukan Kolaborasi
                         </a>
                     </div>
                 </div>
+                @endforeach
             </div>
-            @endfor
-        </div>
-        
-        <!-- Pagination -->
-        <div class="mt-12 flex justify-center">
-            <nav class="flex items-center space-x-2">
-                <a href="#" class="px-3 py-1 rounded border border-gray-300 text-gray-500 hover:bg-gray-50">&laquo;</a>
-                <a href="#" class="px-3 py-1 rounded border border-primary bg-primary text-white">1</a>
-                <a href="#" class="px-3 py-1 rounded border border-gray-300 text-gray-700 hover:bg-gray-50">2</a>
-                <a href="#" class="px-3 py-1 rounded border border-gray-300 text-gray-700 hover:bg-gray-50">3</a>
-                <a href="#" class="px-3 py-1 rounded border border-gray-300 text-gray-500 hover:bg-gray-50">&raquo;</a>
-            </nav>
-        </div>
+        @else
+            <div class="text-center py-8 bg-white rounded-lg border border-gray-200">
+                <div class="text-gray-400 text-3xl mb-2">💡</div>
+                <p class="text-gray-500 text-sm mb-3">Belum ada inovasi yang diposting.</p>
+                <a href="{{ route('pemerintah.inovasi.create') }}" class="inline-block bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition text-xs">
+                    💡 Buat Inovasi Pertama
+                </a>
+            </div>
+        @endif
     </div>
 </section>
 
-<!-- Call to Action -->
-<section class="bg-white py-16">
-    <div class="container mx-auto px-6 md:px-12 text-center">
-        <h2 class="text-3xl font-bold text-dark mb-6">Ajukan Program Prioritas</h2>
-        <p class="text-gray-600 max-w-2xl mx-auto mb-8">Dinas dapat mengajukan program prioritas untuk mendapatkan dukungan dan kolaborasi dari akademisi.</p>
-        <a href="#" class="inline-flex items-center bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
-            Ajukan Program
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z" clip-rule="evenodd" />
-            </svg>
-        </a>
-    </div>
-</section>
+
+
 @endsection

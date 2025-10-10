@@ -37,10 +37,10 @@
 <section class="hero-bg text-white py-24 md:py-32">
     <div class="container mx-auto px-6 md:px-12 text-center">
         <h1 class="text-4xl md:text-6xl font-extrabold mb-6 leading-tight">
-            Bank <span class="text-secondary">Solusi</span>
+            Ruang<span class="text-secondary">Kolaborasi</span>
         </h1>
         <p class="text-xl md:text-2xl max-w-3xl mx-auto mb-10 leading-relaxed">
-            Temukan berbagai solusi inovatif untuk tantangan digital pemerintah daerah.
+            Temukan berbagai kolaborasi digital pada pemerintah daerah.
         </p>
     </div>
 </section>
@@ -50,7 +50,7 @@
     <div class="container mx-auto px-6 md:px-12">
         <div class="max-w-4xl mx-auto">
             <div class="relative">
-                <input type="text" placeholder="Cari solusi..." class="w-full px-6 py-4 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary">
+                <input type="text" placeholder="Cari kolaborasi..." class="w-full px-6 py-4 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary">
                 <button class="absolute right-2 top-2 bg-primary text-white p-2 rounded-xl hover:bg-blue-700 transition">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -64,7 +64,7 @@
 <!-- Categories Section -->
 <section class="bg-gray-50 py-12">
     <div class="container mx-auto px-6 md:px-12">
-        <h2 class="text-2xl font-bold text-dark mb-8 text-center">Kategori Solusi</h2>
+        <h2 class="text-2xl font-bold text-dark mb-8 text-center">Kategori Kolaborasi</h2>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
             @foreach(['Infrastruktur', 'Smart City', 'Layanan Publik', 'Data & Analytics', 'Keamanan', 'Komunikasi', 'Mobility', 'Energi'] as $category)
             <a href="#" class="bg-white p-6 rounded-xl shadow-sm text-center hover:shadow-md transition card-hover">
@@ -83,7 +83,7 @@
 <!-- Solutions List -->
 <section class="bg-white py-16">
     <div class="container mx-auto px-6 md:px-12">
-        <h2 class="text-2xl font-bold text-dark mb-8">Solusi Terpopuler</h2>
+        <h2 class="text-2xl font-bold text-dark mb-8">Kolaboasi Terpopuler</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             @for ($i = 1; $i <= 4; $i++)
             <div class="bg-gray-50 rounded-xl p-6 card-hover">
@@ -142,17 +142,5 @@
     </div>
 </section>
 
-<!-- Call to Action -->
-<section class="bg-gradient-to-r from-primary to-secondary py-16 text-white">
-    <div class="container mx-auto px-6 md:px-12 text-center">
-        <h2 class="text-3xl font-bold mb-6">Ajukan Solusi Inovatif</h2>
-        <p class="max-w-2xl mx-auto mb-8">Akademisi dan praktisi dapat mengajukan solusi inovatif untuk tantangan digital pemerintah daerah.</p>
-        <a href="#" class="inline-flex items-center bg-white text-primary px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition">
-            Ajukan Solusi
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z" clip-rule="evenodd" />
-            </svg>
-        </a>
-    </div>
-</section>
+
 @endsection

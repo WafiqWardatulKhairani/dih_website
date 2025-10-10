@@ -50,7 +50,6 @@ class UserLogin extends Component
                     return;
             }
         }
-
         // Gagal login
         $this->addError('email', 'Email atau password salah.');
     }
@@ -58,7 +57,7 @@ class UserLogin extends Component
 
     public function render()
     {
-        return view('livewire.auth.user-login')
+        return view('livewire.auth')
             ->extends('layouts.app')
             ->section('content');
     }
