@@ -219,21 +219,6 @@
                                     Edit Inovasi
                                 </a>
                             @endif
-
-                            <!-- Tombol Kembali dengan fallback route -->
-                            @if(Route::has('akademisi.inovasi.index'))
-                                <a href="{{ route('akademisi.inovasi.index') }}" 
-                                   class="inline-flex items-center justify-center px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition duration-200 shadow-md hover:shadow-lg flex-1 sm:flex-none">
-                                    <i class="fas fa-list mr-2"></i>
-                                    Lihat Semua Inovasi
-                                </a>
-                            @else
-                                <a href="{{ url('/akademisi/inovasi') }}" 
-                                   class="inline-flex items-center justify-center px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition duration-200 shadow-md hover:shadow-lg flex-1 sm:flex-none">
-                                    <i class="fas fa-list mr-2"></i>
-                                    Lihat Semua Inovasi
-                                </a>
-                            @endif
                         </div>
                     </div>
                 @endif

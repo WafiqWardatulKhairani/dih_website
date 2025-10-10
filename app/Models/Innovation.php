@@ -27,14 +27,12 @@ class Innovation extends Model
 
     // Status constants
     public const STATUS_DRAFT = 'Draft';
-    public const STATUS_REVIEW = 'Review';
     public const STATUS_PUBLICATION = 'Publication';
 
     public static function statuses(): array
     {
         return [
             self::STATUS_DRAFT,
-            self::STATUS_REVIEW,
             self::STATUS_PUBLICATION,
         ];
     }

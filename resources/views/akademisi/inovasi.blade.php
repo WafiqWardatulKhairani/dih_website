@@ -137,7 +137,7 @@
             </option>
         @endforeach
     </select>
-    <p class="text-xs text-gray-400 mt-1">Pilih status: Draft (default), Review, atau Publication.</p>
+    <p class="text-xs text-gray-400 mt-1">Pilih status: Draft (default) atau Publication.</p>
 </div>
 
 

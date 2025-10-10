@@ -260,7 +260,7 @@
         <!-- Project Saya -->
         <section class="mt-8 mb-8">
             <div class="bg-white rounded-2xl shadow p-6 border">
-                <h3 class="text-xl font-semibold text-slate-800">Project Saya</h3>
+                <h3 class="text-xl font-semibold text-slate-800">Proyek Saya</h3>
                 <p class="text-sm text-slate-500 mt-1">Ringkasan kontribusi dan aktivitas Anda di portal akademisi.</p>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">

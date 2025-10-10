@@ -28,14 +28,16 @@ $navItems = match(auth()->user()->role) {
 ['href' => route('pemerintah.solusi'), 'label' => 'Solusi'],
 ['href' => route('pemerintah.inkubasi'), 'label' => 'Inkubasi'],
 ],
+
 'akademisi' => [
     ['href' => route('akademisi.index'), 'label' => 'Dashboard'],
     ['href' => route('akademisi.inovasi.create'), 'label' => 'Posting Inovasi'],
+    ['href' => route('akademisi.proyek-saya'), 'label' => 'Ruang Diskusi'],
     ['href' => route('akademisi.kolaborasi'), 'label' => 'Kolaborasi'],
-    ['href' => route('akademisi.proyek-saya'), 'label' => 'Proyek Saya'],
-    ['href' => route('akademisi.profil-akademik'), 'label' => 'Profil Akademik'],
-    ['href' => route('akademisi.notifikasi'), 'label' => 'Notifikasi'],
+    ['href' => route('akademisi.kolaborasi'), 'label' => 'Solusi'],
+    ['href' => route('akademisi.kolaborasi'), 'label' => 'Inkubasi'],
 ],
+
 'admin' => [
 ['href' => route('admin.index'), 'label' => 'Dashboard'],
 ['href' => route('admin.users.index'), 'label' => 'Manajemen User'],
