@@ -11,7 +11,7 @@ class SubcategorySeeder extends Seeder
     public function run(): void
     {
         $items = [
-            'Teknologi' => ['Artificial Intelligence','Internet of Things','Blockchain','Robotics','Biotechnology'],
+            'Teknologi' => ['Artificial Intelligence','Internet of Things','Sistem Informasi Akademik','Robotics','Biotechnology'],
             'Sosial' => ['Kewirausahaan Sosial','Pemberdayaan Masyarakat','Inklusi Sosial','Pengentasan Kemiskinan'],
             'Pendidikan' => ['EdTech','Metode Pembelajaran','Kurikulum','Assesmen Pendidikan'],
             'Humaniora' => ['Psikologi','Seni & Budaya','Filsafat','Sejarah','Antropologi'],

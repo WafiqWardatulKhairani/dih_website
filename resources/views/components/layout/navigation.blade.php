@@ -6,62 +6,49 @@ $homeRoute = route('landing-page');
 
 // Tentukan menu
 if (in_array($currentRoute, ['landing-page','tentang'])) {
-$navItems = [
-['href' => route('landing-page'), 'label' => 'Beranda'],
-['href' => route('tentang'), 'label' => 'Tentang'],
-];
+    $navItems = [
+        ['href' => route('landing-page'), 'label' => 'Beranda'],
+        ['href' => route('tentang'), 'label' => 'Tentang'],
+    ];
 } else {
-if (auth()->check()) {
-$homeRoute = match(auth()->user()->role) {
-'pemerintah' => route('pemerintah.index'),
-'akademisi' => route('akademisi.index'),
-'admin' => route('admin.index'),
-default => route('landing-page'),
-};
+    if (auth()->check()) {
+        $homeRoute = match(auth()->user()->role) {
+            'pemerintah' => route('pemerintah.index'),
+            'akademisi' => route('akademisi.index'),
+            'admin' => route('admin.index'),
+            default => route('landing-page'),
+        };
 
-$navItems = match(auth()->user()->role) {
-'pemerintah' => [
-['href' => route('pemerintah.index'), 'label' => 'Dashboard'],
-['href' => route('pemerintah.program'), 'label' => 'Program & Inovasi'],
-['href' => route('pemerintah.diskusi'), 'label' => 'Forum Diskusi'],
-['href' => route('pemerintah.kolaborasi'), 'label' => 'Ruang Kolaborasi'],
-],
-
-'akademisi' => [
-<<<<<<< HEAD
-    ['href' => route('akademisi.index'), 'label' => 'Dashboard'],
-    ['href' => route('akademisi.inovasi.create'), 'label' => 'Posting Inovasi'],
-    ['href' => route('akademisi.proyek-saya'), 'label' => 'Ruang Diskusi'],
-    ['href' => route('akademisi.kolaborasi'), 'label' => 'Kolaborasi'],
-    ['href' => route('akademisi.kolaborasi'), 'label' => 'Solusi'],
-    ['href' => route('akademisi.kolaborasi'), 'label' => 'Inkubasi'],
-=======
-['href' => route('akademisi.index'), 'label' => 'Dashboard'],
-['href' => route('akademisi.inovasi.create'), 'label' => 'Posting Inovasi'],
-['href' => route('akademisi.kolaborasi'), 'label' => 'Kolaborasi'],
-['href' => route('akademisi.proyek-saya'), 'label' => 'Proyek Saya'],
-['href' => route('akademisi.profil-akademik'), 'label' => 'Profil Akademik'],
-['href' => route('akademisi.notifikasi'), 'label' => 'Notifikasi'],
->>>>>>> d6680f92d4acdf2200a7b490b31cc58c6a0b061f
-],
-
-'admin' => [
-['href' => route('admin.index'), 'label' => 'Dashboard'],
-['href' => route('admin.users.index'), 'label' => 'Manajemen User'],
-['href' => route('admin.moderasi-konten'), 'label' => 'Moderasi Konten'],
-['href' => route('admin.statistik'), 'label' => 'Statistik'],
-],
-default => [
-['href' => route('landing-page'), 'label' => 'Beranda'],
-['href' => route('tentang'), 'label' => 'Tentang'],
-],
-};
-} else {
-$navItems = [
-['href' => route('landing-page'), 'label' => 'Beranda'],
-['href' => route('tentang'), 'label' => 'Tentang'],
-];
-}
+        $navItems = match(auth()->user()->role) {
+            'pemerintah' => [
+                ['href' => route('pemerintah.index'), 'label' => 'Dashboard'],
+                ['href' => route('pemerintah.program'), 'label' => 'Program & Inovasi'],
+                ['href' => route('pemerintah.diskusi'), 'label' => 'Forum Diskusi'],
+                ['href' => route('pemerintah.kolaborasi'), 'label' => 'Ruang Kolaborasi'],
+            ],
+            'akademisi' => [
+                ['href' => route('akademisi.index'), 'label' => 'Dashboard'],
+                ['href' => route('akademisi.inovasi.index'), 'label' => 'Inovasi'],
+                ['href' => route('akademisi.proyek-saya'), 'label' => 'Forum Diskusi'],
+                ['href' => route('akademisi.kolaborasi'), 'label' => 'Ruang Kolaborasi'],
+            ],
+            'admin' => [
+                ['href' => route('admin.index'), 'label' => 'Dashboard'],
+                ['href' => route('admin.users.index'), 'label' => 'Manajemen User'],
+                ['href' => route('admin.moderasi-konten'), 'label' => 'Moderasi Konten'],
+                ['href' => route('admin.statistik'), 'label' => 'Statistik'],
+            ],
+            default => [
+                ['href' => route('landing-page'), 'label' => 'Beranda'],
+                ['href' => route('tentang'), 'label' => 'Tentang'],
+            ],
+        };
+    } else {
+        $navItems = [
+            ['href' => route('landing-page'), 'label' => 'Beranda'],
+            ['href' => route('tentang'), 'label' => 'Tentang'],
+        ];
+    }
 }
 @endphp
 
@@ -71,138 +58,74 @@ $navItems = [
         <div class="flex items-center ml-8 md:ml-12">
             <a href="{{ $homeRoute }}" class="flex items-center space-x-2">
                 <img src="{{ asset('images/logoKecil.png') }}"
-                    alt="Logo DIH"
-                    class="h-12 md:h-16 transition-transform duration-300 hover:scale-105">
+                     alt="Logo DIH"
+                     class="h-12 md:h-16 transition-transform duration-300 hover:scale-105">
             </a>
         </div>
 
         {{-- ===== Desktop Menu ===== --}}
         <div class="hidden md:flex items-center space-x-5">
             @foreach($navItems as $item)
-            <a href="{{ $item['href'] }}"
-                class="relative font-medium text-gray-700 hover:text-blue-600 transition-colors px-1
-                          after:content-[''] after:absolute after:left-0 after:-bottom-1
-                          after:w-0 after:h-[2px] after:bg-blue-600
-                          hover:after:w-full after:transition-all after:duration-300">
-                {{ $item['label'] }}
-            </a>
+                @php
+                    $isActive = url()->current() === $item['href'];
+                @endphp
+                <a href="{{ $item['href'] }}"
+                   class="relative font-medium px-1 transition-colors
+                          {{ $isActive ? 'text-blue-600 after:w-full' : 'text-gray-700 hover:text-blue-600 after:w-0 hover:after:w-full' }}
+                          after:content-[''] after:absolute after:left-0 after:-bottom-1 after:h-[2px] after:bg-blue-600
+                          after:transition-all after:duration-300">
+                    {{ $item['label'] }}
+                </a>
             @endforeach
 
             {{-- ===== Avatar & Auth ===== --}}
             @auth
-            <div id="status-wrapper" class="ml-5">
-                @if(auth()->user()->status === 'pending')
-                {{-- tombol verifikasi sementara --}}
-                <button id="verifyBtn"
-                    class="px-4 py-1 rounded-full border-2 border-gray-400 text-gray-400 font-semibold cursor-not-allowed"
-                    disabled>
-                    Akun Anda Sedang Diverifikasi
-                </button>
-                @else
-                {{-- Avatar normal --}}
-                <div id="avatar-block" class="relative">
-                    <button id="avatarBtn"
-                        class="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-300 focus:outline-none">
-                        <img src="{{ auth()->user()->avatar
-                                ? asset('storage/'.auth()->user()->avatar)
-                                : asset('images/default-avatar.png') }}"
-                            alt="Avatar"
-                            class="w-full h-full object-cover">
-                    </button>
-                    <div id="avatarDropdown"
-                        class="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg border hidden">
-                        <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                            Edit Profile
-                        </a>
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <button type="submit" class="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100">
-                                Logout
+                <div id="status-wrapper" class="ml-5">
+                    @if(auth()->user()->status === 'pending')
+                        <button id="verifyBtn"
+                                class="px-4 py-1 rounded-full border-2 border-gray-400 text-gray-400 font-semibold cursor-not-allowed"
+                                disabled>
+                            Akun Anda Sedang Diverifikasi
+                        </button>
+                    @else
+                        <div id="avatar-block" class="relative">
+                            <button id="avatarBtn"
+                                    class="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-300 focus:outline-none">
+                                <img src="{{ auth()->user()->avatar
+                                    ? asset('storage/'.auth()->user()->avatar)
+                                    : asset('images/default-avatar.png') }}"
+                                     alt="Avatar"
+                                     class="w-full h-full object-cover">
                             </button>
-                        </form>
-                    </div>
+                            <div id="avatarDropdown"
+                                 class="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg border hidden">
+                                <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                                    Edit Profile
+                                </a>
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit" class="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100">
+                                        Logout
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    @endif
                 </div>
-                @endif
-            </div>
-
-            {{-- === Polling script (hanya untuk user yang pending) === --}}
-            @if(auth()->user()->status === 'pending')
-            <script>
-                (function() {
-                    // gunakan string Blade biasa agar editor tidak memprotes
-                    const statusUrl = "{{ route('user.status') }}";
-                    const dashboardUrl = "{{ route('dashboard') }}"; // pakai route dashboard yang sudah ada
-
-                    // helper untuk menggantikan tombol verifikasi dengan link dashboard
-                    function showDashboardButton() {
-                        const wrapper = document.getElementById('status-wrapper');
-                        if (!wrapper) return;
-
-                        wrapper.innerHTML = `
-                        <a id="dashboardBtn" href="${dashboardUrl}"
-                           class="px-4 py-1 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-semibold">
-                           Akun Terverifikasi
-                        </a>
-                    `;
-                    }
-
-                    // tampilkan pesan akun ditolak
-                    function showRejectedNotice() {
-                        const wrapper = document.getElementById('status-wrapper');
-                        if (!wrapper) return;
-
-                        wrapper.innerHTML = `
-        <div class="px-4 py-1 rounded-full bg-red-600 text-white font-semibold">
-            Akun Anda Ditolak
-        </div>
-    `;
-                    }
-
-                    // polling function
-                    async function checkStatus() {
-                        try {
-                            const res = await fetch(statusUrl, {
-                                headers: {
-                                    'X-Requested-With': 'XMLHttpRequest'
-                                },
-                                credentials: 'same-origin'
-                            });
-                            if (!res.ok) return;
-                            const data = await res.json();
-                            if (data.status === 'verified') {
-                                showDashboardButton();
-                                clearInterval(window._userStatusInterval);
-                            } else if (data.status === 'rejected') {
-                                showRejectedNotice();
-                                clearInterval(window._userStatusInterval);
-                            }
-
-                        } catch (err) {
-                            // silent fail (network / auth)
-                        }
-                    }
-
-                    // jalankan segera lalu set interval
-                    checkStatus();
-                    window._userStatusInterval = setInterval(checkStatus, 5000); // cek tiap 5 detik
-                })();
-            </script>
-            @endif
             @endauth
 
             @guest
-            {{-- === LOGIN / REGISTER === --}}
-            <div class="flex items-center space-x-3 ml-5">
-                <button class="px-4 py-1 rounded-full border-2 border-blue-600 text-blue-600 font-semibold
-                               hover:bg-blue-600 hover:text-white transition open-login-modal">
-                    Login
-                </button>
-                <a href="{{ route('user.register') }}"
-                    class="px-4 py-1 rounded-full bg-gradient-to-r from-blue-600 to-green-500
-                          text-white font-semibold shadow-md hover:opacity-90 transition">
-                    Register
-                </a>
-            </div>
+                <div class="flex items-center space-x-3 ml-5">
+                    <button class="px-4 py-1 rounded-full border-2 border-blue-600 text-blue-600 font-semibold
+                                   hover:bg-blue-600 hover:text-white transition open-login-modal">
+                        Login
+                    </button>
+                    <a href="{{ route('user.register') }}"
+                       class="px-4 py-1 rounded-full bg-gradient-to-r from-blue-600 to-green-500
+                             text-white font-semibold shadow-md hover:opacity-90 transition">
+                        Register
+                    </a>
+                </div>
             @endguest
         </div>
 
@@ -212,64 +135,68 @@ $navItems = [
         </button>
     </div>
 
-    {{-- Mobile Menu --}}
+    {{-- ===== Mobile Menu ===== --}}
     <div id="mobile-menu" class="hidden md:hidden bg-white border-t">
         @foreach($navItems as $item)
-        <a href="{{ $item['href'] }}" class="block py-3 px-4 font-medium hover:bg-gray-100">
-            {{ $item['label'] }}
-        </a>
+            @php
+                $isActiveMobile = url()->current() === $item['href'];
+            @endphp
+            <a href="{{ $item['href'] }}"
+               class="block py-3 px-4 font-medium {{ $isActiveMobile ? 'text-blue-600 bg-blue-50' : 'text-gray-700 hover:bg-gray-100' }}">
+                {{ $item['label'] }}
+            </a>
         @endforeach
 
+        {{-- ===== Mobile Auth Menu ===== --}}
         @auth
-        <div id="status-wrapper-mobile" class="border-t mt-2 p-4">
-            @if(auth()->user()->status === 'pending')
-            <button disabled
-                class="w-full text-center px-4 py-2 rounded-lg border-2 border-gray-400 text-gray-400 font-semibold cursor-not-allowed">
-                Akun Anda Sedang Diverifikasi
-            </button>
-            @elseif(auth()->user()->status === 'verified')
-            <div class="flex items-center space-x-3 mb-2">
-                <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-300">
-                    <img src="{{ auth()->user()->avatar
-                                    ? asset('storage/'.auth()->user()->avatar)
-                                    : asset('images/default-avatar.png') }}"
-                        alt="Avatar" class="w-full h-full object-cover">
-                </div>
-                <div class="flex-1">
-                    <a href="{{ route('profile.edit') }}"
-                        class="block text-blue-600 font-medium hover:underline">
-                        Edit Profile
-                    </a>
-                </div>
+            <div id="status-wrapper-mobile" class="border-t mt-2 p-4">
+                @if(auth()->user()->status === 'pending')
+                    <button disabled class="w-full text-center px-4 py-2 rounded-lg border-2 border-gray-400 text-gray-400 font-semibold cursor-not-allowed">
+                        Akun Anda Sedang Diverifikasi
+                    </button>
+                @elseif(auth()->user()->status === 'verified')
+                    <div class="flex items-center space-x-3 mb-2">
+                        <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-300">
+                            <img src="{{ auth()->user()->avatar
+                                ? asset('storage/'.auth()->user()->avatar)
+                                : asset('images/default-avatar.png') }}"
+                                 alt="Avatar" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1">
+                            <a href="{{ route('profile.edit') }}"
+                               class="block text-blue-600 font-medium hover:underline">
+                                Edit Profile
+                            </a>
+                        </div>
+                    </div>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit"
+                                class="w-full mt-2 px-4 py-2 rounded-lg border-2 border-red-600 text-red-600 font-semibold
+                                       hover:bg-red-600 hover:text-white transition">
+                            Logout
+                        </button>
+                    </form>
+                @elseif(auth()->user()->status === 'rejected')
+                    <div class="w-full text-center px-4 py-2 rounded-lg bg-red-600 text-white font-semibold">
+                        Akun Anda Ditolak
+                    </div>
+                @endif
             </div>
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button type="submit"
-                    class="w-full mt-2 px-4 py-2 rounded-lg border-2 border-red-600 text-red-600 font-semibold
-                               hover:bg-red-600 hover:text-white transition">
-                    Logout
-                </button>
-            </form>
-            @elseif(auth()->user()->status === 'rejected')
-            <div class="w-full text-center px-4 py-2 rounded-lg bg-red-600 text-white font-semibold">
-                Akun Anda Ditolak
-            </div>
-            @endif
-        </div>
         @endauth
 
         @guest
-        <div class="border-t mt-2 p-4 flex flex-col space-y-2">
-            <button class="w-full text-center px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-green-500
-                           text-white font-semibold shadow-md hover:opacity-90 transition open-login-modal">
-                Login
-            </button>
-            <a href="{{ route('user.register') }}"
-                class="w-full text-center px-4 py-2 rounded-lg border-2 border-blue-600 text-blue-600 font-semibold
-                     hover:bg-blue-600 hover:text-white transition">
-                Register
-            </a>
-        </div>
+            <div class="border-t mt-2 p-4 flex flex-col space-y-2">
+                <button class="w-full text-center px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-green-500
+                               text-white font-semibold shadow-md hover:opacity-90 transition open-login-modal">
+                    Login
+                </button>
+                <a href="{{ route('user.register') }}"
+                   class="w-full text-center px-4 py-2 rounded-lg border-2 border-blue-600 text-blue-600 font-semibold
+                         hover:bg-blue-600 hover:text-white transition">
+                    Register
+                </a>
+            </div>
         @endguest
     </div>
 </nav>
@@ -283,9 +210,9 @@ $navItems = [
         <form method="POST" action="{{ route('login') }}" class="space-y-4">
             @csrf
             <input type="email" name="email" placeholder="Email" required
-                class="w-full border border-gray-300 px-4 py-3 rounded-lg">
+                   class="w-full border border-gray-300 px-4 py-3 rounded-lg">
             <input type="password" name="password" placeholder="Password" required
-                class="w-full border border-gray-300 px-4 py-3 rounded-lg">
+                   class="w-full border border-gray-300 px-4 py-3 rounded-lg">
             <div class="flex items-center justify-between">
                 <label class="flex items-center text-sm text-gray-600">
                     <input type="checkbox" name="remember" class="mr-2 rounded"> Remember me
@@ -293,7 +220,7 @@ $navItems = [
                 <a href="{{ route('password.request') }}" class="text-sm text-blue-600 hover:underline">Lupa password?</a>
             </div>
             <button type="submit"
-                class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold">
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold">
                 Login
             </button>
         </form>

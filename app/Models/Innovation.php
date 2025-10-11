@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Innovation extends Model
 {
+    // 🔑 Pastikan model ini pakai tabel academic_innovations, bukan innovations
+    protected $table = 'academic_innovations';
+
     // isi kolom yang boleh diisi mass-assignment
     protected $fillable = [
         'title',
@@ -29,6 +32,7 @@ class Innovation extends Model
     public const STATUS_DRAFT = 'Draft';
     public const STATUS_PUBLICATION = 'Publication';
 
+    // List status yang valid
     public static function statuses(): array
     {
         return [

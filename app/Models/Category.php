@@ -5,14 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Subcategory extends Model
+class Category extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['category_id', 'name'];
+    protected $fillable = ['name'];
 
-    public function category()
+    public function subcategories()
     {
-        return $this->belongsTo(Category::class);
+        return $this->hasMany(Subcategory::class);
     }
 }

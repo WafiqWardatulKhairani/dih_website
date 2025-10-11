@@ -29,4 +29,29 @@ class AcademicInnovation extends Model
         'copyright_status',
         'user_id',
     ];
+
+    /** ==========================
+     *   STATUS CONSTANTS
+     *  ========================== */
+    public const STATUS_DRAFT = 'draft';
+    public const STATUS_PUBLICATION = 'publication';
+
+    /**
+     * Helper untuk validasi Rule::in(AcademicInnovation::statuses())
+     */
+    public static function statuses(): array
+    {
+        return [
+            self::STATUS_DRAFT,
+            self::STATUS_PUBLICATION,
+        ];
+    }
+
+    /** ==========================
+     *   RELATIONS
+     *  ========================== */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

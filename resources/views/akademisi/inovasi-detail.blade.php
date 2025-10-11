@@ -176,7 +176,7 @@
                 </div>
             </div>
 
-            <!-- Video dan Actions -->
+            <!-- Video Demonstrasi -->
             @if($innovation->video_url)
                 <div class="mb-8">
                     <h4 class="font-semibold text-xl mb-4 text-gray-900 flex items-center">
@@ -197,6 +197,8 @@
                     <div class="pt-8 border-t border-gray-200">
                         <h4 class="font-semibold text-lg mb-4 text-gray-900">Kelola Inovasi</h4>
                         <div class="flex flex-col sm:flex-row gap-4">
+
+                            <!-- Tombol Unduh Dokumen -->
                             @if($innovation->document_path)
                                 <a href="{{ asset('storage/' . $innovation->document_path) }}" target="_blank" 
                                    class="inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200 shadow-md hover:shadow-lg flex-1 sm:flex-none">
@@ -205,7 +207,7 @@
                                 </a>
                             @endif
 
-                            <!-- Tombol Edit dengan fallback route -->
+                            <!-- Tombol Edit Inovasi -->
                             @if(Route::has('akademisi.inovasi.edit'))
                                 <a href="{{ route('akademisi.inovasi.edit', $innovation->id) }}" 
                                    class="inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200 shadow-md hover:shadow-lg flex-1 sm:flex-none">
@@ -219,6 +221,18 @@
                                     Edit Inovasi
                                 </a>
                             @endif
+
+                            <!-- Tombol Hapus Inovasi -->
+                            <form action="{{ route('akademisi.inovasi.destroy', $innovation->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus inovasi ini?');" class="inline-flex flex-1 sm:flex-none">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit"
+                                        class="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-200 shadow-md hover:shadow-lg w-full">
+                                    <i class="fas fa-trash mr-2"></i>
+                                    Hapus Inovasi
+                                </button>
+                            </form>
+
                         </div>
                     </div>
                 @endif

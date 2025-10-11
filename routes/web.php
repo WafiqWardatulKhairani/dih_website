@@ -1,19 +1,19 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth;
-use App\Http\Middleware\AdminMiddleware;
-use App\Http\Controllers\LandingPageController;
-use App\Http\Controllers\Auth\AuthenticatedSessionController;
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AkademisiController;
 use App\Http\Controllers\Akademisi\InnovationController;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\PemerintahController;
-use App\Http\Controllers\Pemerintah\ProgramController;
-use App\Http\Controllers\Pemerintah\KolaborasiController;
 use App\Http\Controllers\Pemerintah\DiskusiController;
+use App\Http\Controllers\Pemerintah\KolaborasiController;
+use App\Http\Controllers\Pemerintah\ProgramController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Middleware\AdminMiddleware;
 use App\Livewire\Auth\UserRegister;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 
 require __DIR__ . '/auth.php';
 
@@ -27,7 +27,7 @@ Route::prefix('program-inovasi')->name('program.')->group(function () {
     Route::get('/', [ProgramController::class, 'programInnovationIndex'])->name('innovation.index');
     Route::get('/program', [ProgramController::class, 'showPrograms'])->name('list');
     Route::get('/inovasi', [ProgramController::class, 'showInnovations'])->name('innovation.list');
-    
+
     // ✅ ROUTE DETAIL BARU
     Route::get('/program/{id}', [ProgramController::class, 'showProgramDetail'])->name('detail');
     Route::get('/inovasi/{id}', [ProgramController::class, 'showInnovationDetail'])->name('innovation.detail');
@@ -45,7 +45,7 @@ Route::middleware('guest')->group(function () {
 
 // =============== AUTHENTICATED ROUTES ===============
 Route::middleware('auth')->group(function () {
-    
+
     // =============== PEMERINTAH ROUTES ===============
     Route::prefix('pemerintah')->name('pemerintah.')->group(function () {
         Route::get('/', [PemerintahController::class, 'index'])->name('index');
@@ -72,30 +72,39 @@ Route::middleware('auth')->group(function () {
             Route::delete('/delete/{id}', [ProgramController::class, 'destroyInnovation'])->name('destroy');
         });
     });
-    // =============== AKADEMISI ROUTES ===============
-    Route::prefix('akademisi')->name('akademisi.')->group(function () {
-        Route::get('/', [AkademisiController::class, 'index'])->name('index');
-        
-        // CRUD Inovasi Akademisi
-        Route::prefix('inovasi')->name('inovasi.')->group(function () {
-            Route::get('/create', [InnovationController::class, 'create'])->name('create');
-            Route::post('/store', [InnovationController::class, 'store'])->name('store');
-            Route::get('/{id}', [InnovationController::class, 'show'])->name('show');
-            Route::get('/{id}/edit', [InnovationController::class, 'edit'])->name('edit');
-            Route::put('/{id}', [InnovationController::class, 'update'])->name('update');
-        });
-        
-        // Ajax subcategories
-        Route::get('/subcategories', [InnovationController::class, 'subcategories'])->name('subcategories');
+// =============== AKADEMISI ROUTES ===============
+Route::prefix('akademisi')->name('akademisi.')->middleware(['auth'])->group(function () {
 
-        // Menu lainnya
-        Route::get('/proyek-saya', [AkademisiController::class, 'proyekSaya'])->name('proyek-saya');
-        Route::get('/kolaborasi', [AkademisiController::class, 'kolaborasi'])->name('kolaborasi');
-        Route::get('/profil-akademik', [AkademisiController::class, 'profilAkademik'])->name('profil-akademik');
-        Route::get('/notifikasi', [AkademisiController::class, 'notifikasi'])->name('notifikasi');
+    // Halaman utama akademisi
+    Route::get('/', [AkademisiController::class, 'index'])->name('index');
+
+    // ---------- Inovasi ----------
+    Route::prefix('inovasi')->name('inovasi.')->group(function () {
+
+        // Route AJAX Subkategori (harus sebelum route {innovation})
+        Route::get('/subcategories', [InnovationController::class, 'subcategories'])
+            ->name('subcategories');
+
+        // CRUD inovasi
+        Route::get('/', [InnovationController::class, 'index'])->name('index');
+        Route::get('/create', [InnovationController::class, 'create'])->name('create');
+        Route::post('/', [InnovationController::class, 'store'])->name('store'); // RESTful: store ke "/"
+        Route::get('/{innovation}', [InnovationController::class, 'show'])->name('show');
+        Route::get('/{innovation}/edit', [InnovationController::class, 'edit'])->name('edit');
+        Route::put('/{innovation}', [InnovationController::class, 'update'])->name('update');
+        Route::delete('/{innovation}', [InnovationController::class, 'destroy'])->name('destroy');
+
     });
 
-    // =============== PROFILE ROUTES ===============
+    // ---------- Menu Lain ----------
+    Route::get('/proyek-saya', [AkademisiController::class, 'proyekSaya'])->name('proyek-saya');
+    Route::get('/kolaborasi', [AkademisiController::class, 'kolaborasi'])->name('kolaborasi');
+    Route::get('/profil-akademik', [AkademisiController::class, 'profilAkademik'])->name('profil-akademik');
+    Route::get('/notifikasi', [AkademisiController::class, 'notifikasi'])->name('notifikasi');
+
+});
+
+// =============== PROFILE ROUTES ===============
     Route::controller(ProfileController::class)->group(function () {
         Route::get('/profile', 'edit')->name('profile.edit');
         Route::patch('/profile', 'update')->name('profile.update');
