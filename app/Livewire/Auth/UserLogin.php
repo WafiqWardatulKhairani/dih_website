@@ -4,6 +4,7 @@ namespace App\Livewire\Auth;
 
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 class UserLogin extends Component
 {
@@ -11,54 +12,48 @@ class UserLogin extends Component
 
     public function login()
     {
-        // Validasi
-        $credentials = $this->validate([
-            'email'    => 'required|email',
-            'password' => 'required|min:8',
+        $this->validate([
+            'email' => 'required|email',
+            'password' => 'required|min:6',
         ]);
 
-        // Auth attempt
-        if (Auth::attempt($credentials, $this->remember)) {
-
-            // 🚫 Tambahkan blok ini di sini
-            if (Auth::user()->status === 'rejected') {
+        // Coba login
+        if (Auth::attempt(['email' => $this->email, 'password' => $this->password], $this->remember)) {
+            
+            $user = Auth::user();
+            
+            // Cek status user
+            if ($user->status === 'rejected') {
                 Auth::logout();
-                $this->addError('email', 'Akun Anda telah ditolak dan tidak dapat login.');
+                $this->addError('email', 'Akun Anda telah ditolak.');
                 return;
             }
 
-            // Tetap pakai pengecekan verified
-            if (Auth::user()->status !== 'verified') {
+            if ($user->status !== 'verified') {
                 Auth::logout();
                 $this->addError('email', 'Akun belum diverifikasi admin.');
                 return;
             }
 
-            session()->regenerate(); // keamanan
+            session()->regenerate();
 
-            // Redirect sesuai role
-            switch (Auth::user()->role) {
-                case 'admin':
-                    return redirect()->route('admin.dashboard');
-                case 'pemerintah':
-                    return redirect()->route('pemerintah.index');
-                case 'akademisi':
-                    return redirect()->route('akademisi.index');
-                default:
-                    Auth::logout();
-                    $this->addError('email', 'Role tidak dikenali.');
-                    return;
+            // Redirect berdasarkan role
+            if ($user->role === 'admin') {
+                return redirect()->route('admin.index');
+            } elseif ($user->role === 'pemerintah') {
+                return redirect()->route('pemerintah.index');
+            } elseif ($user->role === 'akademisi') {
+                return redirect()->route('akademisi.index');
             }
+
+            return redirect()->route('landing-page');
         }
-        // Gagal login
+
         $this->addError('email', 'Email atau password salah.');
     }
 
-
     public function render()
     {
-        return view('livewire.auth')
-            ->extends('layouts.app')
-            ->section('content');
+        return view('livewire.auth.user-login');
     }
 }

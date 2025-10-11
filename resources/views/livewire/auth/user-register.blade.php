@@ -1,103 +1,157 @@
-<div class="max-w-lg mx-auto bg-white shadow-lg rounded-xl p-6 my-10">
-    <h2 class="text-2xl font-bold mb-6 text-center text-blue-600">Registrasi Akun</h2>
-
-    @if (session('error'))
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-            {{ session('error') }}
-        </div>
-    @endif
-
-    <form wire:submit.prevent="register" class="space-y-4" enctype="multipart/form-data">
-        <!-- Nama -->
-        <div>
-            <input type="text" wire:model="name" placeholder="Nama Lengkap" 
-                   class="w-full border border-gray-300 px-4 py-3 rounded-lg">
-            @error('name') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
-        </div>
-
-        <!-- Instansi -->
-        <div>
-            <input type="text" wire:model="institution_name" placeholder="Nama Instansi" 
-                   class="w-full border border-gray-300 px-4 py-3 rounded-lg">
-            @error('institution_name') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
-        </div>
-
-        <!-- Telepon -->
-        <div>
-            <input type="tel" wire:model="phone" placeholder="Nomor Telepon" 
-                   class="w-full border border-gray-300 px-4 py-3 rounded-lg">
-            @error('phone') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
-        </div>
-
-        <!-- Alamat -->
-        <div>
-            <textarea wire:model="address" placeholder="Alamat Lengkap" 
-                      class="w-full border border-gray-300 px-4 py-3 rounded-lg"></textarea>
-            @error('address') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
-        </div>
-
-        <!-- Email -->
-        <div>
-            <input type="email" wire:model="email" placeholder="Email" 
-                   class="w-full border border-gray-300 px-4 py-3 rounded-lg">
-            @error('email') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
-        </div>
-
-        <!-- Password & Konfirmasi -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div>
-                <input type="password" wire:model="password" placeholder="Password" 
-                       class="w-full border border-gray-300 px-4 py-3 rounded-lg">
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4">
+    <div class="max-w-md mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4 shadow-lg">
+                🚀
             </div>
-            <div>
-                <input type="password" wire:model="password_confirmation" placeholder="Konfirmasi Password" 
-                       class="w-full border border-gray-300 px-4 py-3 rounded-lg">
-            </div>
-        </div>
-        @error('password') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
-
-        <!-- Role -->
-        <div>
-            <select wire:model="role" class="w-full border border-gray-300 px-4 py-3 rounded-lg">
-                <option value="">-- Pilih Role --</option>
-                <option value="pemerintah">Pemerintah</option>
-                <option value="akademisi">Akademisi</option>
-            </select>
-            @error('role') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">Daftar Akun</h1>
+            <p class="text-gray-600">Bergabung dengan platform kami</p>
         </div>
 
-        <!-- Dokumen -->
-        <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-                Upload Surat Tugas (Wajib PDF)
-            </label>
-            <input type="file" wire:model="document" accept=".pdf,.jpg,.jpeg,.png"
-                   class="w-full border border-gray-300 px-4 py-2 rounded-lg">
-            <div wire:loading wire:target="document" class="text-sm text-gray-500">Uploading document...</div>
-            @error('document') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
-        </div>
-
-        <!-- Avatar / Foto Profil -->
-        <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-                Upload Foto Profil (Wajib)
-            </label>
-            <input type="file" wire:model="avatar" accept=".jpg,.jpeg,.png"
-                   class="w-full border border-gray-300 px-4 py-2 rounded-lg">
-            <div wire:loading wire:target="avatar" class="text-sm text-gray-500">Uploading avatar...</div>
-            @error('avatar') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
-
-            <!-- Preview Avatar -->
-            @if ($avatar)
-                <div class="mt-2">
-                    <span class="text-sm text-gray-600">Preview:</span>
-                    <img src="{{ $avatar->temporaryUrl() }}" alt="Avatar Preview" class="mt-1 w-24 h-24 rounded-full object-cover border">
+        <!-- Auto Approval Indicator -->
+        @if($approvalType === 'auto')
+        <div class="bg-green-50 border border-green-200 rounded-xl p-4 mb-6">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center text-green-600">
+                    ⚡
                 </div>
-            @endif
+                <div>
+                    <p class="font-semibold text-green-800">Auto Approval Terdeteksi</p>
+                    <p class="text-green-600 text-sm">Email institusi Anda akan otomatis disetujui dalam 3 menit</p>
+                </div>
+            </div>
+        </div>
+        @else
+        <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">
+                    ⏳
+                </div>
+                <div>
+                    <p class="font-semibold text-blue-800">Manual Approval</p>
+                    <p class="text-blue-600 text-sm">Akun Anda akan diverifikasi oleh admin</p>
+                </div>
+            </div>
+        </div>
+        @endif
+
+        <!-- Form -->
+        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
+            <form wire:submit="register" enctype="multipart/form-data">
+                <!-- Name -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap</label>
+                    <input type="text" wire:model="name" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                    @error('name') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                </div>
+
+                <!-- Institution -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Nama Instansi</label>
+                    <input type="text" wire:model="institution_name" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                    @error('institution_name') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                </div>
+
+                <!-- Email dengan real-time detection -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <!-- ✅ PERBAIKAN: Ganti jadi wire:model.live -->
+                    <input type="email" wire:model.live="email" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                    @error('email') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                </div>
+
+                <!-- Phone -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Nomor Telepon</label>
+                    <input type="tel" wire:model="phone" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                    @error('phone') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                </div>
+
+                <!-- Address -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Alamat</label>
+                    <textarea wire:model="address" rows="3"
+                              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"></textarea>
+                    @error('address') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                </div>
+
+                <!-- Role -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Jenis Akun</label>
+                    <select wire:model="role" 
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                        <option value="">Pilih Jenis Akun</option>
+                        <option value="pemerintah">Pemerintah</option>
+                        <option value="akademisi">Akademisi</option>
+                    </select>
+                    @error('role') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                </div>
+
+                <!-- Password -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                    <input type="password" wire:model="password" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                    @error('password') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                </div>
+
+                <!-- Confirm Password -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Konfirmasi Password</label>
+                    <input type="password" wire:model="password_confirmation" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                </div>
+
+                <!-- Avatar Upload -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Foto Profil</label>
+                    <input type="file" wire:model="avatar" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                    @error('avatar') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                    @if($avatar)
+                        <div class="mt-2 text-sm text-green-600">
+                            ✅ File terpilih: {{ $avatar->getClientOriginalName() }}
+                        </div>
+                    @endif
+                </div>
+
+                <!-- Document Upload -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Dokumen Identitas (PDF)</label>
+                    <input type="file" wire:model="document" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                    @error('document') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                    @if($document)
+                        <div class="mt-2 text-sm text-green-600">
+                            ✅ File terpilih: {{ $document->getClientOriginalName() }}
+                        </div>
+                    @endif
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" 
+                        class="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-4 rounded-xl font-semibold hover:from-blue-600 hover:to-purple-700 transition-all transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                        wire:loading.attr="disabled">
+                    <span wire:loading.remove>🚀 Daftar Sekarang</span>
+                    <span wire:loading>⏳ Memproses...</span>
+                </button>
+            </form>
+
         </div>
 
-        <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold">
-            Daftar Sekarang
-        </button>
-    </form>
+        <!-- Info Box -->
+        <div class="mt-6 bg-blue-50 border border-blue-200 rounded-xl p-4">
+            <h4 class="font-semibold text-blue-800 mb-2">Info Pendaftaran:</h4>
+            <ul class="text-sm text-blue-600 space-y-1">
+                <li>• Email <strong>@ac.id, @go.id, dll</strong> akan auto-approve dalam 3 menit</li>
+                <li>• Email lainnya menunggu verifikasi admin</li>
+                <li>• Dokumen akan diverifikasi keasliannya</li>
+            </ul>
+        </div>
+    </div>
 </div>

@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
+use Illuminate\Support\Facades\Storage;
 
 class UserRegister extends Component
 {
@@ -16,6 +17,10 @@ class UserRegister extends Component
     public $name, $institution_name, $phone, $address,
         $email, $password, $password_confirmation,
         $role, $document, $avatar;
+
+    public $approvalType = 'manual';
+    public $showCountdown = false;
+    public $countdown = 180;
 
     protected function rules()
     {
@@ -32,15 +37,29 @@ class UserRegister extends Component
         ];
     }
 
+    // ✅ PERBAIKAN: Ganti jadi updated hook
+    public function updated($property)
+    {
+        if ($property === 'email') {
+            $this->checkEmailType();
+        }
+    }
+
+    // ✅ Method terpisah untuk cek email type
+    public function checkEmailType()
+    {
+        if (!empty($this->email)) {
+            $user = new User(['email' => $this->email]);
+            $this->approvalType = $user->isInstitutionalEmail() ? 'auto' : 'manual';
+        }
+    }
+
     public function register()
     {
-        // Validasi input & file
         $validated = $this->validate($this->rules());
 
         try {
-            $docFolder = $validated['role']; // "akademisi" atau "pemerintah"
-
-            // Sanitasi nama untuk nama file
+            $docFolder = $validated['role'];
             $safeName = Str::slug($validated['name'], '_');
 
             // Simpan avatar
@@ -53,8 +72,8 @@ class UserRegister extends Component
             $documentName = $safeName . '_document.' . $docExt;
             $documentPath = $this->document->storeAs("documents/{$docFolder}", $documentName, 'public');
 
-            // Simpan user ke database
-            User::create([
+            // Buat user
+            $user = User::create([
                 'name'             => $validated['name'],
                 'institution_name' => $validated['institution_name'],
                 'phone'            => $validated['phone'],
@@ -65,19 +84,38 @@ class UserRegister extends Component
                 'document_path'    => $documentPath,
                 'avatar'           => $avatarPath,
                 'status'           => 'pending',
+                'approval_type'    => $this->approvalType,
             ]);
 
-            session()->flash('registration_pending', true);
-            session()->flash('success', 'Registrasi berhasil! Akun Anda menunggu verifikasi admin.');
+            // Auto approve untuk email institutional
+            if ($this->approvalType === 'auto') {
+                // Schedule auto approval setelah 3 menit
+                dispatch(function () use ($user) {
+                    $user->update([
+                        'status' => 'verified',
+                        'approved_at' => now()
+                    ]);
+                })->delay(now()->addMinutes(3));
+
+                $message = "Registrasi berhasil! Email institusi terdeteksi. Akun akan otomatis aktif dalam 3 menit.";
+                $title = "Registrasi Berhasil - Auto Approval";
+            } else {
+                $message = "Registrasi berhasil! Akun Anda menunggu verifikasi admin.";
+                $title = "Registrasi Berhasil - Menunggu Verifikasi";
+            }
 
             $this->dispatch(
                 'swal:success',
-                title: 'Registrasi Berhasil!',
-                message: 'Akun Anda sedang menunggu verifikasi admin.',
+                title: $title,
+                message: $message,
                 redirect: route('landing-page'),
                 timer: 5000
             );
+
         } catch (\Exception $e) {
+            if (isset($avatarPath)) Storage::disk('public')->delete($avatarPath);
+            if (isset($documentPath)) Storage::disk('public')->delete($documentPath);
+
             $this->dispatch(
                 'swal:error',
                 title: 'Registrasi Gagal!',

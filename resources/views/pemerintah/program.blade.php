@@ -1,40 +1,43 @@
 @extends('layouts.app')
 
 @section('styles')
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#1e40af',
-                        secondary: '#0ea5e9',
-                        accent: '#3b82f6',
-                        dark: '#1e293b',
-                        light: '#f8fafc'
-                    }
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    primary: '#1e40af',
+                    secondary: '#0ea5e9',
+                    accent: '#3b82f6',
+                    dark: '#1e293b',
+                    light: '#f8fafc'
                 }
             }
         }
-    </script>
-    <style>
-        .hero-bg {
-            background: linear-gradient(135deg, #1e40af 0%, #0ea5e9 100%);
-        }
-        .card-hover {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .card-hover:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px -5px rgba(0, 0, 0, 0.1);
-        }
-        .compact-card {
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-    </style>
+    }
+</script>
+<style>
+    .hero-bg {
+        background: linear-gradient(135deg, #1e40af 0%, #0ea5e9 100%);
+    }
+
+    .card-hover {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card-hover:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px -5px rgba(0, 0, 0, 0.1);
+    }
+
+    .compact-card {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+</style>
 @endsection
 
 @section('content')
@@ -100,50 +103,50 @@
         </div>
 
         @if($programs->count() > 0)
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                @foreach($programs as $program)
-                <div class="bg-white rounded-lg border border-gray-200 overflow-hidden card-hover compact-card">
-                    <div class="h-20 bg-gradient-to-r from-primary to-secondary relative">
-                        @if($program->image)
-                            <img src="{{ asset('storage/' . $program->image) }}" alt="{{ $program->title }}" class="w-full h-full object-cover">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            @foreach($programs as $program)
+            <div class="bg-white rounded-lg border border-gray-200 overflow-hidden card-hover compact-card">
+                <div class="h-20 bg-gradient-to-r from-primary to-secondary relative">
+                    @if($program->image)
+                    <img src="{{ asset('storage/' . $program->image) }}" alt="{{ $program->title }}" class="w-full h-full object-cover">
+                    @endif
+                    <span class="absolute top-2 right-2 bg-white text-primary px-1.5 py-0.5 rounded-full text-xs font-medium shadow-sm">
+                        @if($program->status == 'planning') 📅
+                        @elseif($program->status == 'ongoing') 🚀
+                        @else ✅
                         @endif
-                        <span class="absolute top-2 right-2 bg-white text-primary px-1.5 py-0.5 rounded-full text-xs font-medium shadow-sm">
-                            @if($program->status == 'planning') 📅
-                            @elseif($program->status == 'ongoing') 🚀
-                            @else ✅
-                            @endif
-                        </span>
+                    </span>
+                </div>
+                <div class="p-3 flex-1">
+                    <h3 class="text-sm font-semibold text-dark mb-1 leading-tight">{{ Str::limit($program->title, 40) }}</h3>
+                    <p class="text-xs text-gray-600 mb-2">{{ Str::limit($program->description, 50) }}</p>
+
+                    <div class="flex items-center justify-between text-xs text-gray-500 mb-1">
+                        <span class="truncate">{{ Str::limit($program->opd_name, 12) }}</span>
+                        <span>{{ $program->progress }}%</span>
                     </div>
-                    <div class="p-3 flex-1">
-                        <h3 class="text-sm font-semibold text-dark mb-1 leading-tight">{{ Str::limit($program->title, 40) }}</h3>
-                        <p class="text-xs text-gray-600 mb-2">{{ Str::limit($program->description, 50) }}</p>
-                        
-                        <div class="flex items-center justify-between text-xs text-gray-500 mb-1">
-                            <span class="truncate">{{ Str::limit($program->opd_name, 12) }}</span>
-                            <span>{{ $program->progress }}%</span>
-                        </div>
-                        
-                        <!-- Progress Bar -->
-                        <div class="w-full bg-gray-200 rounded-full h-1.5">
-                            <div class="bg-green-500 h-1.5 rounded-full" style="width: {{ $program->progress }}%"></div>
-                        </div>
-                    </div>
-                    <div class="px-3 pb-3">
-                    <a href="{{ route('program.detail', $program->id) }}" class="block w-full text-center bg-gray-100 text-gray-700 hover:bg-gray-200 text-xs font-medium py-1.5 rounded transition">
-    Lihat Detail
-</a>
+
+                    <!-- Progress Bar -->
+                    <div class="w-full bg-gray-200 rounded-full h-1.5">
+                        <div class="bg-green-500 h-1.5 rounded-full" style="width: {{ $program->progress }}%"></div>
                     </div>
                 </div>
-                @endforeach
+                <div class="px-3 pb-3">
+                    <a href="{{ route('program.detail', $program->id) }}" class="block w-full text-center bg-gray-100 text-gray-700 hover:bg-gray-200 text-xs font-medium py-1.5 rounded transition">
+                        Lihat Detail
+                    </a>
+                </div>
             </div>
+            @endforeach
+        </div>
         @else
-            <div class="text-center py-8 bg-gray-50 rounded-lg border border-gray-200">
-                <div class="text-gray-400 text-3xl mb-2">📋</div>
-                <p class="text-gray-500 text-sm mb-3">Belum ada program yang diposting.</p>
-                <a href="{{ route('pemerintah.program.create') }}" class="inline-block bg-primary text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition text-xs">
-                    📋 Buat Program Pertama
-                </a>
-            </div>
+        <div class="text-center py-8 bg-gray-50 rounded-lg border border-gray-200">
+            <div class="text-gray-400 text-3xl mb-2">📋</div>
+            <p class="text-gray-500 text-sm mb-3">Belum ada program yang diposting.</p>
+            <a href="{{ route('pemerintah.program.create') }}" class="inline-block bg-primary text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition text-xs">
+                📋 Buat Program Pertama
+            </a>
+        </div>
         @endif
     </div>
 </section>
@@ -165,56 +168,56 @@
         </div>
 
         @if($innovations->count() > 0)
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                @foreach($innovations as $innovation)
-                <div class="bg-white rounded-lg border border-gray-200 overflow-hidden card-hover compact-card">
-                    <div class="h-20 bg-gradient-to-r from-green-500 to-emerald-400 relative">
-                        @if($innovation->image)
-                            <img src="{{ asset('storage/' . $innovation->image) }}" alt="{{ $innovation->title }}" class="w-full h-full object-cover">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            @foreach($innovations as $innovation)
+            <div class="bg-white rounded-lg border border-gray-200 overflow-hidden card-hover compact-card">
+                <div class="h-20 bg-gradient-to-r from-green-500 to-emerald-400 relative">
+                    @if($innovation->image)
+                    <img src="{{ asset('storage/' . $innovation->image) }}" alt="{{ $innovation->title }}" class="w-full h-full object-cover">
+                    @endif
+                    <span class="absolute top-2 right-2 bg-white text-green-600 px-1.5 py-0.5 rounded-full text-xs font-medium shadow-sm">
+                        @if($innovation->status == 'prototype') 🔧
+                        @elseif($innovation->status == 'ready') ✅
+                        @elseif($innovation->status == 'implemented') 🚀
+                        @else 🔬
                         @endif
-                        <span class="absolute top-2 right-2 bg-white text-green-600 px-1.5 py-0.5 rounded-full text-xs font-medium shadow-sm">
-                            @if($innovation->status == 'prototype') 🔧
-                            @elseif($innovation->status == 'ready') ✅
-                            @elseif($innovation->status == 'implemented') 🚀
-                            @else 🔬
+                    </span>
+                </div>
+                <div class="p-3 flex-1">
+                    <h3 class="text-sm font-semibold text-dark mb-1 leading-tight">{{ Str::limit($innovation->title, 40) }}</h3>
+                    <p class="text-xs text-gray-600 mb-2">{{ Str::limit($innovation->description, 50) }}</p>
+
+                    <div class="flex items-center justify-between text-xs text-gray-500 mb-1">
+                        <span class="truncate">{{ Str::limit($innovation->institution, 12) }}</span>
+                        <div class="flex items-center">
+                            ⭐ {{ $innovation->rating }}
+                            @if($innovation->is_verified)
+                            <span class="text-green-500 ml-0.5">✓</span>
                             @endif
-                        </span>
-                    </div>
-                    <div class="p-3 flex-1">
-                        <h3 class="text-sm font-semibold text-dark mb-1 leading-tight">{{ Str::limit($innovation->title, 40) }}</h3>
-                        <p class="text-xs text-gray-600 mb-2">{{ Str::limit($innovation->description, 50) }}</p>
-                        
-                        <div class="flex items-center justify-between text-xs text-gray-500 mb-1">
-                            <span class="truncate">{{ Str::limit($innovation->institution, 12) }}</span>
-                            <div class="flex items-center">
-                                ⭐ {{ $innovation->rating }}
-                                @if($innovation->is_verified)
-                                    <span class="text-green-500 ml-0.5">✓</span>
-                                @endif
-                            </div>
-                        </div>
-                        
-                        <div class="flex justify-between items-center text-xs text-gray-500">
-                            <span>{{ $innovation->research_duration }}bln</span>
-                            <span class="capitalize">{{ $innovation->innovation_type }}</span>
                         </div>
                     </div>
-                    <div class="px-3 pb-3">
-                        <a href="#" class="block w-full text-center bg-green-100 text-green-700 hover:bg-green-200 text-xs font-medium py-1.5 rounded transition">
-                            Ajukan Kolaborasi
-                        </a>
+
+                    <div class="flex justify-between items-center text-xs text-gray-500">
+                        <span>{{ $innovation->research_duration }}bln</span>
+                        <span class="capitalize">{{ $innovation->innovation_type }}</span>
                     </div>
                 </div>
-                @endforeach
+                <div class="px-3 pb-3">
+                    <a href="#" class="block w-full text-center bg-green-100 text-green-700 hover:bg-green-200 text-xs font-medium py-1.5 rounded transition">
+                        Ajukan Kolaborasi
+                    </a>
+                </div>
             </div>
+            @endforeach
+        </div>
         @else
-            <div class="text-center py-8 bg-white rounded-lg border border-gray-200">
-                <div class="text-gray-400 text-3xl mb-2">💡</div>
-                <p class="text-gray-500 text-sm mb-3">Belum ada inovasi yang diposting.</p>
-                <a href="{{ route('pemerintah.inovasi.create') }}" class="inline-block bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition text-xs">
-                    💡 Buat Inovasi Pertama
-                </a>
-            </div>
+        <div class="text-center py-8 bg-white rounded-lg border border-gray-200">
+            <div class="text-gray-400 text-3xl mb-2">💡</div>
+            <p class="text-gray-500 text-sm mb-3">Belum ada inovasi yang diposting.</p>
+            <a href="{{ route('pemerintah.inovasi.create') }}" class="inline-block bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition text-xs">
+                💡 Buat Inovasi Pertama
+            </a>
+        </div>
         @endif
     </div>
 </section>

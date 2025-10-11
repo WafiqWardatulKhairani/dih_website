@@ -1,106 +1,217 @@
 @extends('layouts.app')
 
 @section('styles')
-<!-- Styles sama seperti program.blade.php -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    primary: '#1e40af',
+                    secondary: '#0ea5e9',
+                    accent: '#3b82f6',
+                    dark: '#1e293b',
+                    light: '#f8fafc'
+                }
+            }
+        }
+    }
+</script>
+<style>
+    .hero-bg {
+        background: linear-gradient(135deg, #1e40af 0%, #0ea5e9 100%);
+    }
+    .card-hover {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .card-hover:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px -6px rgba(0, 0, 0, 0.15);
+    }
+    .compact-card {
+        height: fit-content;
+        min-height: 380px;
+    }
+</style>
 @endsection
 
 @section('content')
-<!-- Hero Section -->
-<section class="hero-bg text-white py-20 md:py-28">
-    <div class="container mx-auto px-6 md:px-12 text-center">
-        <h1 class="text-4xl md:text-5xl font-extrabold mb-6 leading-tight">
-            Inovasi <span class="text-yellow-300">Digital</span>
+<!-- Hero Section - Lebih Compact -->
+<section class="hero-bg text-white py-12">
+    <div class="container mx-auto px-4 md:px-6 text-center">
+        <h1 class="text-3xl md:text-4xl font-bold mb-3 leading-tight">
+            Semua <span class="text-yellow-300">Inovasi</span>
         </h1>
-        <p class="text-lg md:text-xl max-w-3xl mx-auto mb-8 leading-relaxed">
-            Temukan inovasi digital terbaru yang dapat mendukung pembangunan daerah.
+        <p class="text-base md:text-lg max-w-2xl mx-auto leading-relaxed opacity-90">
+            Temukan semua inovasi digital yang dapat mendukung pembangunan daerah.
         </p>
-        <a href="{{ route('pemerintah.inovasi.create') }}" class="inline-flex items-center bg-purple-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-purple-600 transition">
+        <a href="{{ route('pemerintah.inovasi.create') }}" 
+           class="inline-flex items-center bg-purple-500 text-white px-5 py-2.5 rounded-lg font-semibold hover:bg-purple-600 transition mt-4 text-sm">
             💡 Posting Inovasi Baru
         </a>
     </div>
 </section>
 
-<!-- Inovasi List -->
-<section class="bg-white py-12">
-    <div class="container mx-auto px-6 md:px-12">
+<!-- Filter Section - Lebih Compact -->
+<section class="bg-gray-50 py-6">
+    <div class="container mx-auto px-4 md:px-6">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+            <h2 class="text-xl font-bold text-dark">Daftar Inovasi Digital</h2>
+            <div class="flex flex-wrap gap-3">
+                <select class="px-3 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm">
+                    <option>Semua Kategori</option>
+                    <option>Artificial Intelligence</option>
+                    <option>Internet of Things</option>
+                    <option>Big Data</option>
+                    <option>Blockchain</option>
+                    <option>Pelayanan Publik</option>
+                </select>
+                <select class="px-3 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm">
+                    <option>Semua Status</option>
+                    <option>Research</option>
+                    <option>Prototype</option>
+                    <option>Siap Implementasi</option>
+                    <option>Sudah Diimplementasikan</option>
+                </select>
+                <button class="bg-primary text-white px-3 py-1.5 rounded-lg hover:bg-blue-700 transition text-sm">
+                    🔍 Cari
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Inovasi List - 4 Cards per Row -->
+<section class="bg-white py-8">
+    <div class="container mx-auto px-4 md:px-6">
         @if($innovations->count() > 0)
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            @foreach($innovations as $innovation)
-            <div class="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden card-hover">
-                <div class="h-40 bg-gradient-to-r from-green-500 to-emerald-400 relative">
-                    @if($innovation->image)
-                    <img src="{{ asset('storage/' . $innovation->image) }}" alt="{{ $innovation->title }}" class="w-full h-full object-cover">
-                    @endif
-                    <span class="absolute top-4 right-4 bg-white text-green-600 px-3 py-1 rounded-full text-sm font-semibold shadow-md">
-                        @if($innovation->status == 'prototype') 🔧 Prototype
-                        @elseif($innovation->status == 'ready') ✅ Siap Implementasi
-                        @else 🔬 Riset
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+                @foreach($innovations as $innovation)
+                <div class="bg-white rounded-lg shadow-md border border-gray-100 overflow-hidden card-hover compact-card">
+                    <!-- Header Image -->
+                    <div class="h-28 bg-gradient-to-r from-green-500 to-emerald-400 relative">
+                        @if($innovation->image)
+                            <img src="{{ asset('storage/' . $innovation->image) }}" alt="{{ $innovation->title }}" class="w-full h-full object-cover">
                         @endif
-                    </span>
-                    <div class="absolute bottom-4 left-4">
-                        <span class="bg-black/20 text-white px-2 py-1 rounded text-xs">Inovasi {{ $innovation->institution }}</span>
-                    </div>
-                </div>
-                <div class="p-6">
-                    <div class="flex items-center mb-4">
-                        <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-600 font-bold text-lg">
-                            {{ substr($innovation->institution, 0, 1) }}
-                        </div>
-                        <div class="ml-3">
-                            <p class="text-sm font-medium text-dark">{{ $innovation->institution }}</p>
-                            <p class="text-xs text-gray-500">{{ $innovation->innovation_type }}</p>
-                        </div>
-                    </div>
-                    <h3 class="text-xl font-semibold text-dark mb-3">{{ $innovation->title }}</h3>
-                    <p class="text-gray-600 mb-4 text-sm">{{ Str::limit($innovation->description, 100) }}</p>
-
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="flex items-center text-sm text-gray-500">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            {{ $innovation->research_duration }} bulan research
-                        </div>
-                        <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">
-                            ⭐ {{ $innovation->rating }}/5.0
+                        <span class="absolute top-2 right-2 bg-white text-green-600 px-2 py-1 rounded-full text-xs font-semibold shadow-sm">
+                            @if($innovation->status == 'research') 🔬
+                            @elseif($innovation->status == 'prototype') 🔧
+                            @elseif($innovation->status == 'ready') ✅
+                            @else 🚀
+                            @endif
                         </span>
+                        <div class="absolute bottom-2 left-2">
+                            <span class="bg-black/20 text-white px-1.5 py-0.5 rounded text-xs">Inovasi</span>
+                        </div>
                     </div>
-
-                    <div class="flex justify-between items-center">
-                        <div class="flex items-center text-sm text-gray-500">
+                    
+                    <!-- Content -->
+                    <div class="p-4">
+                        <!-- Institution Info -->
+                        <div class="flex items-center mb-3">
+                            <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600 font-bold text-sm">
+                                {{ substr($innovation->institution, 0, 1) }}
+                            </div>
+                            <div class="ml-2">
+                                <p class="text-xs font-medium text-dark truncate max-w-[120px]">{{ $innovation->institution }}</p>
+                                <p class="text-xs text-gray-500">{{ $innovation->author_name }}</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Title & Description -->
+                        <h3 class="text-sm font-semibold text-dark mb-2 line-clamp-2 leading-tight">{{ $innovation->title }}</h3>
+                        <p class="text-gray-600 text-xs mb-3 line-clamp-2 leading-relaxed">{{ Str::limit($innovation->description, 80) }}</p>
+                        
+                        <!-- TRL Level -->
+                        <div class="mb-3">
+                            <div class="flex justify-between text-xs text-gray-600 mb-1">
+                                <span>Kesiapan Teknologi</span>
+                                <span>TRL {{ $innovation->technology_readiness_level }}</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-1.5">
+                                <div class="bg-green-500 h-1.5 rounded-full" style="width: {{ ($innovation->technology_readiness_level / 9) * 100 }}%"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Research Duration & Status -->
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center text-xs text-gray-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                {{ $innovation->research_duration }} bln
+                            </div>
                             @if($innovation->is_verified)
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                            </svg>
-                            Terverifikasi
+                            <span class="bg-green-100 text-green-700 px-1.5 py-0.5 rounded text-xs font-medium">
+                                ✅ Terverifikasi
+                            </span>
                             @else
-                            <span class="text-orange-500 text-xs">Belum diverifikasi</span>
+                            <span class="bg-yellow-100 text-yellow-700 px-1.5 py-0.5 rounded text-xs font-medium">
+                                ⏳ Review
+                            </span>
                             @endif
                         </div>
-                        <a href="#" class="bg-green-600 text-white px-3 py-2 rounded text-sm font-semibold hover:bg-green-700 transition flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
-                            </svg>
-                            Ajukan Kolaborasi
-                        </a>
+                        
+                        <!-- Category & Actions -->
+                        <div class="flex justify-between items-center pt-2 border-t border-gray-100">
+                            <span class="text-xs text-gray-500 truncate max-w-[80px]">{{ $innovation->category }}</span>
+                            <div class="flex gap-2">
+                                <a href="{{ route('pemerintah.inovasi.edit', $innovation->id) }}" 
+                                   class="text-blue-600 hover:text-blue-800 text-xs font-medium">
+                                    ✏️
+                                </a>
+                                <form action="{{ route('pemerintah.inovasi.destroy', $innovation->id) }}" method="POST" class="inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" 
+                                            class="text-red-600 hover:text-red-800 text-xs font-medium"
+                                            onclick="return confirm('Yakin ingin menghapus inovasi ini?')">
+                                        🗑️
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
                 </div>
+                @endforeach
             </div>
-            @endforeach
-        </div>
-
-        <!-- Pagination -->
-        <div class="mt-12">
-            {{ $innovations->links() }}
-        </div>
+            
+            <!-- Pagination - Lebih Compact -->
+            <div class="mt-8">
+                {{ $innovations->links() }}
+            </div>
         @else
-        <div class="text-center py-12">
-            <p class="text-gray-500 text-lg">Belum ada inovasi yang diposting.</p>
-            <a href="{{ route('pemerintah.inovasi.create') }}" class="inline-block mt-4 bg-purple-500 text-white px-6 py-3 rounded-lg hover:bg-purple-600 transition">
-                💡 Posting Inovasi Pertama
-            </a>
-        </div>
+            <div class="text-center py-12">
+                <div class="text-gray-400 text-5xl mb-3">💡</div>
+                <p class="text-gray-500 text-base mb-4">Belum ada inovasi yang diposting.</p>
+                <a href="{{ route('pemerintah.inovasi.create') }}" class="inline-block bg-purple-500 text-white px-5 py-2.5 rounded-lg hover:bg-purple-600 transition text-sm">
+                    💡 Posting Inovasi Pertama
+                </a>
+            </div>
         @endif
     </div>
 </section>
+
+<style>
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+    .compact-card {
+        min-height: 350px;
+    }
+}
+
+@media (min-width: 1280px) {
+    .xl\:grid-cols-4 {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+</style>
 @endsection

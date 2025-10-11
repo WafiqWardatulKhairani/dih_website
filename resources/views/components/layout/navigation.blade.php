@@ -19,6 +19,7 @@ if (in_array($currentRoute, ['landing-page','tentang'])) {
             default => route('landing-page'),
         };
 
+<<<<<<< Updated upstream
         $navItems = match(auth()->user()->role) {
             'pemerintah' => [
                 ['href' => route('pemerintah.index'), 'label' => 'Dashboard'],
@@ -49,6 +50,42 @@ if (in_array($currentRoute, ['landing-page','tentang'])) {
             ['href' => route('tentang'), 'label' => 'Tentang'],
         ];
     }
+=======
+$navItems = match(auth()->user()->role) {
+'pemerintah' => [
+['href' => route('pemerintah.index'), 'label' => 'Dashboard'],
+['href' => route('pemerintah.program'), 'label' => 'Program & Inovasi'],
+['href' => route('pemerintah.diskusi'), 'label' => 'Forum Diskusi'],
+['href' => route('pemerintah.kolaborasi'), 'label' => 'Ruang Kolaborasi'],
+],
+
+'akademisi' => [
+    ['href' => route('akademisi.index'), 'label' => 'Dashboard'],
+    ['href' => route('akademisi.inovasi.create'), 'label' => 'Posting Inovasi'],
+    ['href' => route('akademisi.proyek-saya'), 'label' => 'Ruang Diskusi'],
+    ['href' => route('akademisi.kolaborasi'), 'label' => 'Kolaborasi'],
+    ['href' => route('akademisi.kolaborasi'), 'label' => 'Solusi'],
+    ['href' => route('akademisi.kolaborasi'), 'label' => 'Inkubasi'],
+],
+
+'admin' => [
+['href' => route('admin.index'), 'label' => 'Dashboard'],
+['href' => route('admin.users.index'), 'label' => 'Manajemen User'],
+['href' => route('admin.moderasi-konten'), 'label' => 'Moderasi Konten'],
+['href' => route('admin.statistik'), 'label' => 'Statistik'],
+],
+default => [
+['href' => route('landing-page'), 'label' => 'Beranda'],
+['href' => route('tentang'), 'label' => 'Tentang'],
+],
+};
+} else {
+$navItems = [
+['href' => route('landing-page'), 'label' => 'Beranda'],
+['href' => route('tentang'), 'label' => 'Tentang'],
+];
+}
+>>>>>>> Stashed changes
 }
 @endphp
 

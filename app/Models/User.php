@@ -20,7 +20,9 @@ class User extends Authenticatable
         'role',
         'document_path',
         'avatar',
-        'status', // Pastikan ini ada
+        'status',
+        'approved_at',
+        'approval_type',
     ];
 
     protected $hidden = [
@@ -28,11 +30,39 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    protected function casts(): array
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+        'approved_at' => 'datetime',
+    ];
+
+    // Method untuk cek email institusi
+    public function isInstitutionalEmail()
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password'          => 'hashed',
+        $institutionalDomains = [
+            'ac.id',           // Universitas
+            'edu',             // Pendidikan internasional
+            'sch.id',          // Sekolah
+            'go.id',           // Pemerintah
         ];
+
+        $emailDomain = strtolower(explode('@', $this->email)[1] ?? '');
+
+        foreach ($institutionalDomains as $domain) {
+            if (str_ends_with($emailDomain, $domain)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // Method untuk auto approve
+    public function approve()
+    {
+        $this->update([
+            'status' => 'verified',
+            'approved_at' => now(),
+        ]);
     }
 }

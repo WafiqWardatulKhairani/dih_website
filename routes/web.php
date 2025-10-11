@@ -41,6 +41,7 @@ Route::redirect('/register', '/daftar')->name('register');
 // =============== GUEST ROUTES ===============
 Route::middleware('guest')->group(function () {
     Route::get('/daftar', UserRegister::class)->name('user.register');
+    Route::get('/login', \App\Livewire\Auth\UserLogin::class)->name('login');
 });
 
 // =============== AUTHENTICATED ROUTES ===============
