@@ -46,15 +46,23 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
 
     // =============== GENERAL KOLABORASI ROUTES ===============
-    Route::prefix('kolaborasi')->name('kolaborasi.')->group(function () {
-        Route::get('/', [KolaborasiController::class, 'index'])->name('index');
-        Route::get('/create', [KolaborasiController::class, 'create'])->name('create');
-        Route::post('/', [KolaborasiController::class, 'store'])->name('store');
-        Route::get('/{id}', [KolaborasiController::class, 'show'])->name('show');
-        Route::get('/{id}/edit', [KolaborasiController::class, 'edit'])->name('edit');
-        Route::put('/{id}', [KolaborasiController::class, 'update'])->name('update');
-        Route::delete('/{id}', [KolaborasiController::class, 'destroy'])->name('destroy');
+Route::prefix('kolaborasi')->name('kolaborasi.')->middleware('auth')->group(function () {
+    Route::get('/', [KolaborasiController::class, 'index'])->name('index');
+    Route::get('/create', [KolaborasiController::class, 'create'])->name('create');
+    Route::post('/', [KolaborasiController::class, 'store'])->name('store');
+    Route::get('/{id}', [KolaborasiController::class, 'show'])->name('show');
+    Route::get('/{id}/edit', [KolaborasiController::class, 'edit'])->name('edit');
+    Route::put('/{id}', [KolaborasiController::class, 'update'])->name('update');
+    Route::delete('/{id}', [KolaborasiController::class, 'destroy'])->name('destroy');
+
+    // Idea Routes
+    Route::prefix('ide')->name('ide.')->group(function () {
+        Route::get('/', [KolaborasiController::class, 'ideIndex'])->name('index');
+        Route::get('/create', [KolaborasiController::class, 'ideCreate'])->name('create');
+        Route::post('/', [KolaborasiController::class, 'ideStore'])->name('store');
+        Route::post('/{id}/vote', [KolaborasiController::class, 'voteIdea'])->name('vote');
     });
+});
 
     // =============== PEMERINTAH ROUTES ===============
     Route::prefix('pemerintah')->name('pemerintah.')->group(function () {
