@@ -17,28 +17,27 @@ class ProgramController extends Controller
         return view('landing.landing_page', compact('programs'));
     }
     
-    // ✅ METHOD BARU UNTUK HALAMAN RINGKASAN PROGRAM & INOVASI
     public function programPage()
-    {
-        // Get 10 programs and innovations for preview (compact cards)
-        $programs = OpdProgram::latest()->take(10)->get();
-        $innovations = OpdInnovation::latest()->take(10)->get();
-        
-        // Statistics for the dashboard
-        $totalPrograms = OpdProgram::count();
-        $totalInnovations = OpdInnovation::count();
-        $programsOngoing = OpdProgram::where('status', 'ongoing')->count();
-        $innovationsReady = OpdInnovation::where('status', 'ready')->count();
+{
+    // Get programs and innovations without pagination
+    $programs = OpdProgram::latest()->get();
+    $innovations = OpdInnovation::latest()->get();
+    
+    // Statistics for the dashboard
+    $totalPrograms = OpdProgram::count();
+    $totalInnovations = OpdInnovation::count();
+    $programsOngoing = OpdProgram::where('status', 'ongoing')->count();
+    $innovationsReady = OpdInnovation::where('status', 'ready')->count();
 
-        return view('pemerintah.program', compact(
-            'programs',
-            'innovations',
-            'totalPrograms',
-            'totalInnovations',
-            'programsOngoing',
-            'innovationsReady'
-        ));
-    }
+    return view('pemerintah.program', compact(
+        'programs',
+        'innovations',
+        'totalPrograms',
+        'totalInnovations',
+        'programsOngoing',
+        'innovationsReady'
+    ));
+}
 
     // ✅ FUNGSI UNTUK PROGRAM & INOVASI (tab version - bisa dihapus kalau tidak dipakai)
     public function programInnovationIndex()

@@ -6,6 +6,7 @@ use App\Http\Controllers\Akademisi\InnovationController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\PemerintahController;
+use App\Http\Controllers\Pemerintah\DashboardController;
 use App\Http\Controllers\Pemerintah\DiskusiController;
 use App\Http\Controllers\Pemerintah\ProgramController;
 use App\Http\Controllers\KolaborasiController;
@@ -26,7 +27,7 @@ Route::prefix('program-inovasi')->name('program.')->group(function () {
     Route::get('/', [ProgramController::class, 'programInnovationIndex'])->name('innovation.index');
     Route::get('/program', [ProgramController::class, 'showPrograms'])->name('list');
     Route::get('/inovasi', [ProgramController::class, 'showInnovations'])->name('innovation.list');
-    
+
     Route::get('/program/{id}', [ProgramController::class, 'showProgramDetail'])->name('detail');
     Route::get('/inovasi/{id}', [ProgramController::class, 'showInnovationDetail'])->name('innovation.detail');
 });
@@ -46,36 +47,40 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
 
     // =============== GENERAL KOLABORASI ROUTES ===============
-Route::prefix('kolaborasi')->name('kolaborasi.')->middleware('auth')->group(function () {
-    Route::get('/', [KolaborasiController::class, 'index'])->name('index');
-    Route::get('/create', [KolaborasiController::class, 'create'])->name('create');
-    Route::post('/', [KolaborasiController::class, 'store'])->name('store');
-    Route::get('/{id}', [KolaborasiController::class, 'show'])->name('show');
-    Route::get('/{id}/edit', [KolaborasiController::class, 'edit'])->name('edit');
-    Route::put('/{id}', [KolaborasiController::class, 'update'])->name('update');
-    Route::delete('/{id}', [KolaborasiController::class, 'destroy'])->name('destroy');
+    Route::prefix('kolaborasi')->name('kolaborasi.')->middleware('auth')->group(function () {
+        Route::get('/', [KolaborasiController::class, 'index'])->name('index');
+        Route::get('/create', [KolaborasiController::class, 'create'])->name('create');
+        Route::post('/', [KolaborasiController::class, 'store'])->name('store');
+        Route::get('/{id}', [KolaborasiController::class, 'show'])->name('show');
+        Route::get('/{id}/edit', [KolaborasiController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [KolaborasiController::class, 'update'])->name('update');
+        Route::delete('/{id}', [KolaborasiController::class, 'destroy'])->name('destroy');
 
-    // Idea Routes
-    Route::prefix('ide')->name('ide.')->group(function () {
-        Route::get('/', [KolaborasiController::class, 'ideIndex'])->name('index');
-        Route::get('/create', [KolaborasiController::class, 'ideCreate'])->name('create');
-        Route::post('/', [KolaborasiController::class, 'ideStore'])->name('store');
-        Route::post('/{id}/vote', [KolaborasiController::class, 'voteIdea'])->name('vote');
+        // Idea Routes
+        Route::prefix('ide')->name('ide.')->group(function () {
+            Route::get('/', [KolaborasiController::class, 'ideIndex'])->name('index');
+            Route::get('/create', [KolaborasiController::class, 'ideCreate'])->name('create');
+            Route::post('/', [KolaborasiController::class, 'ideStore'])->name('store');
+            Route::post('/{id}/vote', [KolaborasiController::class, 'voteIdea'])->name('vote');
+        });
     });
-});
 
     // =============== PEMERINTAH ROUTES ===============
     Route::prefix('pemerintah')->name('pemerintah.')->group(function () {
-        Route::get('/', [PemerintahController::class, 'index'])->name('index');
+        // ✅ DASHBOARD ROUTES - TAMBAH INI
+        Route::get('/', [DashboardController::class, 'index'])->name('index'); // ✅ UBAH INI
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard'); // ✅ TAMBAH INI
+        Route::get('/api/dashboard/chart-data', [DashboardController::class, 'getChartData'])->name('dashboard.chart-data'); // ✅ TAMBAH INI
+
         Route::get('/program', [ProgramController::class, 'programPage'])->name('program');
-        
+
         // ❌ HAPUS SEMUA ROUTE KOLABORASI DARI SINI
-        
+
         Route::get('/diskusi', [DiskusiController::class, 'index'])->name('diskusi');
         Route::get('/proyek', [PemerintahController::class, 'proyek'])->name('proyek');
         Route::get('/laporan', [PemerintahController::class, 'laporan'])->name('laporan');
         Route::get('/pengaturan', [PemerintahController::class, 'pengaturan'])->name('pengaturan');
-        
+
         Route::prefix('program')->name('program.')->group(function () {
             Route::get('/create', [ProgramController::class, 'createProgram'])->name('create');
             Route::post('/store', [ProgramController::class, 'storeProgram'])->name('store');
@@ -83,7 +88,7 @@ Route::prefix('kolaborasi')->name('kolaborasi.')->middleware('auth')->group(func
             Route::put('/update/{id}', [ProgramController::class, 'updateProgram'])->name('update');
             Route::delete('/delete/{id}', [ProgramController::class, 'destroyProgram'])->name('destroy');
         });
-        
+
         Route::prefix('inovasi')->name('inovasi.')->group(function () {
             Route::get('/create', [ProgramController::class, 'createInnovation'])->name('create');
             Route::post('/store', [ProgramController::class, 'storeInnovation'])->name('store');
@@ -126,7 +131,7 @@ Route::prefix('kolaborasi')->name('kolaborasi.')->middleware('auth')->group(func
     // =============== DASHBOARD REDIRECT ===============
     Route::get('/dashboard', function () {
         return match (auth()->user()->role) {
-            'pemerintah' => redirect()->route('pemerintah.index'),
+            'pemerintah' => redirect()->route('pemerintah.dashboard'), // ✅ UBAH INI
             'akademisi'  => redirect()->route('akademisi.index'),
             'admin'      => redirect()->route('admin.index'),
             default      => redirect()->route('landing-page'),

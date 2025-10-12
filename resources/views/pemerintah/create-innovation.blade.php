@@ -222,8 +222,8 @@
 
     function loadSubcategories(cat) {
         const subcategories = {
-            'Artificial Intelligence': ['Machine Learning', 'Computer Vision', 'Natural Language Processing'],
-            'Internet of Things': ['Smart Home', 'Industrial IoT', 'Smart Agriculture'],
+            'Artificial Intelligence': ['Machine Learning', 'Computer Vision', 'Natural Language Processing', 'Smart Agriculture'],
+            'Internet of Things': ['Smart Home', 'Industrial IoT', 'Smart Agriculture', 'Environment'],
             'Big Data': ['Data Analytics', 'Data Visualization', 'Predictive Modeling'],
             'Blockchain': ['Smart Contracts', 'Cryptocurrency', 'Supply Chain'],
             'Mobile Application': ['Android', 'iOS', 'Cross Platform'],
