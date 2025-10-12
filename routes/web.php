@@ -7,8 +7,8 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\PemerintahController;
 use App\Http\Controllers\Pemerintah\DiskusiController;
-use App\Http\Controllers\Pemerintah\KolaborasiController;
 use App\Http\Controllers\Pemerintah\ProgramController;
+use App\Http\Controllers\KolaborasiController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Middleware\AdminMiddleware;
 use App\Livewire\Auth\UserRegister;
@@ -22,13 +22,11 @@ Route::get('/', [LandingPageController::class, 'index'])->name('landing-page');
 Route::get('/tentang', [LandingPageController::class, 'tentang'])->name('tentang');
 
 // Public routes untuk program & inovasi (VIEW ONLY)
-// Public routes untuk program & inovasi (VIEW ONLY)
 Route::prefix('program-inovasi')->name('program.')->group(function () {
     Route::get('/', [ProgramController::class, 'programInnovationIndex'])->name('innovation.index');
     Route::get('/program', [ProgramController::class, 'showPrograms'])->name('list');
     Route::get('/inovasi', [ProgramController::class, 'showInnovations'])->name('innovation.list');
-
-    // ✅ ROUTE DETAIL BARU
+    
     Route::get('/program/{id}', [ProgramController::class, 'showProgramDetail'])->name('detail');
     Route::get('/inovasi/{id}', [ProgramController::class, 'showInnovationDetail'])->name('innovation.detail');
 });
@@ -47,16 +45,29 @@ Route::middleware('guest')->group(function () {
 // =============== AUTHENTICATED ROUTES ===============
 Route::middleware('auth')->group(function () {
 
+    // =============== GENERAL KOLABORASI ROUTES ===============
+    Route::prefix('kolaborasi')->name('kolaborasi.')->group(function () {
+        Route::get('/', [KolaborasiController::class, 'index'])->name('index');
+        Route::get('/create', [KolaborasiController::class, 'create'])->name('create');
+        Route::post('/', [KolaborasiController::class, 'store'])->name('store');
+        Route::get('/{id}', [KolaborasiController::class, 'show'])->name('show');
+        Route::get('/{id}/edit', [KolaborasiController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [KolaborasiController::class, 'update'])->name('update');
+        Route::delete('/{id}', [KolaborasiController::class, 'destroy'])->name('destroy');
+    });
+
     // =============== PEMERINTAH ROUTES ===============
     Route::prefix('pemerintah')->name('pemerintah.')->group(function () {
         Route::get('/', [PemerintahController::class, 'index'])->name('index');
         Route::get('/program', [ProgramController::class, 'programPage'])->name('program');
-        Route::get('/kolaborasi', [KolaborasiController::class, 'index'])->name('kolaborasi');
+        
+        // ❌ HAPUS SEMUA ROUTE KOLABORASI DARI SINI
+        
         Route::get('/diskusi', [DiskusiController::class, 'index'])->name('diskusi');
         Route::get('/proyek', [PemerintahController::class, 'proyek'])->name('proyek');
         Route::get('/laporan', [PemerintahController::class, 'laporan'])->name('laporan');
         Route::get('/pengaturan', [PemerintahController::class, 'pengaturan'])->name('pengaturan');
-        // ✅ PERBAIKAN: CRUD Program Pemerintah dengan nama route yang benar
+        
         Route::prefix('program')->name('program.')->group(function () {
             Route::get('/create', [ProgramController::class, 'createProgram'])->name('create');
             Route::post('/store', [ProgramController::class, 'storeProgram'])->name('store');
@@ -64,7 +75,7 @@ Route::middleware('auth')->group(function () {
             Route::put('/update/{id}', [ProgramController::class, 'updateProgram'])->name('update');
             Route::delete('/delete/{id}', [ProgramController::class, 'destroyProgram'])->name('destroy');
         });
-        // ✅ PERBAIKAN: CRUD Inovasi Pemerintah dengan nama route yang benar
+        
         Route::prefix('inovasi')->name('inovasi.')->group(function () {
             Route::get('/create', [ProgramController::class, 'createInnovation'])->name('create');
             Route::post('/store', [ProgramController::class, 'storeInnovation'])->name('store');
@@ -73,39 +84,31 @@ Route::middleware('auth')->group(function () {
             Route::delete('/delete/{id}', [ProgramController::class, 'destroyInnovation'])->name('destroy');
         });
     });
-// =============== AKADEMISI ROUTES ===============
-Route::prefix('akademisi')->name('akademisi.')->middleware(['auth'])->group(function () {
 
-    // Halaman utama akademisi
-    Route::get('/', [AkademisiController::class, 'index'])->name('index');
+    // =============== AKADEMISI ROUTES ===============
+    Route::prefix('akademisi')->name('akademisi.')->group(function () {
+        Route::get('/', [AkademisiController::class, 'index'])->name('index');
 
-    // ---------- Inovasi ----------
-    Route::prefix('inovasi')->name('inovasi.')->group(function () {
+        Route::prefix('inovasi')->name('inovasi.')->group(function () {
+            Route::get('/subcategories', [InnovationController::class, 'subcategories'])->name('subcategories');
 
-        // Route AJAX Subkategori (harus sebelum route {innovation})
-        Route::get('/subcategories', [InnovationController::class, 'subcategories'])
-            ->name('subcategories');
+            Route::get('/', [InnovationController::class, 'index'])->name('index');
+            Route::get('/create', [InnovationController::class, 'create'])->name('create');
+            Route::post('/', [InnovationController::class, 'store'])->name('store');
+            Route::get('/{innovation}', [InnovationController::class, 'show'])->name('show');
+            Route::get('/{innovation}/edit', [InnovationController::class, 'edit'])->name('edit');
+            Route::put('/{innovation}', [InnovationController::class, 'update'])->name('update');
+            Route::delete('/{innovation}', [InnovationController::class, 'destroy'])->name('destroy');
+        });
 
-        // CRUD inovasi
-        Route::get('/', [InnovationController::class, 'index'])->name('index');
-        Route::get('/create', [InnovationController::class, 'create'])->name('create');
-        Route::post('/', [InnovationController::class, 'store'])->name('store'); // RESTful: store ke "/"
-        Route::get('/{innovation}', [InnovationController::class, 'show'])->name('show');
-        Route::get('/{innovation}/edit', [InnovationController::class, 'edit'])->name('edit');
-        Route::put('/{innovation}', [InnovationController::class, 'update'])->name('update');
-        Route::delete('/{innovation}', [InnovationController::class, 'destroy'])->name('destroy');
+        // ❌ HAPUS SEMUA ROUTE KOLABORASI DARI SINI
 
+        Route::get('/proyek-saya', [AkademisiController::class, 'proyekSaya'])->name('proyek-saya');
+        Route::get('/profil-akademik', [AkademisiController::class, 'profilAkademik'])->name('profil-akademik');
+        Route::get('/notifikasi', [AkademisiController::class, 'notifikasi'])->name('notifikasi');
     });
 
-    // ---------- Menu Lain ----------
-    Route::get('/proyek-saya', [AkademisiController::class, 'proyekSaya'])->name('proyek-saya');
-    Route::get('/kolaborasi', [AkademisiController::class, 'kolaborasi'])->name('kolaborasi');
-    Route::get('/profil-akademik', [AkademisiController::class, 'profilAkademik'])->name('profil-akademik');
-    Route::get('/notifikasi', [AkademisiController::class, 'notifikasi'])->name('notifikasi');
-
-});
-
-// =============== PROFILE ROUTES ===============
+    // =============== PROFILE ROUTES ===============
     Route::controller(ProfileController::class)->group(function () {
         Route::get('/profile', 'edit')->name('profile.edit');
         Route::patch('/profile', 'update')->name('profile.update');
@@ -137,7 +140,6 @@ Route::middleware(['auth', AdminMiddleware::class])
     ->group(function () {
         Route::get('/', [AdminController::class, 'index'])->name('index');
 
-        // User Management
         Route::prefix('users')->name('users.')->group(function () {
             Route::get('/', [AdminController::class, 'usersIndex'])->name('index');
             Route::get('/create', [AdminController::class, 'createUser'])->name('create');
@@ -149,7 +151,6 @@ Route::middleware(['auth', AdminMiddleware::class])
             Route::delete('/{id}/reject', [AdminController::class, 'reject'])->name('reject');
         });
 
-        // Menu Admin Lainnya
         Route::get('/manajemen-user', [AdminController::class, 'manajemenUser'])->name('manajemen-user');
         Route::get('/moderasi-konten', [AdminController::class, 'moderasiKonten'])->name('moderasi-konten');
         Route::get('/statistik', [AdminController::class, 'statistik'])->name('statistik');

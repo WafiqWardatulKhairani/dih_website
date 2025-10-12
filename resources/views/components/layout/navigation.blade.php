@@ -25,7 +25,7 @@ if (in_array($currentRoute, ['landing-page','tentang'])) {
                 ['href' => route('pemerintah.index'), 'label' => 'Dashboard'],
                 ['href' => route('pemerintah.program'), 'label' => 'Program & Inovasi'],
                 ['href' => route('pemerintah.diskusi'), 'label' => 'Forum Diskusi'],
-                ['href' => route('pemerintah.kolaborasi'), 'label' => 'Ruang Kolaborasi'],
+                ['href' => route('kolaborasi.index'), 'label' => 'Ruang Kolaborasi'],
             ],
             'akademisi' => [
                 ['href' => route('akademisi.index'), 'label' => 'Dashboard'],
