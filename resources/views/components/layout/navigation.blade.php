@@ -102,7 +102,7 @@ if (in_array($currentRoute, ['landing-page','tentang'])) {
                             <div id="avatarDropdown"
                                  class="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg border hidden">
                                 <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                                    Edit Profile
+                                    Profil Saya
                                 </a>
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf

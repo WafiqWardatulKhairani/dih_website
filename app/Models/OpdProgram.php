@@ -10,6 +10,7 @@ class OpdProgram extends Model
     use HasFactory;
 
     protected $fillable = [
+        'user_id',
         'title',
         'description', 
         'opd_name',
@@ -27,4 +28,9 @@ class OpdProgram extends Model
         'end_date' => 'date',
         'budget' => 'decimal:2'
     ];
+    public function user()
+{
+    return $this->belongsTo(User::class);
+}
+
 }

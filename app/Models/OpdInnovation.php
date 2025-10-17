@@ -10,6 +10,7 @@ class OpdInnovation extends Model
     use HasFactory;
 
     protected $fillable = [
+        'user_id',
         'title',
         'description',
         'institution', 
@@ -43,4 +44,9 @@ class OpdInnovation extends Model
             self::STATUS_PUBLICATION,
         ];
     }
+    public function user()
+{
+    return $this->belongsTo(User::class);
+}
+
 }

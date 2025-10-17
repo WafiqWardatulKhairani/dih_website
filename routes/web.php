@@ -76,7 +76,6 @@ Route::redirect('/register', '/daftar')->name('register');
 // =============== GUEST ROUTES ===============
 Route::middleware('guest')->group(function () {
     Route::get('/daftar', UserRegister::class)->name('user.register');
-    Route::get('/login', \App\Livewire\Auth\UserLogin::class)->name('login');
 });
 
 // =============== AUTHENTICATED ROUTES ===============
@@ -139,26 +138,32 @@ Route::middleware('auth')->group(function () {
     // ---------------- DASHBOARD ----------------
     Route::get('/', [AkademisiController::class, 'index'])->name('index');
 
-    // ---------------- INOVASI ----------------
-    Route::prefix('inovasi')->name('inovasi.')->group(function () {
-        Route::get('/', [InnovationController::class, 'index'])->name('index');
-        Route::get('/create', [InnovationController::class, 'create'])->name('create');
-        Route::post('/', [InnovationController::class, 'store'])->name('store');
-        Route::get('/{innovation}', [InnovationController::class, 'show'])->name('show');
-        Route::get('/{innovation}/edit', [InnovationController::class, 'edit'])->name('edit');
-        Route::put('/{innovation}', [InnovationController::class, 'update'])->name('update');
-        Route::delete('/{innovation}', [InnovationController::class, 'destroy'])->name('destroy');
-Route::get('/ajax/subcategories', [InnovationController::class, 'subcategories'])->name('subcategories');
-    });
-    
+// ---------------- INOVASI ----------------
+Route::prefix('inovasi')->name('inovasi.')->group(function () {
+    Route::get('/subcategories', [InnovationController::class, 'subcategories'])->name('subcategories');
+    Route::get('/', [InnovationController::class, 'index'])->name('index');
+    Route::get('/create', [InnovationController::class, 'create'])->name('create');
+    Route::post('/', [InnovationController::class, 'store'])->name('store');
+    Route::get('/{innovation}', [InnovationController::class, 'show'])->name('show');
+    Route::get('/{innovation}/edit', [InnovationController::class, 'edit'])->name('edit');
+    Route::put('/{innovation}', [InnovationController::class, 'update'])->name('update');
+    Route::delete('/{innovation}', [InnovationController::class, 'destroy'])->name('destroy');
+});
+
 // ---------------- KOLABORASI ----------------
-    Route::prefix('kolaborasi')->name('kolaborasi.')->group(function () {
-        Route::get('/', [KolaborasiController::class, 'index'])->name('index');
-        Route::get('/create', [KolaborasiController::class, 'create'])->name('create');
-        Route::post('/', [KolaborasiController::class, 'store'])->name('store');
-        Route::get('/{id}', [KolaborasiController::class, 'show'])->name('show');
-        Route::post('/{id}/reply', [KolaborasiController::class, 'reply'])->name('reply');
-    });
+Route::prefix('kolaborasi')->name('kolaborasi.')->group(function () {
+    Route::get('/', [KolaborasiController::class, 'index'])->name('index');
+    Route::get('/create', [KolaborasiController::class, 'create'])->name('create');
+    Route::post('/', [KolaborasiController::class, 'store'])->name('store');
+    Route::get('/{id}', [KolaborasiController::class, 'show'])->name('show');
+    Route::post('/{id}/reply', [KolaborasiController::class, 'reply'])->name('reply');
+});
+
+// ---------------- HALAMAN AKADEMISI LAIN ----------------
+Route::get('/proyek-saya', [AkademisiController::class, 'proyekSaya'])->name('proyek-saya');
+Route::get('/profil-akademik', [AkademisiController::class, 'profilAkademik'])->name('profil-akademik');
+Route::get('/notifikasi', [AkademisiController::class, 'notifikasi'])->name('notifikasi');
+
 
     // ---------------- HALAMAN LAIN ----------------
     Route::get('/proyek-saya', [AkademisiController::class, 'proyekSaya'])->name('proyek-saya');

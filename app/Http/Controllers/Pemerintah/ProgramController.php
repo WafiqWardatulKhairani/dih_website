@@ -16,13 +16,13 @@ class ProgramController extends Controller
         $programs = ProgramPemerintah::latest()->take(6)->get();
         return view('landing.landing_page', compact('programs'));
     }
-    
+
     public function programPage()
 {
-    // Get programs and innovations without pagination
-    $programs = OpdProgram::latest()->get();
-    $innovations = OpdInnovation::latest()->get();
-    
+    // Get latest 8 programs and innovations
+    $programs = OpdProgram::latest()->take(8)->get();
+    $innovations = OpdInnovation::latest()->take(8)->get();
+
     // Statistics for the dashboard
     $totalPrograms = OpdProgram::count();
     $totalInnovations = OpdInnovation::count();
@@ -44,7 +44,7 @@ class ProgramController extends Controller
     {
         $programs = OpdProgram::latest()->paginate(15);
         $innovations = OpdInnovation::latest()->paginate(15);
-        
+
         return view('pemerintah.program', compact('programs', 'innovations'));
     }
 
@@ -99,49 +99,49 @@ class ProgramController extends Controller
     {
         // Ambil data inovasi untuk sidebar (hanya milik OPD yang login)
         $innovations = OpdInnovation::latest()->get();
-        
+
         return view('pemerintah.create-innovation', compact('innovations'));
     }
 
     public function storeInnovation(Request $request)
-{
-    $validated = $request->validate([
-        'title' => 'required|string|max:255',
-        'description' => 'required|string',
-        'institution' => 'required|string|max:255',
-        'category' => 'required|string|max:255',
-        'subcategory' => 'nullable|string|max:255',
-        'author_name' => 'required|string|max:255',
-        'keywords' => 'nullable|string',
-        'purpose' => 'nullable|string',
-        'technology_readiness_level' => 'required|integer|min:1|max:9',
-        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        'document_path' => 'nullable|file|mimes:pdf|max:10240',
-        'video_url' => 'nullable|url',
-        'contact' => 'nullable|string|max:255',
-        'status' => 'required|in:draft,review,publication'
-    ]);
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'institution' => 'required|string|max:255',
+            'category' => 'required|string|max:255',
+            'subcategory' => 'nullable|string|max:255',
+            'author_name' => 'required|string|max:255',
+            'keywords' => 'nullable|string',
+            'purpose' => 'nullable|string',
+            'technology_readiness_level' => 'required|integer|min:1|max:9',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'document_path' => 'nullable|file|mimes:pdf|max:10240',
+            'video_url' => 'nullable|url',
+            'contact' => 'nullable|string|max:255',
+            'status' => 'required|in:draft,review,publication'
+        ]);
 
-    // Handle image upload
-    if ($request->hasFile('image')) {
-        $imagePath = $request->file('image')->store('innovation-images', 'public');
-        $validated['image'] = $imagePath;
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('innovation-images', 'public');
+            $validated['image'] = $imagePath;
+        }
+
+        // Handle document upload
+        if ($request->hasFile('document_path')) {
+            $documentPath = $request->file('document_path')->store('innovation-documents', 'public');
+            $validated['document_path'] = $documentPath;
+        }
+
+        // Set default author name jika kosong
+        $validated['author_name'] = $validated['author_name'] ?? auth()->user()->name;
+
+        OpdInnovation::create($validated);
+
+        // ✅ PERBAIKI INI - redirect ke halaman program ringkasan
+        return redirect()->route('pemerintah.program')->with('success', 'Inovasi berhasil diposting!');
     }
-
-    // Handle document upload
-    if ($request->hasFile('document_path')) {
-        $documentPath = $request->file('document_path')->store('innovation-documents', 'public');
-        $validated['document_path'] = $documentPath;
-    }
-
-    // Set default author name jika kosong
-    $validated['author_name'] = $validated['author_name'] ?? auth()->user()->name;
-
-    OpdInnovation::create($validated);
-
-    // ✅ PERBAIKI INI - redirect ke halaman program ringkasan
-    return redirect()->route('pemerintah.program')->with('success', 'Inovasi berhasil diposting!');
-}
 
     // ✅ FUNGSI EDIT/UPDATE PROGRAM
     public function editProgram($id)
@@ -181,19 +181,19 @@ class ProgramController extends Controller
 
         return redirect()->route('program.list')->with('success', 'Program berhasil diupdate!');
     }
-// ✅ HALAMAN DETAIL PROGRAM
-public function showProgramDetail($id)
-{
-    $program = OpdProgram::findOrFail($id);
-    return view('pemerintah.program-detail', compact('program'));
-}
+    // ✅ HALAMAN DETAIL PROGRAM
+    public function showProgramDetail($id)
+    {
+        $program = OpdProgram::findOrFail($id);
+        return view('pemerintah.program-detail', compact('program'));
+    }
 
-// ✅ HALAMAN DETAIL INOVASI  
-public function showInnovationDetail($id)
-{
-    $innovation = OpdInnovation::findOrFail($id);
-    return view('pemerintah.innovation-detail', compact('innovation'));
-}
+    // ✅ HALAMAN DETAIL INOVASI  
+    public function showInnovationDetail($id)
+    {
+        $innovation = OpdInnovation::findOrFail($id);
+        return view('pemerintah.innovation-detail', compact('innovation'));
+    }
     // ✅ FUNGSI EDIT/UPDATE INOVASI
     public function editInnovation($id)
     {
@@ -239,12 +239,12 @@ public function showInnovationDetail($id)
     public function destroyProgram($id)
     {
         $program = OpdProgram::findOrFail($id);
-        
+
         // Delete image if exists
         if ($program->image) {
             Storage::disk('public')->delete($program->image);
         }
-        
+
         $program->delete();
 
         return redirect()->route('program.list')->with('success', 'Program berhasil dihapus!');
@@ -254,12 +254,12 @@ public function showInnovationDetail($id)
     public function destroyInnovation($id)
     {
         $innovation = OpdInnovation::findOrFail($id);
-        
+
         // Delete image if exists
         if ($innovation->image) {
             Storage::disk('public')->delete($innovation->image);
         }
-        
+
         $innovation->delete();
 
         return redirect()->route('program.innovation.list')->with('success', 'Inovasi berhasil dihapus!');
