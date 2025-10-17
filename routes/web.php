@@ -40,7 +40,6 @@ Route::redirect('/register', '/daftar')->name('register');
 // =============== GUEST ROUTES ===============
 Route::middleware('guest')->group(function () {
     Route::get('/daftar', UserRegister::class)->name('user.register');
-    Route::get('/login', \App\Livewire\Auth\UserLogin::class)->name('login');
 });
 
 // =============== AUTHENTICATED ROUTES ===============
@@ -113,6 +112,11 @@ Route::middleware('auth')->group(function () {
             Route::put('/{innovation}', [InnovationController::class, 'update'])->name('update');
             Route::delete('/{innovation}', [InnovationController::class, 'destroy'])->name('destroy');
         });
+        Route::get('/kolaborasi', [KolaborasiController::class, 'index'])->name('kolaborasi');
+        Route::get('/kolaborasi/create', [KolaborasiController::class, 'create'])->name('kolaborasi.create');
+        Route::post('/kolaborasi', [KolaborasiController::class, 'store'])->name('kolaborasi.store');
+        Route::get('/kolaborasi/{id}', [KolaborasiController::class, 'show'])->name('kolaborasi.show');
+        Route::post('/kolaborasi/{id}/reply', [KolaborasiController::class, 'reply'])->name('kolaborasi.reply');
 
         // ❌ HAPUS SEMUA ROUTE KOLABORASI DARI SINI
 

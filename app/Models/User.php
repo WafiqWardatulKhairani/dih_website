@@ -44,6 +44,7 @@ class User extends Authenticatable
             'edu',             // Pendidikan internasional
             'sch.id',          // Sekolah
             'go.id',           // Pemerintah
+            'yahoo.com',       // Pemerintah
         ];
 
         $emailDomain = strtolower(explode('@', $this->email)[1] ?? '');
