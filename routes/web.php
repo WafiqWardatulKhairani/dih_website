@@ -7,7 +7,7 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\PemerintahController;
 use App\Http\Controllers\Pemerintah\DashboardController;
-use App\Http\Controllers\Pemerintah\DiskusiController;
+use App\Http\Controllers\DiskusiController;
 use App\Http\Controllers\Pemerintah\ProgramController;
 use App\Http\Controllers\KolaborasiController;
 use App\Http\Controllers\ProfileController;
@@ -30,6 +30,42 @@ Route::prefix('program-inovasi')->name('program.')->group(function () {
 
     Route::get('/program/{id}', [ProgramController::class, 'showProgramDetail'])->name('detail');
     Route::get('/inovasi/{id}', [ProgramController::class, 'showInnovationDetail'])->name('innovation.detail');
+});
+
+// Public & Landing Page
+Route::get('/', [LandingPageController::class, 'index'])->name('landing-page');
+Route::get('/tentang', [LandingPageController::class, 'tentang'])->name('tentang');
+
+// ================= FORUM DISKUSI =================
+Route::prefix('forum-diskusi')->name('forum-diskusi.')->group(function () {
+
+    // Semua bisa lihat daftar diskusi
+    Route::get('/', [DiskusiController::class, 'index'])->name('index');
+    Route::get('/search', [DiskusiController::class, 'search'])->name('search');
+    Route::get('/ajax-subcategories', [DiskusiController::class, 'getSubcategories'])->name('ajax-subcategories');
+
+    // ================= ROUTES KHUSUS USER LOGIN =================
+    Route::middleware('auth')->group(function () {
+
+        // Detail diskusi (perlu 2 parameter: type dan id)
+        Route::get('/{type}/{id}', [DiskusiController::class, 'detail'])
+            ->where(['id' => '[0-9]+', 'type' => '(academic|opd)'])
+            ->name('detail');
+
+        // Tambah komentar
+        Route::post('/{type}/{id}/add-comment', [DiskusiController::class, 'addComment'])
+            ->where(['id' => '[0-9]+', 'type' => '(academic|opd)'])
+            ->name('add-comment');
+
+        // Hapus komentar
+        Route::delete('/delete-comment/{id}', [DiskusiController::class, 'deleteComment'])
+            ->name('delete-comment');
+
+        // Ajukan kolaborasi
+        Route::post('/{type}/{id}/propose-collaboration', [DiskusiController::class, 'proposeCollaboration'])
+            ->where(['id' => '[0-9]+', 'type' => '(academic|opd)'])
+            ->name('propose-collaboration');
+    });
 });
 
 // Redirect routes
@@ -97,38 +133,48 @@ Route::middleware('auth')->group(function () {
             Route::delete('/delete/{id}', [ProgramController::class, 'destroyInnovation'])->name('destroy');
         });
     });
-
+    
     // =============== AKADEMISI ROUTES ===============
     Route::prefix('akademisi')->name('akademisi.')->group(function () {
-        Route::get('/', [AkademisiController::class, 'index'])->name('index');
+    // ---------------- DASHBOARD ----------------
+    Route::get('/', [AkademisiController::class, 'index'])->name('index');
 
-        Route::prefix('inovasi')->name('inovasi.')->group(function () {
-            Route::get('/subcategories', [InnovationController::class, 'subcategories'])->name('subcategories');
-
-            Route::get('/', [InnovationController::class, 'index'])->name('index');
-            Route::get('/create', [InnovationController::class, 'create'])->name('create');
-            Route::post('/', [InnovationController::class, 'store'])->name('store');
-            Route::get('/{innovation}', [InnovationController::class, 'show'])->name('show');
-            Route::get('/{innovation}/edit', [InnovationController::class, 'edit'])->name('edit');
-            Route::put('/{innovation}', [InnovationController::class, 'update'])->name('update');
-            Route::delete('/{innovation}', [InnovationController::class, 'destroy'])->name('destroy');
-        });
-
-        // ❌ HAPUS SEMUA ROUTE KOLABORASI DARI SINI
-
-        Route::get('/proyek-saya', [AkademisiController::class, 'proyekSaya'])->name('proyek-saya');
-        Route::get('/profil-akademik', [AkademisiController::class, 'profilAkademik'])->name('profil-akademik');
-        Route::get('/notifikasi', [AkademisiController::class, 'notifikasi'])->name('notifikasi');
+    // ---------------- INOVASI ----------------
+    Route::prefix('inovasi')->name('inovasi.')->group(function () {
+        Route::get('/', [InnovationController::class, 'index'])->name('index');
+        Route::get('/create', [InnovationController::class, 'create'])->name('create');
+        Route::post('/', [InnovationController::class, 'store'])->name('store');
+        Route::get('/{innovation}', [InnovationController::class, 'show'])->name('show');
+        Route::get('/{innovation}/edit', [InnovationController::class, 'edit'])->name('edit');
+        Route::put('/{innovation}', [InnovationController::class, 'update'])->name('update');
+        Route::delete('/{innovation}', [InnovationController::class, 'destroy'])->name('destroy');
+Route::get('/ajax/subcategories', [InnovationController::class, 'subcategories'])->name('subcategories');
+    });
+    
+// ---------------- KOLABORASI ----------------
+    Route::prefix('kolaborasi')->name('kolaborasi.')->group(function () {
+        Route::get('/', [KolaborasiController::class, 'index'])->name('index');
+        Route::get('/create', [KolaborasiController::class, 'create'])->name('create');
+        Route::post('/', [KolaborasiController::class, 'store'])->name('store');
+        Route::get('/{id}', [KolaborasiController::class, 'show'])->name('show');
+        Route::post('/{id}/reply', [KolaborasiController::class, 'reply'])->name('reply');
     });
 
-    // =============== PROFILE ROUTES ===============
-    Route::controller(ProfileController::class)->group(function () {
-        Route::get('/profile', 'edit')->name('profile.edit');
-        Route::patch('/profile', 'update')->name('profile.update');
-        Route::delete('/profile', 'destroy')->name('profile.destroy');
-    });
+    // ---------------- HALAMAN LAIN ----------------
+    Route::get('/proyek-saya', [AkademisiController::class, 'proyekSaya'])->name('proyek-saya');
+    Route::get('/profil-akademik', [AkademisiController::class, 'profilAkademik'])->name('profil-akademik');
+    Route::get('/notifikasi', [AkademisiController::class, 'notifikasi'])->name('notifikasi');
+});
 
-    // =============== DASHBOARD REDIRECT ===============
+
+// =============== PROFILE ROUTES ===============
+Route::controller(ProfileController::class)->group(function () {
+    Route::get('/profile', 'edit')->name('profile.edit');
+    Route::patch('/profile', 'update')->name('profile.update');
+    Route::delete('/profile', 'destroy')->name('profile.destroy');
+});
+
+// =============== DASHBOARD REDIRECT ===============
     Route::get('/dashboard', function () {
         return match (auth()->user()->role) {
             'pemerintah' => redirect()->route('pemerintah.dashboard'), // ✅ UBAH INI

@@ -88,7 +88,7 @@
                             <h3 class="text-lg font-semibold text-slate-800">Bank Solusi</h3>
                             <p class="text-sm text-slate-500 mt-1">Temukan solusi untuk tantangan akademik dan penelitian Anda. Akses pengetahuan dari para ahli di berbagai bidang.</p>
                             <div class="mt-3">
-                                <a href="{{ route('akademisi.kolaborasi') ?? '#' }}" class="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-cyan-600">Jelajahi Solusi <i class="fas fa-arrow-right"></i></a>
+                                <a href="{{ route('akademisi.kolaborasi.index') ?? '#' }}" class="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-cyan-600">Jelajahi Solusi <i class="fas fa-arrow-right"></i></a>
                             </div>
                         </div>
                     </div>
