@@ -24,15 +24,15 @@ if (in_array($currentRoute, ['landing-page','tentang'])) {
             'pemerintah' => [
                 ['href' => route('pemerintah.index'), 'label' => 'Dashboard'],
                 ['href' => route('pemerintah.program'), 'label' => 'Program & Inovasi'],
-                ['href' => route('pemerintah.diskusi'), 'label' => 'Forum Diskusi'],
+                ['href' => route('forum-diskusi.index'), 'label' => 'Forum Diskusi'],
                 ['href' => route('kolaborasi.index'), 'label' => 'Ruang Kolaborasi'],
             ],
-            'akademisi' => [
-                ['href' => route('akademisi.index'), 'label' => 'Dashboard'],
-                ['href' => route('akademisi.inovasi.index'), 'label' => 'Inovasi'],
-                ['href' => route('akademisi.proyek-saya'), 'label' => 'Forum Diskusi'],
-                ['href' => route('akademisi.kolaborasi'), 'label' => 'Ruang Kolaborasi'],
-            ],
+'akademisi' => [
+    ['href' => route('akademisi.index'), 'label' => 'Dashboard'],
+    ['href' => route('akademisi.inovasi.index'), 'label' => 'Inovasi'],
+    ['href' => route('forum-diskusi.index'), 'label' => 'Forum Diskusi'],
+    ['href' => route('akademisi.kolaborasi.index'), 'label' => 'Ruang Kolaborasi'],
+],
             'admin' => [
                 ['href' => route('admin.index'), 'label' => 'Dashboard'],
                 ['href' => route('admin.users.index'), 'label' => 'Manajemen User'],

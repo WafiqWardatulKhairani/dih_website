@@ -18,6 +18,8 @@
     <!-- Custom CSS (jika masih dipakai) -->
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     <link rel="stylesheet" href="{{ asset('css/pemerintah.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/akademisi.css') }}">
+
 
     <!-- Vite -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -28,8 +30,8 @@
     @stack('styles')
 </head>
 
-<body class="font-sans antialiased">
-    <div class="min-h-screen bg-gray-100">
+<body class="font-sans antialiased" style="background-color: transparent;">
+    <div class="min-h-screen @yield('body-bg', 'bg-gray-100')">
         {{-- Navigation --}}
         @if(isset($customNavigation) && $customNavigation)
             {{ $customNavigation }}

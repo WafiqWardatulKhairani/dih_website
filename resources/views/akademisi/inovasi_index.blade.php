@@ -1,8 +1,30 @@
 @extends('layouts.app')
 
-@section('title', 'Inovasi Saya - Platform Inovasi')
+@section('styles')
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    primary: '#1e3a8a',
+                    secondary: '#1e40af',
+                    accent: '#3b82f6',
+                    dark: '#1e293b',
+                    light: '#f8fafc',
+                    success: '#059669',
+                    warning: '#d97706'
+                }
+            }
+        }
+    }
+</script>
+
 
 @section('content')
+
+
 <div class="w-full">
 
     <!-- HERO SECTION -->
@@ -192,7 +214,7 @@
                 return;
             }
 
-            fetch(`{{ route('akademisi.inovasi.subcategories') }}?category=${encodeURIComponent(category)}`)
+fetch(`{{ route('akademisi.inovasi.subcategories') }}?category=${encodeURIComponent(category)}`)
                 .then(res => res.json())
                 .then(data => {
                     subcategorySelect.innerHTML = '<option value="">Semua Subkategori</option>';
