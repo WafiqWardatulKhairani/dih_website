@@ -21,10 +21,9 @@ class AdminUserSeeder extends Seeder
                 'email' => 'superadmin@portalopd.com',
                 'phone' => '081234567890',
                 'address' => 'Jl. Admin Utama No. 1',
-                'password' => Hash::make('SuperAdminDIH_21September2025'), // Password kompleks
+                'password' => 'SuperAdminDIH_21September2025', // password raw, nanti di-hash
                 'role' => 'admin',
                 'status' => 'verified',
-                'email_verified_at' => now(),
                 'avatar' => null,
                 'document_path' => null,
             ],
@@ -34,10 +33,9 @@ class AdminUserSeeder extends Seeder
                 'email' => 'admin.pemerintah@portalopd.com',
                 'phone' => '081234567891',
                 'address' => 'Jl. Pemerintah No. 2',
-                'password' => Hash::make('AdminPemerintah_DIH21September2025'), // Password kompleks
+                'password' => 'AdminPemerintah_DIH21September2025',
                 'role' => 'admin',
                 'status' => 'verified',
-                'email_verified_at' => now(),
                 'avatar' => null,
                 'document_path' => null,
             ],
@@ -47,20 +45,33 @@ class AdminUserSeeder extends Seeder
                 'email' => 'admin.akademisi@portalopd.com',
                 'phone' => '081234567892',
                 'address' => 'Jl. Akademik No. 3',
-                'password' => Hash::make('Admin_AkademisiDIH21September2025'), // Password kompleks
+                'password' => 'Admin_AkademisiDIH21September2025',
                 'role' => 'admin',
                 'status' => 'verified',
-                'email_verified_at' => now(),
                 'avatar' => null,
                 'document_path' => null,
             ]
         ];
 
         foreach ($admins as $admin) {
-            User::create($admin);
+            User::updateOrCreate(
+                ['email' => $admin['email']], // kondisi unik
+                [
+                    'name' => $admin['name'],
+                    'institution_name' => $admin['institution_name'],
+                    'phone' => $admin['phone'],
+                    'address' => $admin['address'],
+                    'password' => Hash::make($admin['password']),
+                    'role' => $admin['role'],
+                    'status' => $admin['status'],
+                    'email_verified_at' => now(),
+                    'avatar' => $admin['avatar'],
+                    'document_path' => $admin['document_path'],
+                ]
+            );
         }
 
-        $this->command->info('3 admin users created successfully!');
+        $this->command->info('3 admin users created or updated successfully!');
         $this->command->info('Email: superadmin@portalopd.com / Password: SuperAdminDIH_21September2025');
         $this->command->info('Email: admin.pemerintah@portalopd.com / Password: AdminPemerintah_DIH21September2025');
         $this->command->info('Email: admin.akademisi@portalopd.com / Password: Admin_AkademisiDIH21September2025');

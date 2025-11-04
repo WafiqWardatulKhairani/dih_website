@@ -7,267 +7,215 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Category;
-use App\Models\Subcategory;
+use Carbon\Carbon;
 
 class DiskusiController extends Controller
 {
     /**
-     * Halaman utama forum diskusi
+     * Halaman utama forum diskusi inovasi
      */
     public function index(Request $request)
     {
         $search = $request->input('search');
-        $categoryId = $request->input('category');
-        $subcategoryId = $request->input('subcategory');
+        $category = $request->input('category');
+        $subcategory = $request->input('subcategory');
         $filter = $request->input('filter', 'Semua');
 
-        // QUERY AKADEMISI
-        $academicQuery = DB::table('academic_innovations')
-            ->select(
-                'id',
-                'user_id',
-                'title',
-                'category',
-                DB::raw('NULL as subcategory'),
-                'author_name',
-                'institution as institution_name',
-                'keywords',
-                'description',
-                'purpose',
-                'technology_readiness_level',
-                'image_path',
-                'document_path',
-                'video_url',
-                DB::raw("'academic' as author_role"),
-                'created_at'
-            )
-            ->where('status', 'publication');
+        $categories = DB::table('academic_innovations')
+            ->whereNotNull('category')
+            ->where('status', 'publication')
+            ->distinct()
+            ->pluck('category');
 
-        // QUERY OPD
-        $opdQuery = DB::table('opd_innovations')
+        $academicQuery = DB::table('academic_innovations as ai')
+            ->leftJoin('users as u', 'ai.user_id', '=', 'u.id')
             ->select(
-                'id',
-                DB::raw('NULL as user_id'),
-                'title',
-                'category',
-                'subcategory',
-                'author_name',
-                'institution as institution_name',
-                'keywords',
-                'description',
-                'purpose',
-                'technology_readiness_level',
-                DB::raw('image as image_path'),
-                'document_path',
-                'video_url',
-                DB::raw("'opd' as author_role"),
-                'created_at'
+                DB::raw("'academic' as source_type"),
+                'ai.id',
+                'ai.title',
+                'ai.category',
+                DB::raw('COALESCE(ai.subcategory, "-") as subcategory_name'),
+                'ai.author_name',
+                'ai.technology_readiness_level',
+                'ai.image_path',
+                'u.avatar',
+                'ai.created_at'
             )
-            ->where('status', 'publication');
+            ->where('ai.status', 'publication');
 
-        // FILTER PENCARIAN
+        $opdQuery = DB::table('opd_innovations as oi')
+            ->leftJoin('users as u', 'oi.user_id', '=', 'u.id')
+            ->select(
+                DB::raw("'opd' as source_type"),
+                'oi.id',
+                'oi.title',
+                'oi.category',
+                DB::raw('COALESCE(oi.subcategory, "-") as subcategory_name'),
+                'oi.author_name',
+                'oi.technology_readiness_level',
+                DB::raw('oi.image as image_path'),
+                'u.avatar',
+                'oi.created_at'
+            )
+            ->where('oi.status', 'publication');
+
         if ($search) {
-            $academicQuery->where('title', 'like', "%$search%");
-            $opdQuery->where('title', 'like', "%$search%");
-        }
-        if ($categoryId) {
-            $academicQuery->where('category', $categoryId);
-            $opdQuery->where('category', $categoryId);
-        }
-        if ($subcategoryId) {
-            $academicQuery->where(DB::raw('NULL'), $subcategoryId); // academic_innovations tidak punya subcategory
-            $opdQuery->where('subcategory', $subcategoryId);
+            $academicQuery->where('ai.title', 'like', "%{$search}%");
+            $opdQuery->where('oi.title', 'like', "%{$search}%");
         }
 
-        // UNION
-        $unionSql = $academicQuery->unionAll($opdQuery);
-
-        // Bungkus union agar bisa pakai orderBy
-        $innovations = DB::table(DB::raw("({$unionSql->toSql()}) as innovations"))
-            ->mergeBindings($unionSql)
-            ->select('*');
-
-        // FILTER TAMBAHAN & URUTAN
-        if ($filter === 'Terbaru') {
-            $innovations->orderBy('created_at', 'desc');
-        } elseif ($filter === 'Terpopuler') {
-            $innovations->orderBy('created_at', 'desc'); // Placeholder
-        } elseif ($filter === 'Berkolaborasi' && Schema::hasTable('innovation_participants')) {
-            $innovations->whereExists(function ($query) {
-                $query->select(DB::raw(1))
-                    ->from('innovation_participants')
-                    ->whereRaw('innovation_participants.innovation_id = innovations.id');
-            })->orderBy('created_at', 'desc');
-        } else {
-            $innovations->orderBy('created_at', 'desc');
+        if ($category) {
+            $academicQuery->where('ai.category', $category);
+            $opdQuery->where('oi.category', $category);
         }
 
-        // PAGINATION MANUAL
+        if ($subcategory) {
+            $academicQuery->where('ai.subcategory', $subcategory);
+            $opdQuery->where('oi.subcategory', $subcategory);
+        }
+
+        $union = $academicQuery->unionAll($opdQuery);
+        $innovations = DB::query()->fromSub($union, 'innovations');
+
+        switch ($filter) {
+            case 'Terbaru':
+                $innovations->orderByDesc('created_at');
+                break;
+            case 'Terpopuler':
+                $innovations->orderByDesc('created_at'); // sementara
+                break;
+            default:
+                $innovations->orderByDesc('created_at');
+        }
+
         $page = $request->input('page', 1);
         $perPage = 12;
-        $allInnovations = $innovations->get();
-        $currentItems = $allInnovations->slice(($page - 1) * $perPage, $perPage)->values();
+        $all = $innovations->get();
+
+        // Ubah path gambar dan avatar langsung dari DB
+        $all = $all->map(function ($item) {
+            $item->image_url = $item->image_path
+                ? asset('storage/' . $item->image_path)
+                : asset('images/default-innovation.jpg');
+
+            $item->avatar_url = $item->avatar
+                ? asset('storage/' . $item->avatar)
+                : asset('images/default-avatar.png');
+
+            $item->created_at = Carbon::parse($item->created_at);
+
+            return $item;
+        });
+
+        $currentItems = $all->slice(($page - 1) * $perPage, $perPage)->values();
         $paginatedInnovations = new LengthAwarePaginator(
             $currentItems,
-            $allInnovations->count(),
+            $all->count(),
             $perPage,
             $page,
             ['path' => $request->url(), 'query' => $request->query()]
         );
 
-        // DATA FILTER
-        $categories = Category::all();
-        $subcategories = $categoryId
-            ? Subcategory::where('category_id', $categoryId)->get()
-            : collect();
-
-        // STATISTIK
         $totalUsers = DB::table('users')->count();
-        $totalInnovations =
-            DB::table('academic_innovations')->where('status', 'publication')->count() +
-            DB::table('opd_innovations')->where('status', 'publication')->count();
+        $totalInnovations = DB::table('academic_innovations')->where('status', 'publication')->count()
+            + DB::table('opd_innovations')->where('status', 'publication')->count();
         $totalCollaborations = Schema::hasTable('innovation_participants')
             ? DB::table('innovation_participants')->count()
             : 0;
 
-        // TOP USERS (berdasarkan komentar)
-        $topUsers = collect();
-        if (Schema::hasTable('discussion_comments') && Schema::hasTable('users')) {
-            $topUsers = DB::table('discussion_comments')
-                ->select('user_id', DB::raw('COUNT(*) as total_comments'))
-                ->groupBy('user_id')
-                ->orderByDesc('total_comments')
-                ->limit(10)
-                ->get()
-                ->map(function ($u) {
-                    $userData = DB::table('users')->where('id', $u->user_id)->first();
-                    $u->name = $userData->name ?? 'Pengguna Tidak Dikenal';
-                    $u->institution_name = $userData->institution_name ?? '-';
-                    $u->avatar = $userData->avatar ?? null;
-                    return $u;
-                });
-        }
-
         return view('diskusi.diskusi', compact(
-            'paginatedInnovations', 'categories', 'subcategories',
-            'totalUsers', 'totalInnovations', 'totalCollaborations',
-            'categoryId', 'subcategoryId', 'filter', 'search', 'topUsers'
+            'paginatedInnovations',
+            'categories',
+            'totalUsers',
+            'totalInnovations',
+            'totalCollaborations',
+            'category',
+            'subcategory',
+            'filter',
+            'search'
         ));
     }
 
     /**
-     * Detail inovasi
+     * Ambil subkategori untuk filter
+     */
+    public function getSubcategories(Request $request)
+    {
+        $category = $request->query('category');
+        if (!$category) return response()->json([]);
+
+        $subcategories = DB::table('academic_innovations')
+            ->where('category', $category)
+            ->whereNotNull('subcategory')
+            ->distinct()
+            ->pluck('subcategory');
+
+        return response()->json($subcategories);
+    }
+
+    /**
+     * Detail inovasi + komentar
      */
     public function detail($type, $id)
     {
+        if (!in_array($type, ['academic', 'opd'])) abort(404);
         $table = $type === 'academic' ? 'academic_innovations' : 'opd_innovations';
 
-        $innovation = DB::table($table)
-            ->select(
-                'id',
-                'user_id',
-                'title',
-                DB::raw($table === 'academic_innovations' ? 'NULL as subcategory' : 'subcategory'),
-                'category',
-                'author_name',
-                DB::raw('institution as institution_name'),
-                'description',
-                'technology_readiness_level',
-                'image_path',
-                'document_path',
-                'video_url',
-                'created_at',
-                DB::raw("'" . $type . "' as author_role")
-            )
-            ->where('id', $id)
+        $innovation = DB::table($table.' as t')
+            ->leftJoin('users as u', 't.user_id', '=', 'u.id')
+            ->select('t.*', 'u.avatar')
+            ->where('t.id', $id)
             ->first();
 
         if (!$innovation) abort(404);
 
-        // Nama subkategori
-        $subcategoryName = null;
-        if ($innovation->subcategory && Schema::hasTable('subcategories')) {
-            $sub = DB::table('subcategories')->where('id', $innovation->subcategory)->first();
-            $subcategoryName = $sub ? $sub->name : null;
-        }
+        $innovation->subcategory_name = $innovation->subcategory_name ?? ($innovation->subcategory ?? '-');
+        $innovation->image_url = $innovation->image_path
+            ? asset('storage/' . $innovation->image_path)
+            : asset('images/default-innovation.jpg');
 
-        // Peserta
-        $participants = Schema::hasTable('innovation_participants')
-            ? DB::table('innovation_participants as ip')
-                ->leftJoin('users as u', 'ip.user_id', '=', 'u.id')
-                ->where('ip.innovation_id', $id)
-                ->select('u.id', 'u.name', 'u.institution_name', 'u.avatar', 'ip.created_at as joined_at')
-                ->get()
-            : collect();
+        $innovation->avatar_url = $innovation->avatar
+            ? asset('storage/' . $innovation->avatar)
+            : asset('images/default-avatar.png');
 
-        // Komentar
-        $comments = Schema::hasTable('discussion_comments')
-            ? DB::table('discussion_comments as dc')
-                ->leftJoin('users as u', 'dc.user_id', '=', 'u.id')
-                ->where('dc.innovation_id', $id)
-                ->orderBy('dc.created_at', 'asc')
-                ->select(
-                    'dc.id',
-                    'dc.content',
-                    'dc.created_at',
-                    'u.id as user_id',
-                    'u.name as user_name',
-                    'u.institution_name as user_institution',
-                    'u.role as user_role',
-                    'u.avatar as user_avatar'
-                )
-                ->get()
-            : collect();
+        $innovation->created_at = Carbon::parse($innovation->created_at);
 
-        // Kolaborasi
-        $collaborations = Schema::hasTable('collaboration_requests')
-            ? DB::table('collaboration_requests as cr')
-                ->leftJoin('users as u', 'cr.user_id', '=', 'u.id')
-                ->where('cr.innovation_id', $id)
-                ->orderBy('cr.created_at', 'desc')
-                ->select(
-                    'cr.id',
-                    'cr.user_id',
-                    'cr.message',
-                    'cr.status',
-                    'cr.created_at',
-                    'u.name as user_name',
-                    'u.institution_name as user_institution',
-                    'u.avatar as user_avatar'
-                )
-                ->get()
-            : collect();
+        // Ambil komentar dengan info user
+        $comments = DB::table('discussion_comments as dc')
+            ->leftJoin('users as u', 'dc.user_id', '=', 'u.id')
+            ->where('dc.innovation_id', $innovation->id)
+            ->select(
+                'dc.*',
+                'u.name as user_name',
+                'u.role as user_role',
+                'u.avatar as user_avatar'
+            )
+            ->orderByDesc('dc.created_at')
+            ->get()
+            ->map(function ($c) {
+                $c->created_at = Carbon::parse($c->created_at);
+                $c->avatar_url = $c->user_avatar
+                    ? asset('storage/' . $c->user_avatar)
+                    : asset('images/default-avatar.png');
+                return $c;
+            });
 
-        // Pengajuan kolaborasi milik user login
-        $myCollaboration = null;
-        if (Auth::check() && Schema::hasTable('collaboration_requests')) {
-            $myCollaboration = DB::table('collaboration_requests')
-                ->where('innovation_id', $id)
-                ->where('user_id', Auth::id())
-                ->first();
-        }
+        // Sidebar inovasi lain
+        $sidebarInnovations = DB::table('academic_innovations as ai')
+            ->leftJoin('discussion_comments as dc', 'ai.id', '=', 'dc.innovation_id')
+            ->select('ai.id','ai.title','ai.category','ai.subcategory','ai.author_name', DB::raw('COUNT(dc.id) as comments_count'))
+            ->where('ai.id', '!=', $innovation->id)
+            ->groupBy('ai.id','ai.title','ai.category','ai.subcategory','ai.author_name')
+            ->orderByDesc('ai.created_at')
+            ->limit(5)
+            ->get();
 
-        // Pending kolaborasi untuk owner
-        $pendingForOwner = null;
-        if (Schema::hasTable('collaboration_requests')) {
-            $pendingForOwner = DB::table('collaboration_requests as cr')
-                ->leftJoin('users as u', 'cr.user_id', '=', 'u.id')
-                ->where('cr.innovation_id', $id)
-                ->where('cr.status', 'pending')
-                ->select('cr.*', 'u.name as user_name', 'u.institution_name as user_institution', 'u.avatar as user_avatar')
-                ->first();
-        }
-
-        return view('diskusi.diskusi-detail', [
-            'innovation' => (object) array_merge((array) $innovation, ['subcategory_name' => $subcategoryName]),
-            'participants' => $participants,
-            'comments' => $comments,
-            'collaborations' => $collaborations,
-            'myCollaboration' => $myCollaboration,
-            'pendingForOwner' => $pendingForOwner,
-            'type' => $type
-        ]);
+        return view('diskusi.diskusi-detail', compact(
+            'innovation',
+            'type',
+            'comments',
+            'sidebarInnovations'
+        ));
     }
 
     /**
@@ -275,9 +223,16 @@ class DiskusiController extends Controller
      */
     public function addComment(Request $request, $type, $id)
     {
-        $request->validate(['content' => 'required|string|max:2000']);
-        if (!Auth::check()) return back()->with('error', 'Silakan login terlebih dahulu.');
-        if (!Schema::hasTable('discussion_comments')) return back()->with('error', 'Tabel komentar belum dibuat.');
+        $request->validate([
+            'content' => 'required|string|max:1000'
+        ]);
+
+        if (!Auth::check()) return redirect()->route('login');
+        if (!in_array($type, ['academic','opd'])) abort(404);
+
+        $table = $type === 'academic' ? 'academic_innovations' : 'opd_innovations';
+        $innovation = DB::table($table)->where('id', $id)->first();
+        if (!$innovation) abort(404);
 
         DB::table('discussion_comments')->insert([
             'innovation_id' => $id,
@@ -287,17 +242,21 @@ class DiskusiController extends Controller
             'updated_at' => now(),
         ]);
 
-        return back()->with('success', 'Komentar berhasil ditambahkan.');
+        return redirect()->route('forum-diskusi.detail', ['type'=>$type, 'id'=>$id])
+            ->with('success','Komentar berhasil dikirim.');
     }
 
     /**
-     * Ambil subkategori (AJAX)
+     * Hapus komentar
      */
-    public function getSubcategories(Request $request)
+    public function deleteComment($id)
     {
-        $categoryId = $request->query('category');
-        if (!$categoryId) return response()->json([]);
-        $subcategories = Subcategory::where('category_id', $categoryId)->get(['id', 'name']);
-        return response()->json($subcategories);
+        $comment = DB::table('discussion_comments')->where('id', $id)->first();
+        if (!$comment) abort(404);
+        if (Auth::id() != $comment->user_id) abort(403);
+
+        DB::table('discussion_comments')->where('id', $id)->delete();
+
+        return back()->with('success','Komentar berhasil dihapus.');
     }
 }

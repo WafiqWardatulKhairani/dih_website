@@ -9,15 +9,15 @@ class Kernel extends HttpKernel
     /**
      * Global HTTP middleware stack.
      *
-     * Middleware ini jalan untuk setiap request.
+     * Middleware ini berjalan untuk setiap request ke aplikasi.
      */
     protected $middleware = [
-        // \App\Http\Middleware\TrustProxies::class,
-        \Illuminate\Foundation\Http\Middleware\CheckForMaintenanceMode::class,
+        \App\Http\Middleware\TrustProxies::class,
+        \Illuminate\Http\Middleware\HandleCors::class,
+        \App\Http\Middleware\PreventRequestsDuringMaintenance::class,
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
-        \App\Http\Middleware\TrustProxies::class,
     ];
 
     /**
@@ -34,7 +34,7 @@ class Kernel extends HttpKernel
         ],
 
         'api' => [
-            'throttle:60,1',
+            \Illuminate\Routing\Middleware\ThrottleRequests::class . ':api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
     ];
@@ -42,9 +42,10 @@ class Kernel extends HttpKernel
     /**
      * The application's route middleware aliases.
      *
-     * @var array<string, class-string|string>
+     * Middleware dapat dipanggil via alias di file routes/web.php
      */
     protected $middlewareAliases = [
+        // Default Laravel
         'auth' => \App\Http\Middleware\Authenticate::class,
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
         'auth.session' => \Illuminate\Session\Middleware\AuthenticateSession::class,
@@ -55,10 +56,11 @@ class Kernel extends HttpKernel
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
-        
-        // Middleware custom
+
+        // Custom middleware
         'checkRole' => \App\Http\Middleware\CheckRole::class,
         'user.status' => \App\Http\Middleware\CheckUserStatus::class,
         'admin' => \App\Http\Middleware\AdminMiddleware::class,
+        'kolaborasi.active' => \App\Http\Middleware\CheckKolaborasiActive::class, // ← Tambahan penting
     ];
 }

@@ -31,7 +31,7 @@ if (in_array($currentRoute, ['landing-page','tentang'])) {
     ['href' => route('akademisi.index'), 'label' => 'Dashboard'],
     ['href' => route('akademisi.inovasi.index'), 'label' => 'Inovasi'],
     ['href' => route('forum-diskusi.index'), 'label' => 'Forum Diskusi'],
-    ['href' => route('akademisi.kolaborasi.index'), 'label' => 'Ruang Kolaborasi'],
+    ['href' => route('kolaborasi.index'), 'label' => 'Ruang Kolaborasi'],
 ],
             'admin' => [
                 ['href' => route('admin.index'), 'label' => 'Dashboard'],

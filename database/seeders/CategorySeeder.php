@@ -7,6 +7,9 @@ use App\Models\Category;
 
 class CategorySeeder extends Seeder
 {
+    /**
+     * Run the database seeds.
+     */
     public function run(): void
     {
         $categories = [
@@ -17,7 +20,13 @@ class CategorySeeder extends Seeder
         ];
 
         foreach ($categories as $cat) {
-            Category::updateOrCreate(['name' => $cat]);
+            // Gunakan updateOrCreate supaya bisa dijalankan berulang kali tanpa error
+            Category::updateOrCreate(
+                ['name' => $cat], // kondisi unik
+                ['name' => $cat]  // data yang akan di-update atau dibuat
+            );
         }
+
+        $this->command->info('CategorySeeder berhasil dijalankan!');
     }
 }

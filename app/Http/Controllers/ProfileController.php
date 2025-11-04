@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ProfileUpdateRequest;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use App\Models\OpdProgram;
@@ -17,6 +15,9 @@ use Carbon\Carbon;
 
 class ProfileController extends Controller
 {
+    /**
+     * Tampilkan halaman edit profil user
+     */
     public function edit(Request $request): View
     {
         $user = $request->user();
@@ -26,7 +27,7 @@ class ProfileController extends Controller
         $stats = [];
 
         if ($user->role === 'pemerintah') {
-            // Untuk pemerintah, ambil dari opd_programs dan opd_innovations dengan pagination 12 item
+            // Ambil program & inovasi pemerintah
             $programs = OpdProgram::where('user_id', $user->id)
                 ->latest()
                 ->paginate(12, ['*'], 'program_page')
@@ -37,7 +38,7 @@ class ProfileController extends Controller
                 ->paginate(12, ['*'], 'innovation_page')
                 ->withQueryString();
 
-            // FALLBACK: Jika tidak ada program dengan user_id, coba dengan opd_name yang sesuai
+            // Fallback jika tidak ada data berdasarkan user_id
             if ($programs->isEmpty()) {
                 $programs = OpdProgram::where('opd_name', 'LIKE', '%' . $user->institution_name . '%')
                     ->latest()
@@ -45,7 +46,6 @@ class ProfileController extends Controller
                     ->withQueryString();
             }
 
-            // FALLBACK: Jika tidak ada inovasi dengan user_id, coba dengan author_name
             if ($innovations->isEmpty()) {
                 $innovations = OpdInnovation::where('author_name', $user->name)
                     ->latest()
@@ -53,26 +53,26 @@ class ProfileController extends Controller
                     ->withQueryString();
             }
 
-            // Hitung statistik (gunakan semua data, bukan hanya yang ditampilkan)
+            // Statistik lengkap (semua data, bukan hanya halaman sekarang)
             $allPrograms = OpdProgram::where('user_id', $user->id)->get();
             $allInnovations = OpdInnovation::where('user_id', $user->id)->get();
 
             if ($allPrograms->isEmpty()) {
                 $allPrograms = OpdProgram::where('opd_name', 'LIKE', '%' . $user->institution_name . '%')->get();
             }
+
             if ($allInnovations->isEmpty()) {
                 $allInnovations = OpdInnovation::where('author_name', $user->name)->get();
             }
 
             $stats = $this->calculateStats($allPrograms, $allInnovations);
         } elseif ($user->role === 'akademisi') {
-            // Untuk akademisi, ambil dari academic_innovations dengan pagination 12 item
+            // Ambil inovasi akademisi
             $innovations = AcademicInnovation::where('user_id', $user->id)
                 ->latest()
                 ->paginate(12, ['*'], 'innovation_page')
                 ->withQueryString();
 
-            // Fallback untuk akademisi
             if ($innovations->isEmpty()) {
                 $innovations = AcademicInnovation::where('author_name', $user->name)
                     ->latest()
@@ -92,9 +92,9 @@ class ProfileController extends Controller
     }
 
     /**
-     * Hitung statistik untuk pemerintah
+     * Hitung statistik pemerintah
      */
-    private function calculateStats($programs, $innovations)
+    private function calculateStats($programs, $innovations): array
     {
         $oneYearAgo = Carbon::now()->subYear();
 
@@ -111,13 +111,12 @@ class ProfileController extends Controller
     }
 
     /**
-     * Hitung statistik untuk akademisi
+     * Hitung statistik akademisi
      */
-    private function calculateAcademicStats($innovations)
+    private function calculateAcademicStats($innovations): array
     {
         $oneYearAgo = Carbon::now()->subYear();
 
-        // Hitung kategori terbanyak
         $categoryCounts = $innovations->groupBy('category')->map->count();
         $mostFrequentCategory = $categoryCounts->isNotEmpty() ? $categoryCounts->sortDesc()->keys()->first() : null;
 
@@ -131,7 +130,7 @@ class ProfileController extends Controller
     }
 
     /**
-     * Update data profil user.
+     * Update profil user
      */
     public function update(Request $request): RedirectResponse
     {
@@ -145,20 +144,17 @@ class ProfileController extends Controller
             'document_path' => 'nullable|file|mimes:pdf,doc,docx|max:2048',
         ]);
 
-        // Update data user
         $user->name = $validated['name'];
         $user->institution_name = $validated['institution_name'];
-        $user->address = $validated['address'];
-        $user->phone = $validated['phone'];
+        $user->address = $validated['address'] ?? '';
+        $user->phone = $validated['phone'] ?? '';
 
-        // Handle upload dokumen
+        // Upload dokumen jika ada
         if ($request->hasFile('document_path')) {
             if ($user->document_path) {
                 Storage::delete('public/' . $user->document_path);
             }
-
-            $path = $request->file('document_path')->store('documents', 'public');
-            $user->document_path = $path;
+            $user->document_path = $request->file('document_path')->store('documents', 'public');
         }
 
         $user->save();
@@ -167,7 +163,7 @@ class ProfileController extends Controller
     }
 
     /**
-     * Hapus akun user.
+     * Hapus akun user
      */
     public function destroy(Request $request): RedirectResponse
     {

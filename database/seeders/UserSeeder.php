@@ -10,43 +10,52 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        User::create([
-            'name' => 'Super Admin',
-            'institution_name' => 'Kementerian Pusat',
-            'email' => 'admin@example.com',
-            'password' => Hash::make('password'),
-            'role' => 'admin',
-            'phone' => '081234567890',
-            'address' => 'Jakarta',
-            'avatar' => null,
-            'status' => 'verified', // Tambahkan ini
-            'email_verified_at' => now(), // Tambahkan ini
-        ]);
+        $users = [
+            [
+                'name' => 'Super Admin',
+                'institution_name' => 'Kementerian Pusat',
+                'email' => 'admin@example.com',
+                'password' => Hash::make('password'),
+                'role' => 'admin',
+                'phone' => '081234567890',
+                'address' => 'Jakarta',
+                'avatar' => null,
+                'status' => 'verified',
+                'email_verified_at' => now(),
+            ],
+            [
+                'name' => 'Pemerintah',
+                'institution_name' => 'Kementerian Pendidikan',
+                'email' => 'pemerintah@example.com',
+                'password' => Hash::make('password'),
+                'role' => 'pemerintah',
+                'phone' => '081111111111',
+                'address' => 'Jakarta',
+                'avatar' => null,
+                'status' => 'verified',
+                'email_verified_at' => now(),
+            ],
+            [
+                'name' => 'Akademisi',
+                'institution_name' => 'Universitas Negeri',
+                'email' => 'akademisi@example.com',
+                'password' => Hash::make('password'),
+                'role' => 'akademisi',
+                'phone' => '082222222222',
+                'address' => 'Bandung',
+                'avatar' => null,
+                'status' => 'verified',
+                'email_verified_at' => now(),
+            ],
+        ];
 
-        User::create([
-            'name' => 'Pemerintah',
-            'institution_name' => 'Kementerian Pendidikan',
-            'email' => 'pemerintah@example.com',
-            'password' => Hash::make('password'),
-            'role' => 'pemerintah',
-            'phone' => '081111111111',
-            'address' => 'Jakarta',
-            'avatar' => null,
-            'status' => 'verified', // Tambahkan ini
-            'email_verified_at' => now(), // Tambahkan ini
-        ]);
+        foreach ($users as $data) {
+            User::updateOrCreate(
+                ['email' => $data['email']], // cek berdasarkan email
+                $data // jika sudah ada, update dengan data ini
+            );
+        }
 
-        User::create([
-            'name' => 'Akademisi',
-            'institution_name' => 'Universitas Negeri',
-            'email' => 'akademisi@example.com',
-            'password' => Hash::make('password'),
-            'role' => 'akademisi',
-            'phone' => '082222222222',
-            'address' => 'Bandung',
-            'avatar' => null,
-            'status' => 'verified', // Tambahkan ini
-            'email_verified_at' => now(), // Tambahkan ini
-        ]);
+        $this->command->info('UserSeeder berhasil dijalankan tanpa duplicate!');
     }
 }

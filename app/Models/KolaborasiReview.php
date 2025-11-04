@@ -10,31 +10,40 @@ class KolaborasiReview extends Model
     use HasFactory;
 
     protected $table = 'kolaborasi_reviews';
-    
+
     protected $fillable = [
-        'kolaborasi_project_id', 'user_id', 'judul', 'komentar',
-        'tipe', 'status', 'versi'
+        'kolaborasi_id',          // ID kolaborasi
+        'kolaborasi_project_id',  // ID task terkait (opsional)
+        'user_id',                // user yang direview / target
+        'reviewer_id',            // user yang memberi review
+        'komentar',               // komentar review
+        'status',                 // status task (opsional)
+        'rating',                 // rating 1-5
+        'versi',                  // opsional
+        'reviewed_at',            // waktu review
     ];
 
-    // Relationships
-    public function project()
+    /**
+     * Task terkait review
+     */
+    public function task()
     {
-        return $this->belongsTo(KolaborasiProject::class, 'kolaborasi_project_id');
+        return $this->belongsTo(KolaborasiTask::class, 'kolaborasi_project_id');
     }
 
-    public function user()
+    /**
+     * User yang dinilai / target review
+     */
+    public function reviewee()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(\App\Models\User::class, 'user_id')->withDefault();
     }
 
-    // Scopes
-    public function scopeProgressReviews($query)
+    /**
+     * User yang memberi review
+     */
+    public function reviewer()
     {
-        return $query->where('tipe', 'progress_review');
-    }
-
-    public function scopePending($query)
-    {
-        return $this->where('status', 'pending');
+        return $this->belongsTo(\App\Models\User::class, 'reviewer_id')->withDefault();
     }
 }

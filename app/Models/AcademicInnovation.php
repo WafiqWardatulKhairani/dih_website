@@ -11,9 +11,13 @@ class AcademicInnovation extends Model
 
     protected $table = 'academic_innovations';
 
+    /**
+     * Kolom yang bisa diisi massal
+     */
     protected $fillable = [
         'title',
         'category',
+        'subcategory', // tambahkan ini agar subkategori tersimpan
         'keywords',
         'abstract',
         'description',
@@ -50,8 +54,20 @@ class AcademicInnovation extends Model
     /** ==========================
      *   RELATIONS
      *  ========================== */
+
+    /**
+     * Hubungan ke User (pemilik inovasi)
+     */
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Hubungan ke Diskusi
+     */
+    public function discussions()
+    {
+        return $this->morphMany(Discussion::class, 'discussionable');
     }
 }

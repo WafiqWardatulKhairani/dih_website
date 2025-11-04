@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Akademisi;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\AcademicInnovation;
+use App\Models\Category;
 use App\Models\Subcategory;
 use App\Models\Discussion;
 use Illuminate\Support\Facades\Auth;
@@ -19,76 +20,75 @@ class InnovationController extends Controller
     }
 
     // =========================================================
-    // INDEX: daftar inovasi publik + inovasi milik user
+    // INDEX: Daftar inovasi milik user yang login
     // =========================================================
     public function index(Request $request)
     {
-        $categories = Subcategory::select('category')->distinct()->pluck('category');
+        $categories = Category::orderBy('name')->pluck('name')->toArray();
 
-        $baseQuery = AcademicInnovation::query()
-            ->where('status', AcademicInnovation::STATUS_PUBLICATION);
+        // Hanya inovasi milik user login
+        $query = AcademicInnovation::where('user_id', Auth::id());
 
-        // Filter pencarian
+        // Filter pencarian kata kunci
         if ($request->filled('q')) {
-            $q = $request->q;
-            $baseQuery->where(function ($qb) use ($q) {
-                $qb->where('title', 'like', "%{$q}%")
-                    ->orWhere('description', 'like', "%{$q}%")
-                    ->orWhere('keywords', 'like', "%{$q}%");
+            $search = $request->q;
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%")
+                  ->orWhere('keywords', 'like', "%{$search}%");
             });
         }
 
         // Filter kategori
         if ($request->filled('category')) {
-            $baseQuery->where('category', $request->category);
+            $query->where('category', $request->category);
         }
 
-        // Daftar inovasi publik terbaru
-        $latest = (clone $baseQuery)->orderByDesc('created_at')->paginate(6);
+        // Pagination
+        $paginatedInnovations = $query->orderByDesc('created_at')->paginate(12)->appends($request->query());
 
-        // Daftar inovasi milik user
+        // Daftar inovasi milik user, dikelompokkan per tahun
         $userInnovations = AcademicInnovation::where('user_id', Auth::id())
             ->orderByDesc('created_at')
             ->get()
             ->groupBy(fn($item) => $item->created_at->format('Y'));
 
-        // Inovasi trending
-        $trending = (clone $baseQuery)->orderByDesc('created_at')->take(6)->get();
+        // Inovasi trending publik (opsional)
+        $trending = AcademicInnovation::where('status', AcademicInnovation::STATUS_PUBLICATION)
+            ->orderByDesc('created_at')
+            ->take(6)
+            ->get();
 
+        // **REVISI DI SINI**: Gunakan view index, bukan form create
         return view('akademisi.inovasi_index', compact(
             'categories',
-            'latest',
+            'paginatedInnovations',
             'userInnovations',
             'trending'
         ));
     }
 
     // =========================================================
-    // CREATE: form posting inovasi baru
+    // CREATE: Form tambah inovasi
     // =========================================================
     public function create()
     {
-        $categories = Subcategory::select('category')->distinct()->pluck('category');
+        $categories = Category::orderBy('name')->pluck('name')->toArray();
 
-        $yearlyInnovations = AcademicInnovation::where('user_id', Auth::id())
+        // Sertakan juga daftar inovasi user agar sidebar tidak error
+        $userInnovations = AcademicInnovation::where('user_id', Auth::id())
             ->orderByDesc('created_at')
             ->get()
             ->groupBy(fn($item) => $item->created_at->format('Y'));
 
-        $latest = AcademicInnovation::where('status', AcademicInnovation::STATUS_PUBLICATION)
-            ->orderByDesc('created_at')
-            ->take(6)
-            ->get();
-
         return view('akademisi.inovasi', compact(
             'categories',
-            'yearlyInnovations',
-            'latest'
+            'userInnovations'
         ));
     }
 
     // =========================================================
-    // STORE: simpan inovasi baru
+    // STORE: Simpan inovasi baru
     // =========================================================
     public function store(Request $request)
     {
@@ -123,6 +123,7 @@ class InnovationController extends Controller
         if ($request->hasFile('image_path')) {
             $data['image_path'] = $request->file('image_path')->store('gambar_inovasi', 'public');
         }
+
         if ($request->hasFile('document_path')) {
             $data['document_path'] = $request->file('document_path')->store('dokumen_inovasi', 'public');
         }
@@ -134,20 +135,19 @@ class InnovationController extends Controller
     }
 
     // =========================================================
-    // SHOW: detail inovasi + diskusi terkait
+    // SHOW: Detail inovasi
     // =========================================================
     public function show($id)
     {
         $innovation = AcademicInnovation::findOrFail($id);
 
-        // Ambil diskusi yang terkait dengan inovasi ini
         $discussions = Discussion::where('discussionable_type', AcademicInnovation::class)
             ->where('discussionable_id', $id)
             ->with(['user', 'replies.user'])
             ->orderByDesc('created_at')
             ->paginate(5);
 
-        $yearlyInnovations = AcademicInnovation::where('user_id', Auth::id())
+        $userInnovations = AcademicInnovation::where('user_id', Auth::id())
             ->where('id', '!=', $id)
             ->orderByDesc('created_at')
             ->get()
@@ -160,42 +160,28 @@ class InnovationController extends Controller
 
         return view('akademisi.inovasi-detail', compact(
             'innovation',
-            'yearlyInnovations',
+            'userInnovations',
             'latest',
             'discussions'
         ));
     }
 
     // =========================================================
-    // EDIT: form ubah inovasi
+    // EDIT & UPDATE: Edit inovasi
     // =========================================================
     public function edit($id)
     {
         $innovation = AcademicInnovation::findOrFail($id);
         if (Auth::id() != $innovation->user_id) abort(403);
 
-        $categories = Subcategory::select('category')->distinct()->pluck('category');
-        $yearlyInnovations = AcademicInnovation::where('user_id', Auth::id())
-            ->orderByDesc('created_at')
-            ->get()
-            ->groupBy(fn($item) => $item->created_at->format('Y'));
-
-        $latest = AcademicInnovation::where('status', AcademicInnovation::STATUS_PUBLICATION)
-            ->orderByDesc('created_at')
-            ->take(6)
-            ->get();
+        $categories = Category::orderBy('name')->pluck('name')->toArray();
 
         return view('akademisi.inovasi-edit', compact(
             'innovation',
-            'categories',
-            'yearlyInnovations',
-            'latest'
+            'categories'
         ));
     }
 
-    // =========================================================
-    // UPDATE: simpan perubahan inovasi
-    // =========================================================
     public function update(Request $request, $id)
     {
         $innovation = AcademicInnovation::findOrFail($id);
@@ -249,7 +235,7 @@ class InnovationController extends Controller
     }
 
     // =========================================================
-    // DESTROY: hapus inovasi
+    // DESTROY: Hapus inovasi
     // =========================================================
     public function destroy($id)
     {
@@ -270,15 +256,18 @@ class InnovationController extends Controller
     }
 
     // =========================================================
-    // AJAX: ambil subkategori berdasarkan kategori
+    // SUBCATEGORIES: Ambil subkategori dari kategori tertentu
     // =========================================================
     public function subcategories(Request $request)
     {
-        $category = $request->query('category');
+        $categoryName = $request->query('category');
 
+        if (!$categoryName) return response()->json([]);
+
+        $category = Category::where('name', $categoryName)->first();
         if (!$category) return response()->json([]);
 
-        $subs = Subcategory::where('category', $category)
+        $subs = Subcategory::where('category_id', $category->id)
             ->orderBy('name')
             ->pluck('name');
 

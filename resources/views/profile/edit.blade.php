@@ -548,7 +548,7 @@
                         @else
                         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                             @foreach($innovations as $innovation)
-                            <a href="{{ route('akademisi.inovasi.detail', $innovation->id) }}" class="block">
+                            <a href="{{ route('akademisi.inovasi.show', $innovation->id) }}" class="block">
                                 <div class="group bg-white rounded-xl p-4 border border-gray-200 hover:border-purple-300 hover:shadow-lg transition-all duration-300 h-full">
                                     <div class="flex justify-between items-start mb-3">
                                         <div class="flex-1 min-w-0">
