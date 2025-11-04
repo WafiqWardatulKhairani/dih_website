@@ -268,9 +268,9 @@ Route::prefix('kolaborasi')
     // 🔹 PEMERINTAH ROUTES
     // ============================================================
     Route::prefix('pemerintah')->name('pemerintah.')->group(function () {
-        Route::get('/', [DashboardController::class, 'index'])->name('index');
-        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-        Route::get('/api/dashboard/chart-data', [DashboardController::class, 'getChartData'])->name('dashboard.chart-data');
+Route::get('/', [PemerintahDashboardController::class, 'index'])->name('index');
+Route::get('/dashboard', [PemerintahDashboardController::class, 'index'])->name('dashboard');
+Route::get('/api/dashboard/chart-data', [PemerintahDashboardController::class, 'getChartData'])->name('dashboard.chart-data');
         Route::get('/kolaborasi', fn() => redirect()->route('kolaborasi.ide.index'))->name('kolaborasi');
         Route::get('/program', [ProgramController::class, 'programPage'])->name('program');
 
