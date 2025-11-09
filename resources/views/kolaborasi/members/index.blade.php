@@ -134,7 +134,6 @@
                             </td>
                             <td class="py-3 px-4 text-gray-700">{{ $status }}</td>
                             <td class="py-3 px-4 text-center">
-                                {{-- SETUJUI --}}
                                 @if($canApprove && $member->status === 'pending')
                                     <form action="{{ route('kolaborasi.members.approve', [$kolaborasi->id, $member->id]) }}" method="POST" class="inline approve-form">
                                         @csrf

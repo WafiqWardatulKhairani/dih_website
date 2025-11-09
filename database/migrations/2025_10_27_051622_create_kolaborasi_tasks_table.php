@@ -18,7 +18,8 @@ class CreateKolaborasiTasksTable extends Migration
             $table->string('status')->default('todo'); // todo, in_progress, done
             $table->timestamps();
 
-            $table->foreign('kolaborasi_id')->references('id')->on('kolaborasi_ides')->cascadeOnDelete();
+            // ✅ ubah ke tabel yang benar
+            $table->foreign('kolaborasi_id')->references('id')->on('kolaborasi_ideas')->cascadeOnDelete();
             $table->foreign('assigned_to')->references('id')->on('users')->nullOnDelete();
         });
     }

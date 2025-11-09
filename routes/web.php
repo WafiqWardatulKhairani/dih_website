@@ -6,8 +6,7 @@ use App\Http\Middleware\AdminMiddleware;
 
 // ===== CONTROLLERS =====
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
-use App\Http\Controllers\Auth\PasswordResetLinkController;
-use App\Http\Controllers\Auth\NewPasswordController;
+use App\Http\Controllers\Auth\SimplePasswordResetController;
 use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ProfileController;
@@ -117,15 +116,12 @@ Route::prefix('forum-diskusi')->name('forum-diskusi.')->group(function () {
 
 // Guest Routes
 Route::middleware('guest')->group(function () {
-    Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
-    Route::post('/login', [AuthenticatedSessionController::class, 'store']);
+    Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('login');    
     Route::get('/daftar', UserRegister::class)->name('user.register');
 
-    // Password Reset
-    Route::get('/forgot-password', [PasswordResetLinkController::class, 'create'])->name('password.request');
-    Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])->name('password.email');
-    Route::get('/reset-password/{token}', [NewPasswordController::class, 'create'])->name('password.reset');
-    Route::post('/reset-password', [NewPasswordController::class, 'store'])->name('password.update');
+    Route::get('/forgot-password', [SimplePasswordResetController::class, 'create'])->name('simple.password.request');
+    Route::post('/forgot-password', [SimplePasswordResetController::class, 'store'])->name('simple.password.update');
+    
 });
 
 // Logout
@@ -141,136 +137,136 @@ Route::redirect('/register', '/daftar')->name('register');
 // ========================================================
 Route::middleware('auth')->group(function () {
 
-// ============================================================
-// 🌐 ROUTE KOLABORASI (PUBLIC + PRIVATE)
-// ============================================================
+    // ============================================================
+    // 🌐 ROUTE KOLABORASI (PUBLIC + PRIVATE)
+    // ============================================================
 
-// ============================================================
-// 🔹 ROUTE PUBLIK — Bisa diakses tanpa login
-// ============================================================
-Route::prefix('kolaborasi')
-    ->name('kolaborasi.')
-    ->group(function () {
-        Route::get('/', [KolaborasiController::class, 'index'])->name('index');             // List kolaborasi
-        Route::get('/{id}/detail', [KolaborasiController::class, 'detail'])->name('detail'); // Halaman detail kolaborasi
-        Route::get('/search', [KolaborasiController::class, 'search'])->name('search');     // Search kolaborasi
-    });
+    // ============================================================
+    // 🔹 ROUTE PUBLIK — Bisa diakses tanpa login
+    // ============================================================
+    Route::prefix('kolaborasi')
+        ->name('kolaborasi.')
+        ->group(function () {
+            Route::get('/', [KolaborasiController::class, 'index'])->name('index');             // List kolaborasi
+            Route::get('/{id}/detail', [KolaborasiController::class, 'detail'])->name('detail'); // Halaman detail kolaborasi
+            Route::get('/search', [KolaborasiController::class, 'search'])->name('search');     // Search kolaborasi
+        });
 
-// ============================================================
-// 🔹 ROUTE PRIVATE — Hanya bisa diakses setelah login
-// ============================================================
-Route::prefix('kolaborasi')
-    ->name('kolaborasi.')
-    ->middleware(['auth'])
-    ->group(function () {
+    // ============================================================
+    // 🔹 ROUTE PRIVATE — Hanya bisa diakses setelah login
+    // ============================================================
+    Route::prefix('kolaborasi')
+        ->name('kolaborasi.')
+        ->middleware(['auth'])
+        ->group(function () {
 
-        // ============================================================
-        // 🔹 IDE KOLABORASI
-        // ============================================================
-        Route::prefix('ide')
-            ->name('ide.')
-            ->controller(IdeController::class)
-            ->group(function () {
-                Route::get('/create', 'create')->name('create');                        // Form ide baru
-                Route::post('/', 'store')->name('store');                                // Simpan ide baru
-                Route::get('/{id}', 'show')->name('show');                               // Detail ide
-                Route::get('/{id}/edit', 'edit')->name('edit');                          // Form edit ide
-                Route::put('/{id}', 'update')->name('update');                            // Update ide
-                Route::delete('/{id}', 'destroy')->name('destroy');                       // Hapus ide
-                Route::post('/{id}/vote', 'vote')->name('vote');                          // Voting ide
-                Route::post('/{id}/approve-ajax', 'approveAjax')->name('approve_ajax');   // Approve ide via AJAX
-                Route::post('/{id}/join', 'join')->name('join');                          // Join kolaborasi
-            });
+            // ============================================================
+            // 🔹 IDE KOLABORASI
+            // ============================================================
+            Route::prefix('ide')
+                ->name('ide.')
+                ->controller(IdeController::class)
+                ->group(function () {
+                    Route::get('/create', 'create')->name('create');                        // Form ide baru
+                    Route::post('/', 'store')->name('store');                                // Simpan ide baru
+                    Route::get('/{id}', 'show')->name('show');                               // Detail ide
+                    Route::get('/{id}/edit', 'edit')->name('edit');                          // Form edit ide
+                    Route::put('/{id}', 'update')->name('update');                            // Update ide
+                    Route::delete('/{id}', 'destroy')->name('destroy');                       // Hapus ide
+                    Route::post('/{id}/vote', 'vote')->name('vote');                          // Voting ide
+                    Route::post('/{id}/approve-ajax', 'approveAjax')->name('approve_ajax');   // Approve ide via AJAX
+                    Route::post('/{id}/join', 'join')->name('join');                          // Join kolaborasi
+                });
 
-        // ============================================================
-        // 🔹 MEMBER KOLABORASI
-        // ============================================================
-        Route::prefix('members')
-            ->name('members.')
-            ->controller(MemberController::class)
-            ->group(function () {
-                Route::get('/{kolaborasi}', 'index')->name('index');                       // Daftar anggota kolaborasi
-                Route::post('/{kolaborasi}/add', 'store')->name('store');                  // Tambah anggota baru
-                Route::post('/{kolaborasi}/{member}/approve', 'approve')->name('approve'); // Approve anggota
-                Route::delete('/{kolaborasi}/{user}', 'destroy')->name('destroy');         // Hapus anggota
-            });
+            // ============================================================
+            // 🔹 MEMBER KOLABORASI
+            // ============================================================
+            Route::prefix('members')
+                ->name('members.')
+                ->controller(MemberController::class)
+                ->group(function () {
+                    Route::get('/{kolaborasi}', 'index')->name('index');                       // Daftar anggota kolaborasi
+                    Route::post('/{kolaborasi}/add', 'store')->name('store');                  // Tambah anggota baru
+                    Route::post('/{kolaborasi}/{member}/approve', 'approve')->name('approve'); // Approve anggota
+                    Route::delete('/{kolaborasi}/{user}', 'destroy')->name('destroy');         // Hapus anggota
+                });
 
-        // ============================================================
-        // 🔹 TASK / TUGAS KOLABORASI
-        // ============================================================
-        Route::prefix('tasks')
-            ->name('tasks.')
-            ->controller(TaskController::class)
-            ->group(function () {
-                Route::get('/{kolaborasi}', 'index')->name('index');       // Daftar tugas
-                Route::post('/{kolaborasi}', 'store')->name('store');       // Tambah tugas
-                Route::put('/{id}', 'update')->name('update');              // Update tugas
-                Route::delete('/{id}', 'destroy')->name('destroy');         // Hapus tugas
-            });
+            // ============================================================
+            // 🔹 TASK / TUGAS KOLABORASI
+            // ============================================================
+            Route::prefix('tasks')
+                ->name('tasks.')
+                ->controller(TaskController::class)
+                ->group(function () {
+                    Route::get('/{kolaborasi}', 'index')->name('index');       // Daftar tugas
+                    Route::post('/{kolaborasi}', 'store')->name('store');       // Tambah tugas
+                    Route::put('/{id}', 'update')->name('update');              // Update tugas
+                    Route::delete('/{id}', 'destroy')->name('destroy');         // Hapus tugas
+                });
 
-        // ============================================================
-        // 🔹 PROGRESS KOLABORASI
-        // ============================================================
-        Route::prefix('progress')
-            ->name('progress.')
-            ->controller(ProgressController::class)
-            ->group(function () {
-                Route::get('/{kolaborasi}', 'index')->name('index');         // Halaman progress
-                Route::post('/{kolaborasi}', 'store')->name('store');        // Tambah progress baru
-                Route::delete('/{progress}', 'destroy')->name('destroy');    // Hapus progress
-                Route::patch('/{progress}', 'update')->name('update');       // Update progress inline
-            });
+            // ============================================================
+            // 🔹 PROGRESS KOLABORASI
+            // ============================================================
+            Route::prefix('progress')
+                ->name('progress.')
+                ->controller(ProgressController::class)
+                ->group(function () {
+                    Route::get('/{kolaborasi}', 'index')->name('index');         // Halaman progress
+                    Route::post('/{kolaborasi}', 'store')->name('store');        // Tambah progress baru
+                    Route::delete('/{progress}', 'destroy')->name('destroy');    // Hapus progress
+                    Route::patch('/{progress}', 'update')->name('update');       // Update progress inline
+                });
 
-        // ============================================================
-        // 🔹 DOKUMEN KOLABORASI
-        // ============================================================
-        Route::prefix('documents')
-            ->name('documents.')
-            ->controller(DocumentController::class)
-            ->group(function () {
-                Route::get('/{kolaborasi}', 'index')->name('index');                  // List dokumen
-                Route::post('/{kolaborasi}/upload', 'store')->name('store');          // Upload dokumen
-                Route::delete('/{id}', 'destroy')->name('destroy');                    // Hapus dokumen
-            });
+            // ============================================================
+            // 🔹 DOKUMEN KOLABORASI
+            // ============================================================
+            Route::prefix('documents')
+                ->name('documents.')
+                ->controller(DocumentController::class)
+                ->group(function () {
+                    Route::get('/{kolaborasi}', 'index')->name('index');                  // List dokumen
+                    Route::post('/{kolaborasi}/upload', 'store')->name('store');          // Upload dokumen
+                    Route::delete('/{id}', 'destroy')->name('destroy');                    // Hapus dokumen
+                });
 
-        // ============================================================
-        // 🔹 REVIEW KOLABORASI
-        // ============================================================
-        Route::prefix('reviews')
-            ->name('reviews.')
-            ->controller(ReviewController::class)
-            ->group(function () {
-                Route::get('/{kolaborasi}', 'index')->name('index');                  // Halaman review
-                Route::post('/{kolaborasi}', 'store')->name('store');                 // Simpan review baru
-                Route::put('/{review_id}', 'update')->name('update');                 // Update review (PUT)
-                Route::patch('/{review_id}', 'update-patch')->name('update-patch');  // Update review (PATCH)
-                Route::delete('/{review_id}', 'destroy')->name('destroy');            // Hapus review
-                Route::patch('/{review_id}/rating', 'updateRating')->name('updateRating');       // AJAX rating
-                Route::patch('/{review_id}/komentar', 'updateKomentar')->name('updateKomentar'); // AJAX komentar
-            });
+            // ============================================================
+            // 🔹 REVIEW KOLABORASI
+            // ============================================================
+            Route::prefix('reviews')
+                ->name('reviews.')
+                ->controller(ReviewController::class)
+                ->group(function () {
+                    Route::get('/{kolaborasi}', 'index')->name('index');                  // Halaman review
+                    Route::post('/{kolaborasi}', 'store')->name('store');                 // Simpan review baru
+                    Route::put('/{review_id}', 'update')->name('update');                 // Update review (PUT)
+                    Route::patch('/{review_id}', 'update-patch')->name('update-patch');  // Update review (PATCH)
+                    Route::delete('/{review_id}', 'destroy')->name('destroy');            // Hapus review
+                    Route::patch('/{review_id}/rating', 'updateRating')->name('updateRating');       // AJAX rating
+                    Route::patch('/{review_id}/komentar', 'updateKomentar')->name('updateKomentar'); // AJAX komentar
+                });
 
-        // ============================================================
-        // 🔹 REQUEST (Permintaan Gabung / Undangan)
-        // ============================================================
-        Route::prefix('requests')
-            ->name('requests.')
-            ->controller(RequestController::class)
-            ->group(function () {
-                Route::get('/', 'index')->name('index');                               // Daftar request
-                Route::post('/{kolaborasi}', 'store')->name('store');                  // Kirim request join
-                Route::post('/{kolaborasi}/{id}/approve', 'approve')->name('approve'); // Approve request
-                Route::post('/{kolaborasi}/{id}/reject', 'reject')->name('reject');    // Reject request
-                Route::delete('/{kolaborasi}/{id}', 'destroy')->name('destroy');       // Hapus request
-            });
-    });
+            // ============================================================
+            // 🔹 REQUEST (Permintaan Gabung / Undangan)
+            // ============================================================
+            Route::prefix('requests')
+                ->name('requests.')
+                ->controller(RequestController::class)
+                ->group(function () {
+                    Route::get('/', 'index')->name('index');                               // Daftar request
+                    Route::post('/{kolaborasi}', 'store')->name('store');                  // Kirim request join
+                    Route::post('/{kolaborasi}/{id}/approve', 'approve')->name('approve'); // Approve request
+                    Route::post('/{kolaborasi}/{id}/reject', 'reject')->name('reject');    // Reject request
+                    Route::delete('/{kolaborasi}/{id}', 'destroy')->name('destroy');       // Hapus request
+                });
+        });
 
     // ============================================================
     // 🔹 PEMERINTAH ROUTES
     // ============================================================
     Route::prefix('pemerintah')->name('pemerintah.')->group(function () {
-Route::get('/', [PemerintahDashboardController::class, 'index'])->name('index');
-Route::get('/dashboard', [PemerintahDashboardController::class, 'index'])->name('dashboard');
-Route::get('/api/dashboard/chart-data', [PemerintahDashboardController::class, 'getChartData'])->name('dashboard.chart-data');
+        Route::get('/', [PemerintahDashboardController::class, 'index'])->name('index');
+        Route::get('/dashboard', [PemerintahDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/api/dashboard/chart-data', [PemerintahDashboardController::class, 'getChartData'])->name('dashboard.chart-data');
         Route::get('/kolaborasi', fn() => redirect()->route('kolaborasi.ide.index'))->name('kolaborasi');
         Route::get('/program', [ProgramController::class, 'programPage'])->name('program');
 
@@ -300,9 +296,9 @@ Route::get('/api/dashboard/chart-data', [PemerintahDashboardController::class, '
     // 🔹 AKADEMISI ROUTES
     // ============================================================
     Route::prefix('akademisi')->name('akademisi.')->group(function () {
-    // ===================== DASHBOARD =====================
-    Route::get('/', [AkademisiDashboardController::class, 'index'])->name('index');
-    Route::get('/dashboard', [AkademisiDashboardController::class, 'index'])->name('dashboard');
+        // ===================== DASHBOARD =====================
+        Route::get('/', [AkademisiDashboardController::class, 'index'])->name('index');
+        Route::get('/dashboard', [AkademisiDashboardController::class, 'index'])->name('dashboard');
 
         Route::prefix('inovasi')->name('inovasi.')->group(function () {
             Route::get('/subcategories', [InnovationController::class, 'subcategories'])->name('subcategories');
@@ -326,7 +322,7 @@ Route::get('/api/dashboard/chart-data', [PemerintahDashboardController::class, '
     // ============================================================
     Route::controller(ProfileController::class)->group(function () {
         Route::get('/profile', 'edit')->name('profile.edit');
-        Route::patch('/profile', 'update')->name('profile.update');
+        Route::match(['put', 'patch'], '/profile', 'update')->name('profile.update');
         Route::delete('/profile', 'destroy')->name('profile.destroy');
     });
 

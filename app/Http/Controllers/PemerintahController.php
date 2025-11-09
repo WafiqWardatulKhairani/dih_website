@@ -10,4 +10,5 @@ class PemerintahController extends Controller
     {
         return view('pemerintah.index');
     }
+
 }

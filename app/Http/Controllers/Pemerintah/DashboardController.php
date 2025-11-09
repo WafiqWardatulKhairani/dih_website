@@ -15,7 +15,7 @@ class DashboardController extends Controller
         $totalPrograms = OpdProgram::count();
         $totalInnovations = OpdInnovation::count();
         $activePrograms = OpdProgram::where('status', 'ongoing')->count();
-        $readyInnovations = OpdInnovation::whereIn('status', ['ready', 'implemented'])->count();
+        $readyInnovations = OpdInnovation::where('status', 'publication')->count();
         
         // ========== PROGRAM PROGRESS ==========
         $averageProgramProgress = OpdProgram::where('status', 'ongoing')->avg('progress') ?? 0;

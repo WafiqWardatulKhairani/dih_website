@@ -58,7 +58,7 @@
 
                     <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                         @csrf
-                        @method('PUT')
+                        @method('PATCH')
 
                         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                             <!-- Kolom 1: Informasi Pribadi & Institusi -->
@@ -159,10 +159,6 @@
                                                         class="flex-1 text-center px-3 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors">
                                                         📄 Lihat Dokumen
                                                     </a>
-                                                    <button type="button" onclick="alert('Untuk mengganti dokumen, upload file baru di bawah')"
-                                                        class="flex-1 text-center px-3 py-2 border border-green-600 text-green-600 text-sm rounded-lg hover:bg-green-50 transition-colors">
-                                                        🔄 Ganti
-                                                    </button>
                                                 </div>
                                             </div>
                                             @else
@@ -457,10 +453,10 @@
 
                             <!-- Pagination untuk Innovations -->
                             @if($innovations->total() > 0)
-<div class="mt-6">
-    {{ $innovations->links('vendor.pagination.tailwind') }}
-</div>
-@endif
+                            <div class="mt-6">
+                                {{ $innovations->links('vendor.pagination.tailwind') }}
+                            </div>
+                            @endif
                             @endif
                         </div>
                     </div>
@@ -580,10 +576,10 @@
 
                         <!-- Pagination untuk Innovations Akademisi -->
                         @if($innovations->total() > 0)
-<div class="mt-6">
-    {{ $innovations->links('vendor.pagination.tailwind') }}
-</div>
-@endif
+                        <div class="mt-6">
+                            {{ $innovations->links('vendor.pagination.tailwind') }}
+                        </div>
+                        @endif
                         @endif
                     </div>
                     @endif

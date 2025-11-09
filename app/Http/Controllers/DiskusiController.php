@@ -161,11 +161,16 @@ class DiskusiController extends Controller
         if (!in_array($type, ['academic', 'opd'])) abort(404);
         $table = $type === 'academic' ? 'academic_innovations' : 'opd_innovations';
 
-        $innovation = DB::table($table.' as t')
+        $innovation = DB::table($table . ' as t')
             ->leftJoin('users as u', 't.user_id', '=', 'u.id')
-            ->select('t.*', 'u.avatar')
+            ->select(
+                't.*',
+                'u.avatar',
+                DB::raw($type === 'opd' ? 't.image as image_path' : 't.image_path')
+            )
             ->where('t.id', $id)
             ->first();
+
 
         if (!$innovation) abort(404);
 
@@ -184,6 +189,7 @@ class DiskusiController extends Controller
         $comments = DB::table('discussion_comments as dc')
             ->leftJoin('users as u', 'dc.user_id', '=', 'u.id')
             ->where('dc.innovation_id', $innovation->id)
+            ->where('dc.innovation_type', $type) 
             ->select(
                 'dc.*',
                 'u.name as user_name',
@@ -200,12 +206,13 @@ class DiskusiController extends Controller
                 return $c;
             });
 
+
         // Sidebar inovasi lain
         $sidebarInnovations = DB::table('academic_innovations as ai')
             ->leftJoin('discussion_comments as dc', 'ai.id', '=', 'dc.innovation_id')
-            ->select('ai.id','ai.title','ai.category','ai.subcategory','ai.author_name', DB::raw('COUNT(dc.id) as comments_count'))
+            ->select('ai.id', 'ai.title', 'ai.category', 'ai.subcategory', 'ai.author_name', DB::raw('COUNT(dc.id) as comments_count'))
             ->where('ai.id', '!=', $innovation->id)
-            ->groupBy('ai.id','ai.title','ai.category','ai.subcategory','ai.author_name')
+            ->groupBy('ai.id', 'ai.title', 'ai.category', 'ai.subcategory', 'ai.author_name')
             ->orderByDesc('ai.created_at')
             ->limit(5)
             ->get();
@@ -228,7 +235,7 @@ class DiskusiController extends Controller
         ]);
 
         if (!Auth::check()) return redirect()->route('login');
-        if (!in_array($type, ['academic','opd'])) abort(404);
+        if (!in_array($type, ['academic', 'opd'])) abort(404);
 
         $table = $type === 'academic' ? 'academic_innovations' : 'opd_innovations';
         $innovation = DB::table($table)->where('id', $id)->first();
@@ -236,14 +243,16 @@ class DiskusiController extends Controller
 
         DB::table('discussion_comments')->insert([
             'innovation_id' => $id,
+            'innovation_type' => $type,
             'user_id' => Auth::id(),
             'content' => $request->content,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
 
-        return redirect()->route('forum-diskusi.detail', ['type'=>$type, 'id'=>$id])
-            ->with('success','Komentar berhasil dikirim.');
+
+        return redirect()->route('forum-diskusi.detail', ['type' => $type, 'id' => $id])
+            ->with('success', 'Komentar berhasil dikirim.');
     }
 
     /**
@@ -257,6 +266,6 @@ class DiskusiController extends Controller
 
         DB::table('discussion_comments')->where('id', $id)->delete();
 
-        return back()->with('success','Komentar berhasil dihapus.');
+        return back()->with('success', 'Komentar berhasil dihapus.');
     }
 }

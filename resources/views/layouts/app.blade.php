@@ -19,7 +19,7 @@
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     <link rel="stylesheet" href="{{ asset('css/pemerintah.css') }}">
     <link rel="stylesheet" href="{{ asset('css/akademisi.css') }}">
-
+    <link rel="stylesheet" href="{{ asset('css/kolaborasi.css') }}">
 
     <!-- Vite -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])

@@ -132,35 +132,44 @@ class ProfileController extends Controller
     /**
      * Update profil user
      */
-    public function update(Request $request): RedirectResponse
-    {
-        $user = $request->user();
+    /**
+ * Update profil user
+ */
+public function update(Request $request): RedirectResponse
+{
+    $user = $request->user();
 
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'institution_name' => 'required|string|max:255',
-            'address' => 'nullable|string',
-            'phone' => 'nullable|string|max:20',
-            'document_path' => 'nullable|file|mimes:pdf,doc,docx|max:2048',
-        ]);
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'institution_name' => 'required|string|max:255',
+        'address' => 'nullable|string',
+        'phone' => 'nullable|string|max:20',
+        'document_path' => 'nullable|file|mimes:pdf,doc,docx|max:2048',
+    ]);
 
-        $user->name = $validated['name'];
-        $user->institution_name = $validated['institution_name'];
-        $user->address = $validated['address'] ?? '';
-        $user->phone = $validated['phone'] ?? '';
+    // Update user data
+    $user->name = $validated['name'];
+    $user->institution_name = $validated['institution_name'];
+    $user->address = $validated['address'] ?? '';
+    $user->phone = $validated['phone'] ?? '';
 
-        // Upload dokumen jika ada
-        if ($request->hasFile('document_path')) {
-            if ($user->document_path) {
-                Storage::delete('public/' . $user->document_path);
-            }
-            $user->document_path = $request->file('document_path')->store('documents', 'public');
+    // Handle document upload
+    if ($request->hasFile('document_path')) {
+        // Delete old document if exists
+        if ($user->document_path && Storage::exists('public/' . $user->document_path)) {
+            Storage::delete('public/' . $user->document_path);
         }
-
-        $user->save();
-
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+        
+        // Store new document
+        $documentPath = $request->file('document_path')->store('documents', 'public');
+        $user->document_path = $documentPath;
     }
+
+    $user->save();
+
+    return Redirect::route('profile.edit')->with('status', 'profile-updated')
+                                           ->with('success', 'Profil berhasil diperbarui!');
+}
 
     /**
      * Hapus akun user

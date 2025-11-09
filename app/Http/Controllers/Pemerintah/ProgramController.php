@@ -78,9 +78,9 @@ class ProgramController extends Controller
             'status' => 'required|in:planning,ongoing,completed',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after:start_date',
-            'budget' => 'nullable|numeric|min:0',
+            'budget' => 'required|numeric|min:0',
             'progress' => 'required|integer|min:0|max:100',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
         // Handle image upload
@@ -116,7 +116,7 @@ class ProgramController extends Controller
             'purpose' => 'nullable|string',
             'technology_readiness_level' => 'required|integer|min:1|max:9',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'document_path' => 'nullable|file|mimes:pdf|max:10240',
+            'document_path' => 'nullable|file|mimes:pdf|max:1024',
             'video_url' => 'nullable|url',
             'contact' => 'nullable|string|max:255',
             'status' => 'required|in:draft,review,publication'

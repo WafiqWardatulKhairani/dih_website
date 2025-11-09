@@ -60,7 +60,7 @@
                     <!-- Penulis dan Institusi -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <div>
-                            <label for="author_name" class="block text-gray-700 font-medium mb-2">Nama Penulis/Penemu</label>
+                            <label for="author_name" class="block text-gray-700 font-medium mb-2">Nama Penulis/Penemu</label> 
                             <input value="{{ old('author_name', auth()->user()->name ?? '') }}" type="text" id="author_name" name="author_name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Nama lengkap penulis" required>
                         </div>
                         <div>

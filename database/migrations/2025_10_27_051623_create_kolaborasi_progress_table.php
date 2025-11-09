@@ -14,13 +14,12 @@ class CreateKolaborasiProgressTable extends Migration
             $table->unsignedBigInteger('task_id')->nullable();
             $table->string('judul');
             $table->text('deskripsi')->nullable();
-            $table->string('status')->default('pending'); // pending, ongoing, done
+            $table->string('status')->default('pending'); 
             $table->timestamps();
 
-            // ===== FOREIGN KEYS =====
             $table->foreign('kolaborasi_id')
                 ->references('id')
-                ->on('kolaborasi_ides')
+                ->on('kolaborasi_ideas')
                 ->onDelete('cascade');
 
             $table->foreign('task_id')

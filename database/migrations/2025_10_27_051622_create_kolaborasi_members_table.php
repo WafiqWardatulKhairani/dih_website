@@ -12,12 +12,13 @@ class CreateKolaborasiMembersTable extends Migration
             $table->id();
             $table->unsignedBigInteger('kolaborasi_id')->index();
             $table->unsignedBigInteger('user_id')->index();
-            $table->string('role')->default('member'); // leader, member, observer
-            $table->string('status')->default('pending'); // pending, active, rejected
+            $table->string('role')->default('member'); 
+            $table->string('status')->default('pending'); 
             $table->timestamps();
 
-            $table->foreign('kolaborasi_id')->references('id')->on('kolaborasi_ides')->cascadeOnDelete();
+            $table->foreign('kolaborasi_id')->references('id')->on('kolaborasi_ideas')->cascadeOnDelete();
             $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();
+
             $table->unique(['kolaborasi_id', 'user_id']);
         });
     }

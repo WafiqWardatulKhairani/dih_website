@@ -38,16 +38,16 @@
                         <!-- Name -->
                         <div>
                             <label class="block text-xs font-medium text-gray-700 mb-1">Nama Lengkap</label>
-                            <input type="text" wire:model="name" 
-                                   class="w-full px-2 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent transition-all text-xs">
+                            <input type="text" wire:model="name"
+                                class="w-full px-2 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent transition-all text-xs">
                             @error('name') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                         </div>
 
                         <!-- Phone -->
                         <div>
                             <label class="block text-xs font-medium text-gray-700 mb-1">Nomor Telepon</label>
-                            <input type="tel" wire:model="phone" 
-                                   class="w-full px-2 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent transition-all text-xs">
+                            <input type="tel" wire:model="phone"
+                                class="w-full px-2 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent transition-all text-xs">
                             @error('phone') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                         </div>
 
@@ -55,7 +55,7 @@
                         <div>
                             <label class="block text-xs font-medium text-gray-700 mb-1">Alamat</label>
                             <textarea wire:model="address" rows="2"
-                                      class="w-full px-2 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent transition-all text-xs"></textarea>
+                                class="w-full px-2 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent transition-all text-xs"></textarea>
                             @error('address') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                         </div>
 
@@ -63,28 +63,32 @@
                         <div class="space-y-2 pt-1">
                             <!-- Avatar Upload -->
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Foto Profil</label>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">
+                                    Foto Profil <span class="text-red-500">*</span>
+                                </label>
                                 <div class="border border-dashed border-gray-300 rounded-md p-2 hover:border-blue-400 transition-colors">
                                     <label class="cursor-pointer block">
                                         <input type="file" wire:model="avatar" class="hidden">
                                         <div class="flex flex-col items-center text-center">
                                             <i class="fas fa-camera text-sm text-gray-400 mb-1"></i>
                                             <span class="text-xs font-medium text-gray-700">Upload Foto</span>
-                                            <span class="text-xs text-gray-500">Opsional</span>
+                                            <span class="text-xs text-gray-500">Wajib JPG/PNG, max 2MB</span>
                                         </div>
                                     </label>
                                     @if($avatar)
-                                        <div class="mt-1 text-xs text-green-600 text-center">
-                                            ✅ {{ $avatar->getClientOriginalName() }}
-                                        </div>
+                                    <div class="mt-1 text-xs text-green-600 text-center">
+                                        ✅ {{ $avatar->getClientOriginalName() }}
+                                    </div>
                                     @endif
                                 </div>
-                                @error('avatar') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                                @error('avatar')
+                                <span class="text-red-500 text-xs">{{ $message }}</span>
+                                @enderror
                             </div>
 
                             <!-- Document Upload -->
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Dokumen Identitas</label>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Surat Tugas</label>
                                 <div class="border border-dashed border-gray-300 rounded-md p-2 hover:border-blue-400 transition-colors">
                                     <label class="cursor-pointer block">
                                         <input type="file" wire:model="document" class="hidden">
@@ -95,9 +99,9 @@
                                         </div>
                                     </label>
                                     @if($document)
-                                        <div class="mt-1 text-xs text-green-600 text-center">
-                                            ✅ {{ $document->getClientOriginalName() }}
-                                        </div>
+                                    <div class="mt-1 text-xs text-green-600 text-center">
+                                        ✅ {{ $document->getClientOriginalName() }}
+                                    </div>
                                     @endif
                                 </div>
                                 @error('document') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
@@ -117,18 +121,18 @@
                         <!-- Institution -->
                         <div>
                             <label class="block text-xs font-medium text-gray-700 mb-1">Nama Instansi</label>
-                            <input type="text" wire:model="institution_name" 
-                                   class="w-full px-2 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent transition-all text-xs">
+                            <input type="text" wire:model="institution_name"
+                                class="w-full px-2 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent transition-all text-xs">
                             @error('institution_name') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                         </div>
 
                         <!-- Email dengan real-time detection -->
                         <div>
                             <label class="block text-xs font-medium text-gray-700 mb-1">Email</label>
-                            <input type="email" wire:model.live="email" 
-                                   class="w-full px-2 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent transition-all text-xs">
+                            <input type="email" wire:model.live="email"
+                                class="w-full px-2 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent transition-all text-xs">
                             @error('email') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                            
+
                             <!-- Email type indicator -->
                             @if($email)
                             <div class="mt-1 text-xs {{ $approvalType === 'auto' ? 'text-green-600' : 'text-blue-600' }} flex items-center gap-1">
@@ -144,8 +148,8 @@
                         <!-- Role -->
                         <div>
                             <label class="block text-xs font-medium text-gray-700 mb-1">Jenis Akun</label>
-                            <select wire:model="role" 
-                                    class="w-full px-2 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent transition-all text-xs">
+                            <select wire:model="role"
+                                class="w-full px-2 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent transition-all text-xs">
                                 <option value="">Pilih Jenis Akun</option>
                                 <option value="pemerintah">Pemerintah</option>
                                 <option value="akademisi">Akademisi</option>
@@ -156,23 +160,23 @@
                         <!-- Password -->
                         <div>
                             <label class="block text-xs font-medium text-gray-700 mb-1">Password</label>
-                            <input type="password" wire:model="password" 
-                                   class="w-full px-2 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent transition-all text-xs">
+                            <input type="password" wire:model="password"
+                                class="w-full px-2 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent transition-all text-xs">
                             @error('password') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                         </div>
 
                         <!-- Confirm Password -->
                         <div>
                             <label class="block text-xs font-medium text-gray-700 mb-1">Konfirmasi Password</label>
-                            <input type="password" wire:model="password_confirmation" 
-                                   class="w-full px-2 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent transition-all text-xs">
+                            <input type="password" wire:model="password_confirmation"
+                                class="w-full px-2 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent transition-all text-xs">
                         </div>
 
                         <!-- Submit Button -->
                         <div class="pt-3">
-                            <button type="submit" 
-                                    class="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-2 rounded-md font-semibold hover:from-blue-600 hover:to-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-xs"
-                                    wire:loading.attr="disabled">
+                            <button type="submit"
+                                class="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-2 rounded-md font-semibold hover:from-blue-600 hover:to-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-xs"
+                                wire:loading.attr="disabled">
                                 <span wire:loading.remove>
                                     <i class="fas fa-rocket text-xs"></i>
                                     Daftar Sekarang

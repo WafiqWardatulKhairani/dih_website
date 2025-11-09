@@ -73,7 +73,7 @@
             <div class="bg-white text-center p-6 rounded-xl border border-gray-200 card-hover">
                 <div class="text-2xl font-bold text-green-600 mb-2" id="inovasi-counter">{{ $programStats['total_innovations'] }}</div>
                 <div class="text-gray-600 text-sm font-medium">Total Inovasi</div>
-                <div class="text-xs text-blue-600 mt-1">{{ $programStats['ready_innovations'] }} siap</div>
+                <div class="text-xs text-blue-600 mt-1">{{ $programStats['ready_innovations'] }} publikasi</div>
             </div>
             <div class="bg-white text-center p-6 rounded-xl border border-gray-200 card-hover">
                 <div class="text-2xl font-bold text-purple-600 mb-2" id="progress-counter">{{ round($averageProgramProgress) }}%</div>

@@ -66,41 +66,17 @@
             <div class="lg:col-span-2">
                 @if($innovation->image)
                 <div class="mb-6">
-                    <img src="{{ asset('storage/' . $innovation->image) }}" alt="{{ $innovation->title }}" 
-                         class="w-full h-64 object-cover rounded-lg shadow-md">
+                    <img src="{{ asset('storage/' . $innovation->image) }}" alt="{{ $innovation->title }}"
+                        class="w-full h-64 object-cover rounded-lg shadow-md">
                 </div>
                 @endif
-                
+
                 <div class="prose max-w-none">
                     <h3 class="text-xl font-semibold mb-4">Deskripsi Inovasi</h3>
                     <p class="text-gray-700 leading-relaxed">{{ $innovation->description }}</p>
                 </div>
 
-                <!-- Research Info -->
-                <div class="mt-8 bg-gray-50 p-6 rounded-lg">
-                    <h3 class="text-xl font-semibold mb-4">Informasi Research</h3>
-                    <div class="grid grid-cols-2 gap-6">
-                        <div>
-                            <span class="text-gray-500 text-sm">Durasi Research:</span>
-                            <p class="font-medium text-lg">{{ $innovation->research_duration }} bulan</p>
-                        </div>
-                        <div>
-                            <span class="text-gray-500 text-sm">Rating:</span>
-                            <div class="flex items-center">
-                                <span class="font-medium text-lg mr-2">{{ $innovation->rating }}/5.0</span>
-                                <div class="flex text-yellow-400">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        @if($i <= floor($innovation->rating))
-                                            ⭐
-                                        @else
-                                            ☆
-                                        @endif
-                                    @endfor
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
             </div>
 
             <!-- Sidebar -->
@@ -122,15 +98,27 @@
                             <p class="font-medium capitalize">{{ $innovation->innovation_type }}</p>
                         </div>
                         <div>
-                            <span class="text-green-600 text-sm">Status Verifikasi:</span>
+                            <span class="text-green-600 text-sm">Status Inovasi:</span>
                             <p class="font-medium">
-                                @if($innovation->is_verified)
-                                    <span class="text-green-600">✓ Terverifikasi</span>
-                                @else
-                                    <span class="text-orange-600">⏳ Belum Diverifikasi</span>
-                                @endif
+                                @switch($innovation->status)
+                                @case('draft')
+                                <span class="text-gray-600">📝 Draft</span>
+                                @break
+
+                                @case('review')
+                                <span class="text-yellow-600">🔍 Sedang Direview</span>
+                                @break
+
+                                @case('publication')
+                                <span class="text-green-600">✅ Terpublikasi</span>
+                                @break
+
+                                @default
+                                <span class="text-gray-600">{{ ucfirst($innovation->status) }}</span>
+                                @endswitch
                             </p>
                         </div>
+
                     </div>
                 </div>
 
@@ -138,38 +126,35 @@
                 <div class="bg-white border border-gray-200 rounded-lg p-6">
                     <h4 class="font-semibold text-dark mb-4">Aksi</h4>
                     <div class="space-y-3">
-                        <a href="{{ route('pemerintah.inovasi.edit', $innovation->id) }}" 
-                           class="w-full inline-flex justify-center items-center bg-primary text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                        <a href="{{ route('pemerintah.inovasi.edit', $innovation->id) }}"
+                            class="w-full inline-flex justify-center items-center bg-primary text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
                             ✏️ Edit Inovasi
                         </a>
                         <form action="{{ route('pemerintah.inovasi.destroy', $innovation->id) }}" method="POST" class="inline w-full">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" 
-                                    class="w-full inline-flex justify-center items-center bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition"
-                                    onclick="return confirm('Yakin ingin menghapus inovasi ini?')">
+                            <button type="submit"
+                                class="w-full inline-flex justify-center items-center bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition"
+                                onclick="return confirm('Yakin ingin menghapus inovasi ini?')">
                                 🗑️ Hapus Inovasi
                             </button>
                         </form>
-                        <button class="w-full inline-flex justify-center items-center bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
-                            🤝 Ajukan Kolaborasi
-                        </button>
                     </div>
                 </div>
 
                 <!-- Status Info -->
                 <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
-                    <h4 class="font-semibold text-blue-800 mb-2">Status Inovasi</h4>
+                    <h4 class="font-semibold text-blue-800 mb-2">Status Kesiapan Teknologi</h4>
                     <div class="flex items-center">
                         <div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
                         <span class="text-blue-700">
-                            @if($innovation->status == 'research')
+                            @if($innovation->technology_readiness_level <= 3)
                                 Dalam tahap penelitian
-                            @elseif($innovation->status == 'prototype')
-                                Sudah memiliki prototype
-                            @elseif($innovation->status == 'ready')
-                                Siap diimplementasikan
-                            @else
+                                @elseif($innovation->technology_readiness_level <= 5)
+                                    Sudah memiliki prototype
+                                    @elseif($innovation->technology_readiness_level <= 7)
+                                        Siap diimplementasikan
+                                    @else
                                 Sudah diimplementasikan
                             @endif
                         </span>

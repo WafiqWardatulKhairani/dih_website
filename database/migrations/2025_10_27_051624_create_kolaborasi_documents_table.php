@@ -15,11 +15,11 @@ class CreateKolaborasiDocumentsTable extends Migration
             $table->string('file_path');
             $table->string('file_type')->nullable();
             $table->string('category')->default('teknis');
-            $table->string('visibility')->default('member-only'); // public, member-only, owner-only
+            $table->string('visibility')->default('member-only'); 
             $table->unsignedBigInteger('uploaded_by')->index();
             $table->timestamps();
 
-            $table->foreign('kolaborasi_id')->references('id')->on('kolaborasi_ides')->cascadeOnDelete();
+            $table->foreign('kolaborasi_id')->references('id')->on('kolaborasi_ideas')->cascadeOnDelete();
             $table->foreign('uploaded_by')->references('id')->on('users')->cascadeOnDelete();
         });
     }
