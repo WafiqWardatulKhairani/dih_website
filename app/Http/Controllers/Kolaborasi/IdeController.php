@@ -37,6 +37,7 @@ class IdeController extends Controller
     public function create(Request $request)
     {
         $innovationId = $request->query('innovation_id');
+
         $innovation = AcademicInnovation::find($innovationId)
             ?? OpdInnovation::find($innovationId);
 
@@ -82,8 +83,9 @@ class IdeController extends Controller
             ? $request->file('cover_image')->store('gambar_kolaborasi', 'public')
             : null;
 
-        DB::transaction(function() use ($request, $user, $innovation, $documentPath, $imagePath, &$kolaborasi) {
-            // Simpan ide kolaborasi
+        DB::beginTransaction();
+
+        try {
             $kolaborasi = KolaborasiIde::create([
                 'judul' => $request->title,
                 'deskripsi_singkat' => $request->description,
@@ -98,13 +100,19 @@ class IdeController extends Controller
                 'submitted_at' => now(),
             ]);
 
-            // Tambahkan pengaju sebagai leader kolaborasi
             $kolaborasi->members()->create([
                 'user_id' => $user->id,
                 'role' => 'leader',
                 'status' => 'active',
             ]);
-        });
+
+            DB::commit();
+
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            report($e);
+            return back()->with('error', 'Gagal membuat ide kolaborasi.');
+        }
 
         return redirect()
             ->route('kolaborasi.ide.show', $kolaborasi->id)
@@ -112,7 +120,7 @@ class IdeController extends Controller
     }
 
     // =========================================================
-    // 🔹 DETAIL IDE KOLABORASI
+    // 🔹 DETAIL IDE
     // =========================================================
     public function show($id)
     {
@@ -126,14 +134,15 @@ class IdeController extends Controller
         $user = Auth::user();
 
         $academicOwner = AcademicInnovation::with('user')->find($kolaborasi->innovation_id);
-        $opdOwner = OpdInnovation::with('user')->find($kolaborasi->innovation_id);
+        $opdOwner      = OpdInnovation::with('user')->find($kolaborasi->innovation_id);
+
         $pemilikIde = $academicOwner?->user ?? $opdOwner?->user ?? null;
 
         $leader = $kolaborasi->members->firstWhere('role', 'leader');
 
-        $isLeader = $leader?->user_id === $user->id;
+        $isLeader     = $leader?->user_id === $user->id;
         $isPemilikIde = $pemilikIde?->id === $user->id;
-        $isAnggota = $kolaborasi->members->where('user_id', $user->id)->count() > 0;
+        $isAnggota    = $kolaborasi->members->contains('user_id', $user->id);
 
         return view('kolaborasi.ide.show', compact(
             'kolaborasi',
@@ -146,33 +155,31 @@ class IdeController extends Controller
     }
 
     // =========================================================
-    // 🔹 EDIT IDE KOLABORASI
+    // 🔹 FORM EDIT IDE
     // =========================================================
     public function edit($id)
     {
         $kolaborasi = KolaborasiIde::findOrFail($id);
 
-        $userId = Auth::id();
+        // Cek otorisasi: hanya leader boleh edit
         $leader = $kolaborasi->members()->where('role', 'leader')->first();
-
-        if ($leader?->user_id !== $userId) {
-            return back()->with('error', 'Anda Bukan Pengaju Kolaborasi.');
+        if ($leader?->user_id !== Auth::id()) {
+            return back()->with('error', 'Hanya leader yang dapat mengedit ide.');
         }
 
         return view('kolaborasi.ide.edit', compact('kolaborasi'));
     }
 
     // =========================================================
-    // 🔹 UPDATE IDE KOLABORASI
+    // 🔹 UPDATE IDE
     // =========================================================
     public function update(Request $request, $id)
     {
         $kolaborasi = KolaborasiIde::findOrFail($id);
-        $userId = Auth::id();
-        $leader = $kolaborasi->members()->where('role', 'leader')->first();
 
-        if ($leader?->user_id !== $userId) {
-            return back()->with('error', 'Anda Bukan Pengaju Kolaborasi.');
+        $leader = $kolaborasi->members()->where('role', 'leader')->first();
+        if ($leader?->user_id !== Auth::id()) {
+            return back()->with('error', 'Anda tidak memiliki izin untuk mengubah ide ini.');
         }
 
         $request->validate([
@@ -183,65 +190,61 @@ class IdeController extends Controller
             'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
         ]);
 
-        DB::transaction(function() use ($request, $kolaborasi) {
-            if ($request->hasFile('document')) {
-                if ($kolaborasi->dokumen_path && Storage::disk('public')->exists($kolaborasi->dokumen_path)) {
-                    Storage::disk('public')->delete($kolaborasi->dokumen_path);
-                }
-                $kolaborasi->dokumen_path = $request->file('document')->store('dokumen_kolaborasi', 'public');
+        // Upload file jika ada
+        if ($request->hasFile('document')) {
+            if ($kolaborasi->dokumen_path) {
+                Storage::disk('public')->delete($kolaborasi->dokumen_path);
             }
+            $kolaborasi->dokumen_path = $request->file('document')->store('dokumen_kolaborasi', 'public');
+        }
 
-            if ($request->hasFile('cover_image')) {
-                if ($kolaborasi->image_path && Storage::disk('public')->exists($kolaborasi->image_path)) {
-                    Storage::disk('public')->delete($kolaborasi->image_path);
-                }
-                $kolaborasi->image_path = $request->file('cover_image')->store('gambar_kolaborasi', 'public');
+        if ($request->hasFile('cover_image')) {
+            if ($kolaborasi->image_path) {
+                Storage::disk('public')->delete($kolaborasi->image_path);
             }
+            $kolaborasi->image_path = $request->file('cover_image')->store('gambar_kolaborasi', 'public');
+        }
 
-            $kolaborasi->update([
-                'judul' => $request->title,
-                'deskripsi_singkat' => $request->description,
-                'estimasi_waktu' => $request->estimated_duration,
-            ]);
-        });
+        $kolaborasi->update([
+            'judul' => $request->title,
+            'deskripsi_singkat' => $request->description,
+            'estimasi_waktu' => $request->estimated_duration,
+        ]);
 
         return redirect()
             ->route('kolaborasi.ide.show', $kolaborasi->id)
-            ->with('success', 'Ide kolaborasi berhasil diperbarui.');
+            ->with('success', 'Perubahan berhasil disimpan.');
     }
 
     // =========================================================
-    // 🔹 HAPUS IDE KOLABORASI
+    // 🔹 HAPUS IDE
     // =========================================================
     public function destroy($id)
     {
         $kolaborasi = KolaborasiIde::findOrFail($id);
-        $userId = Auth::id();
-        $leader = $kolaborasi->members()->where('role', 'leader')->first();
 
-        if ($leader?->user_id !== $userId) {
-            return back()->with('error', 'Anda Bukan Pengaju Kolaborasi.');
+        $leader = $kolaborasi->members()->where('role', 'leader')->first();
+        if ($leader?->user_id !== Auth::id()) {
+            return back()->with('error', 'Anda tidak memiliki izin untuk menghapus ide ini.');
         }
 
-        DB::transaction(function() use ($kolaborasi) {
-            if ($kolaborasi->dokumen_path && Storage::disk('public')->exists($kolaborasi->dokumen_path)) {
-                Storage::disk('public')->delete($kolaborasi->dokumen_path);
-            }
+        // Hapus file jika ada
+        if ($kolaborasi->dokumen_path) {
+            Storage::disk('public')->delete($kolaborasi->dokumen_path);
+        }
+        if ($kolaborasi->image_path) {
+            Storage::disk('public')->delete($kolaborasi->image_path);
+        }
 
-            if ($kolaborasi->image_path && Storage::disk('public')->exists($kolaborasi->image_path)) {
-                Storage::disk('public')->delete($kolaborasi->image_path);
-            }
-
-            $kolaborasi->delete();
-        });
+        $kolaborasi->delete();
 
         return redirect()
             ->route('kolaborasi.index')
-            ->with('success', 'Ide kolaborasi telah dihapus.');
+            ->with('success', 'Ide kolaborasi berhasil dihapus.');
     }
 
     // =========================================================
-    // 🔹 JOIN KOLABORASI
+    // 🔹 REQUEST JOIN KOLABORASI
     // =========================================================
     public function join($id)
     {
@@ -249,8 +252,8 @@ class IdeController extends Controller
         $userId = Auth::id();
 
         $alreadyMember = KolaborasiMember::where('kolaborasi_id', $id)
-                            ->where('user_id', $userId)
-                            ->exists();
+            ->where('user_id', $userId)
+            ->exists();
 
         if ($alreadyMember) {
             return back()->with('info', 'Anda sudah tergabung atau menunggu persetujuan.');
@@ -258,59 +261,51 @@ class IdeController extends Controller
 
         KolaborasiMember::create([
             'kolaborasi_id' => $id,
-            'user_id' => $userId,
-            'role' => 'member',
-            'status' => 'pending', // menunggu approval leader
+            'user_id'       => $userId,
+            'role'          => 'member',
+            'status'        => 'pending',
         ]);
 
-        return back()->with('success', 'Permintaan bergabung berhasil dikirim. Tunggu persetujuan leader.');
+        return back()->with('success', 'Permintaan bergabung dikirim.');
     }
 
     // =========================================================
-    // 🔹 APPROVE KOLABORASI VIA AJAX (SweetAlert)
+    // 🔹 APPROVE MEMBER OLEH LEADER
     // =========================================================
-    public function approveAjax($id)
+    public function approveAjax($memberId)
     {
-        $kolaborasi = KolaborasiIde::with('members')->findOrFail($id);
+        $member = KolaborasiMember::with('kolaborasi')->findOrFail($memberId);
+        $kolaborasi = $member->kolaborasi;
 
         $userId = Auth::id();
-        $isPemilikIde = AcademicInnovation::where('id', $kolaborasi->innovation_id)
-                ->where('user_id', $userId)
-                ->exists()
-            || OpdInnovation::where('id', $kolaborasi->innovation_id)
-                ->where('user_id', $userId)
-                ->exists();
 
-        if (!$isPemilikIde) {
-            return response()->json(['status' => 'error', 'message' => 'Anda Bukan Pengaju Kolaborasi.'], 403);
-        }
-
-        $totalAnggota = $kolaborasi->members->count();
-        if ($totalAnggota < 3) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Kolaborasi belum bisa diaktifkan karena anggota kurang dari 3.'
-            ], 400);
+        $leader = $kolaborasi->members()->where('role', 'leader')->first();
+        if ($leader?->user_id !== $userId) {
+            return response()->json(['status' => 'error', 'message' => 'Anda bukan leader.'], 403);
         }
 
         try {
-            DB::transaction(function () use ($kolaborasi, $userId) {
-                $kolaborasi->update([
-                    'is_active' => true,
-                    'reviewed_at' => now(),
-                    'reviewed_by' => $userId,
-                ]);
-            });
+            DB::beginTransaction();
+
+            $member->update([
+                'status' => 'active',
+                'approved_at' => now(),
+            ]);
+
+            DB::commit();
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'Kolaborasi telah disetujui dan diaktifkan.'
+                'message' => 'Anggota berhasil disetujui.'
             ]);
+
         } catch (\Throwable $e) {
+            DB::rollBack();
             report($e);
+
             return response()->json([
                 'status' => 'error',
-                'message' => 'Terjadi kesalahan saat menyetujui kolaborasi.'
+                'message' => 'Terjadi kesalahan saat approval.'
             ], 500);
         }
     }

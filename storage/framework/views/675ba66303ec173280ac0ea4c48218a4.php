@@ -273,7 +273,7 @@ tailwind.config = {
                     </div>
                 </div>
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-<<<<<<< HEAD:storage/framework/views/675ba66303ec173280ac0ea4c48218a4.php
+<<<<<<< HEAD
                 <div class="bg-indigo-50 rounded-xl p-12 text-center border-2 border-dashed border-indigo-300 col-span-full">
                     <i class="fas fa-handshake text-5xl text-blue-400 mb-4"></i>
                     <h3 class="text-xl font-semibold text-gray-700 mb-2">Belum Ada Kolaborasi</h3>
@@ -285,7 +285,7 @@ tailwind.config = {
                     <h3 class="text-base font-semibold text-gray-700 mb-1">Belum Ada Kolaborasi</h3>
                     <p class="text-gray-500 text-xs">
                         Mulai kolaborasi antara Akademisi dan OPD Pekanbaru.
->>>>>>> 2db0d8c (Update Page : Ruang Kolaborasi):storage/framework/views/654b6ca5760852ce7be99f8901e3664b.php
+>>>>>>> 2db0d8c (Update Page : Ruang Kolaborasi)
                     </p>
                 </div>
             <?php endif; ?>
@@ -299,9 +299,4 @@ tailwind.config = {
     </div>
 </div>
 <?php $__env->stopSection(); ?>
-<<<<<<< HEAD:storage/framework/views/675ba66303ec173280ac0ea4c48218a4.php
-
 <?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH D:\laragon\www\dih_website\resources\views/kolaborasi/index.blade.php ENDPATH**/ ?>
-=======
-<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH D:\xampp\htdocs\dih_website\resources\views/kolaborasi/index.blade.php ENDPATH**/ ?>
->>>>>>> 2db0d8c (Update Page : Ruang Kolaborasi):storage/framework/views/654b6ca5760852ce7be99f8901e3664b.php

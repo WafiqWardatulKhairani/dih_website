@@ -15,14 +15,14 @@ class KolaborasiIde extends Model
     protected $fillable = [
         'judul',
         'deskripsi_singkat',
-        'user_id',             // Pengaju kolaborasi (leader)
+        'user_id',             
         'field',
         'estimasi_waktu',
         'is_active',
         'category',
         'subcategory',
-        'innovation_id',       // Relasi ke academic_innovations atau opd_innovations
-        'innovation_type',     // 'academic' atau 'opd'
+        'innovation_id',
+        'innovation_type', 
         'dokumen_path',
         'image_path',
         'submitted_at',
@@ -36,101 +36,72 @@ class KolaborasiIde extends Model
         'reviewed_at' => 'datetime',
     ];
 
-    /*
-    |--------------------------------------------------------------------------
-    | 🔹 RELATIONSHIPS
-    |--------------------------------------------------------------------------
-    */
+    /* ============================================================
+     |  RELATIONSHIPS
+     |============================================================ */
 
-    /**
-     * Pemilik ide (pengaju kolaborasi utama / leader)
-     */
+    /** Pemilik ide (leader) */
     public function owner()
     {
-        return $this->belongsTo(User::class, 'user_id')->withDefault([
-            'name' => 'Tidak Diketahui',
-        ]);
+        return $this->belongsTo(User::class, 'user_id')
+            ->withDefault(['name' => 'Tidak Diketahui']);
     }
 
-    /**
-     * Anggota kolaborasi
-     */
+    /** Member kolaborasi */
     public function members()
     {
         return $this->hasMany(KolaborasiMember::class, 'kolaborasi_id');
     }
 
-    /**
-     * Tugas kolaborasi
-     */
+    /** Tugas */
     public function tasks()
     {
         return $this->hasMany(KolaborasiTask::class, 'kolaborasi_id');
     }
 
-    /**
-     * Progress kolaborasi
-     */
+    /** Progress */
     public function progress()
     {
         return $this->hasMany(KolaborasiProgress::class, 'kolaborasi_id');
     }
 
-    /**
-     * Dokumen kolaborasi
-     */
+    /** Dokumen */
     public function documents()
     {
         return $this->hasMany(KolaborasiDocument::class, 'kolaborasi_id');
     }
 
-    /**
-     * Review kolaborasi
-     */
+    /** Review */
     public function reviews()
     {
         return $this->hasMany(KolaborasiReview::class, 'kolaborasi_id');
     }
 
-    /**
-     * Relasi ke inovasi akademik (jika ide ini berasal dari akademik)
-     */
+    /** Inovasi akademik */
     public function academicInnovation()
     {
-        return $this->belongsTo(AcademicInnovation::class, 'innovation_id')
-            ->where('innovation_type', 'academic');
+        return $this->belongsTo(AcademicInnovation::class, 'innovation_id');
     }
 
-    /**
-     * Relasi ke inovasi OPD (jika ide ini berasal dari OPD)
-     */
+    /** Inovasi OPD */
     public function opdInnovation()
     {
-        return $this->belongsTo(OpdInnovation::class, 'innovation_id')
-            ->where('innovation_type', 'opd');
+        return $this->belongsTo(OpdInnovation::class, 'innovation_id');
     }
 
-    /**
-     * Polimorfik: Dapatkan model inovasi terkait (academic atau opd)
-     */
+    /** Polimorfik inovasi (langsung return model instance) */
     public function innovation()
     {
-        if ($this->innovation_type === 'academic') {
-            return $this->academicInnovation();
-        }
-
-        if ($this->innovation_type === 'opd') {
-            return $this->opdInnovation();
-        }
-
-        return null;
+        return $this->innovation_type === 'academic'
+            ? $this->academicInnovation
+            : ($this->innovation_type === 'opd'
+                ? $this->opdInnovation
+                : null);
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | 🔹 ACCESSORS
-    |--------------------------------------------------------------------------
-    */
+    /* ============================================================
+     |  ACCESSORS
+     |============================================================ */
 
     public function getStatusLabelAttribute(): string
     {
@@ -151,10 +122,9 @@ class KolaborasiIde extends Model
 
     public function getImageUrlAttribute(): ?string
     {
-        if ($this->image_path && Storage::exists($this->image_path)) {
-            return Storage::url($this->image_path);
-        }
-        return asset('images/defaults/kolaborasi-cover.png');
+        return ($this->image_path && Storage::exists($this->image_path))
+            ? Storage::url($this->image_path)
+            : asset('images/defaults/kolaborasi-cover.png');
     }
 
     public function getTitleAttribute(): string
@@ -172,11 +142,9 @@ class KolaborasiIde extends Model
         return $this->attributes['estimasi_waktu'] ?? null;
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | 🔹 MUTATORS
-    |--------------------------------------------------------------------------
-    */
+    /* ============================================================
+     |  MUTATORS
+     |============================================================ */
 
     public function setTitleAttribute($value): void
     {
@@ -193,11 +161,9 @@ class KolaborasiIde extends Model
         $this->attributes['estimasi_waktu'] = $value;
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | 🔹 SCOPES
-    |--------------------------------------------------------------------------
-    */
+    /* ============================================================
+     |  SCOPES
+     |============================================================ */
 
     public function scopeActive($query)
     {
@@ -220,37 +186,39 @@ class KolaborasiIde extends Model
 
         return $query->where(function ($q) use ($keyword) {
             $q->where('judul', 'like', "%{$keyword}%")
-              ->orWhere('deskripsi_singkat', 'like', "%{$keyword}%");
+                ->orWhere('deskripsi_singkat', 'like', "%{$keyword}%");
         });
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | 🔹 CUSTOM HELPERS
-    |--------------------------------------------------------------------------
-    */
+    /* ============================================================
+     |  CUSTOM HELPERS (DAPAT DIPAKAI NAVIGASI UI)
+     |============================================================ */
 
-    /**
-     * Cek apakah user adalah pemilik ide inovasi (academic atau opd)
-     */
+    /** Cek apakah user pemilik inovasi */
     public function isOwnedByUser($userId): bool
     {
-        if ($this->innovation_type === 'academic') {
-            return $this->academicInnovation && $this->academicInnovation->user_id === $userId;
-        }
+        $model = $this->innovation();
 
-        if ($this->innovation_type === 'opd') {
-            return $this->opdInnovation && $this->opdInnovation->user_id === $userId;
-        }
-
-        return false;
+        return $model && $model->user_id === $userId;
     }
 
-    /**
-     * Cek apakah user adalah pengaju kolaborasi utama (leader)
-     */
+    /** Cek apakah user adalah leader kolaborasi */
     public function isLeader($userId): bool
     {
         return $this->user_id === $userId;
+    }
+
+    /** Cek apakah user adalah member aktif */
+    public function isMember($userId): bool
+    {
+        return $this->members()->where('user_id', $userId)->exists();
+    }
+
+    /** Cek apakah user boleh join */
+    public function canJoin($userId): bool
+    {
+        return !$this->isLeader($userId) &&
+               !$this->isMember($userId) &&
+               !$this->isOwnedByUser($userId);
     }
 }

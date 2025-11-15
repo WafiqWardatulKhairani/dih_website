@@ -18,12 +18,12 @@ class KolaborasiController extends Controller
 {
     public function __construct()
     {
-        // Hanya halaman publik yang bisa diakses tanpa login
+        // Halaman publik tetap bisa diakses tanpa login
         $this->middleware('auth')->except(['index', 'detail']);
     }
 
     // ============================================================
-    // 🔹 INDEX: Daftar kolaborasi publik
+    // 🔹 INDEX (Daftar Kolaborasi Publik)
     // ============================================================
     public function index(Request $request)
     {
@@ -48,45 +48,54 @@ class KolaborasiController extends Controller
 
             $kolaborasis = $query->paginate(9)->appends($request->query());
 
-            // ✅ Hitung jumlah anggota + progress
-            $kolaborasis->getCollection()->transform(function ($k) {
-                // -----------------------
-                // Hitung anggota
-                // -----------------------
-                $membersCount = $k->members()->where('status','active')->count();
+            // ==================================================
+            // 🔥 Perhitungan custom: members_count + progress
+            // Menggunakan ->each() (AMAN, tidak ubah object)
+            // ==================================================
+            $kolaborasis->getCollection()->each(function ($k) {
 
-                // Cek Pemilik Ide dari academic / opd innovation
+                // -------------------------------
+                // Hitung anggota aktif
+                // -------------------------------
+                $membersCount = $k->members()->where('status', 'active')->count();
+
+                // Owner inovasi (academic / opd)
                 $ownerId = null;
+
                 if ($k->innovation_type === 'academic') {
                     $ownerId = AcademicInnovation::where('id', $k->innovation_id)->value('user_id');
                 } elseif ($k->innovation_type === 'opd') {
                     $ownerId = OpdInnovation::where('id', $k->innovation_id)->value('user_id');
                 }
 
-                // Tambahkan Pemilik Ide sebagai 1 anggota jika berbeda dari leader
-                $leaderId = $k->members()->where('role','leader')->value('user_id');
+                // Leader kolaborasi
+                $leaderId = $k->members()->where('role', 'leader')->value('user_id');
+
+                // Tambahkan owner inovasi sebagai anggota tambahan
                 if ($ownerId && $ownerId != $leaderId) {
                     $membersCount += 1;
                 }
 
-                $k->members_count = $membersCount;
+                // Pasang atribut
+                $k->setAttribute('members_count', $membersCount);
 
-                // -----------------------
-                // Hitung progress task
-                // -----------------------
-                $totalTasks = $k->tasks()->count();
-                $doneTasks  = $k->tasks()->where('status', 'done')->count();
-                $k->progress = $totalTasks > 0 ? ($doneTasks / $totalTasks) * 100 : 0;
+                // -------------------------------
+                // Hitung progress
+                // -------------------------------
+                $total = $k->tasks()->count();
+                $done  = $k->tasks()->where('status', 'done')->count();
+                $progress = $total > 0 ? ($done / $total) * 100 : 0;
 
-                return $k;
+                $k->setAttribute('progress', $progress);
             });
 
             return view('kolaborasi.index', compact('kolaborasis', 'search'));
 
         } catch (\Throwable $e) {
+
             Log::error('Error di KolaborasiController@index: ' . $e->getMessage());
 
-            // Buat paginator kosong agar halaman tetap tampil rapi
+            // fallback paginator kosong
             $kolaborasis = new LengthAwarePaginator([], 0, 9, 1, [
                 'path' => Paginator::resolveCurrentPath(),
             ]);
@@ -97,7 +106,7 @@ class KolaborasiController extends Controller
     }
 
     // ============================================================
-    // 🔹 DETAIL: Detail kolaborasi publik
+    // 🔹 DETAIL (Detail Kolaborasi Publik)
     // ============================================================
     public function detail($id)
     {
@@ -111,21 +120,27 @@ class KolaborasiController extends Controller
             ])->findOrFail($id);
 
             $user = Auth::user();
+
             $isOwner = false;
             $isMember = false;
             $isLeader = false;
 
             if ($user) {
+
+                // Owner Academic Innovation
                 $isAcademicOwner = AcademicInnovation::where('id', $kolaborasi->innovation_id)
                     ->where('user_id', $user->id)
                     ->exists();
 
+                // Owner OPD Innovation
                 $isOpdOwner = OpdInnovation::where('id', $kolaborasi->innovation_id)
                     ->where('user_id', $user->id)
                     ->exists();
 
+                // Salah satu benar -> User adalah pemilik ide
                 $isOwner = $isAcademicOwner || $isOpdOwner;
 
+                // Cek apakah user adalah anggota aktif
                 $memberRecord = $kolaborasi->members()
                     ->where('user_id', $user->id)
                     ->where('status', 'active')
@@ -137,14 +152,23 @@ class KolaborasiController extends Controller
                 }
             }
 
-            return view('kolaborasi.index-detail', compact('kolaborasi', 'isOwner', 'isMember', 'isLeader'));
+            return view('kolaborasi.index-detail', compact(
+                'kolaborasi',
+                'isOwner',
+                'isMember',
+                'isLeader'
+            ));
 
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+
             Log::warning("Kolaborasi tidak ditemukan: kolaborasi_id={$id}");
             return redirect()->route('kolaborasi.index')->with('error', 'Kolaborasi tidak ditemukan.');
+
         } catch (\Throwable $e) {
+
             Log::error('Error di KolaborasiController@detail: ' . $e->getMessage());
             return redirect()->route('kolaborasi.index')->with('error', 'Terjadi kesalahan saat memuat detail kolaborasi.');
         }
     }
 }
+

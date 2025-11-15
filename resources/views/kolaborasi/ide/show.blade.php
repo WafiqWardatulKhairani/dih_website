@@ -118,7 +118,7 @@
             {{-- STATUS + KATEGORI --}}
             <div class="flex flex-wrap items-center justify-between mb-6">
                 <div class="flex items-center space-x-3 text-sm">
-                                        @if($kolaborasi->is_active)
+                    @if($kolaborasi->is_active)
                         <span class="px-3 py-1 rounded-full bg-green-100 text-green-700">Aktif</span>
                     @else
                         <span class="px-3 py-1 rounded-full bg-yellow-100 text-yellow-700">Belum Aktif</span>
@@ -174,6 +174,13 @@
                 $isOwner = $currentUserId === $pemilikIde?->id;
                 $leader = $kolaborasi->members->firstWhere('role', 'leader');
                 $isLeader = $leader && $currentUserId === $leader->user_id;
+
+                // cek apakah user sedang pending (sudah request tapi belum disetujui)
+                $memberStatus = $currentUserId 
+                    ? KolaborasiMember::where('kolaborasi_id', $kolaborasi->id)
+                                      ->where('user_id', $currentUserId)
+                                      ->value('status')
+                    : null;
             @endphp
 
             <div class="mb-6 text-gray-800 space-y-1">
@@ -223,7 +230,7 @@
 
             <hr class="my-6">
 
-            {{-- WORKSPACE --}}
+            {{-- WORKSPACE (hanya tampilkan link workspace jika kolaborasi aktif) --}}
             @if($kolaborasi->is_active)
                 <div class="flex flex-wrap gap-2 mb-4">
                     <a href="{{ route('kolaborasi.tasks.index', $kolaborasi->id) }}" class="btn-tab bg-blue-100 text-blue-700">Tugas</a>
@@ -232,11 +239,19 @@
                     <a href="{{ route('kolaborasi.reviews.index', $kolaborasi->id) }}" class="btn-tab bg-pink-100 text-pink-700">Review</a>
                     <a href="{{ route('kolaborasi.members.index', $kolaborasi->id) }}" class="btn-tab bg-yellow-100 text-pink-700">Anggota</a>
                 </div>
+            @endif
 
-                {{-- BUTTON “BERGABUNG KE KOLABORASI” --}}
-                @auth
-                    @if(!$isOwner)
-                        @if(!$alreadyMember)
+            {{-- BUTTON “BERGABUNG KE KOLABORASI” --}}
+            @auth
+                {{-- Tampilkan tombol join TERLEPAS dari apakah kolaborasi aktif atau belum --}}
+                @if(!$isOwner && !$isLeader)
+                    @if(!$alreadyMember)
+                        {{-- belum terdaftar sama sekali --}}
+                        @if($memberStatus === 'pending')
+                            <button class="px-4 py-2 bg-gray-400 text-white rounded-lg cursor-not-allowed mb-6" disabled>
+                                Menunggu Persetujuan
+                            </button>
+                        @else
                             <form action="{{ route('kolaborasi.requests.store', $kolaborasi->id) }}" method="POST" class="mb-6">
                                 @csrf
                                 <input type="hidden" name="kolaborasi_id" value="{{ $kolaborasi->id }}">
@@ -246,40 +261,39 @@
                                     🤝 Bergabung ke Kolaborasi
                                 </button>
                             </form>
-                        @else
-                            @php
-                                $memberStatus = \App\Models\KolaborasiMember::where('kolaborasi_id', $kolaborasi->id)
-                                                    ->where('user_id', auth()->user()->id)
-                                                    ->value('status');
-                            @endphp
-                            <button class="px-4 py-2 bg-gray-400 text-white rounded-lg cursor-not-allowed mb-6" disabled>
-                                {{ $memberStatus === 'pending' ? 'Menunggu Persetujuan' : 'Sudah Bergabung' }}
-                            </button>
                         @endif
+                    @else
+                        {{-- sudah menjadi member aktif --}}
+                        <button class="px-4 py-2 bg-gray-400 text-white rounded-lg cursor-not-allowed mb-6" disabled>
+                            {{ $memberStatus === 'pending' ? 'Menunggu Persetujuan' : 'Sudah Bergabung' }}
+                        </button>
                     @endif
-                @endauth
-
-                {{-- BUTTON EDIT & HAPUS --}}
-                @if($isLeader || $isOwner)
-                    <div class="flex flex-wrap gap-3 mb-6">
-                        @if($isLeader)
-                            <a href="{{ route('kolaborasi.ide.edit', $kolaborasi->id) }}" 
-                               class="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition">
-                                ✏️ Edit Kolaborasi
-                            </a>
-                        @endif
-                        <form action="{{ route('kolaborasi.ide.destroy', $kolaborasi->id) }}" method="POST" class="inline-block">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit"
-                                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
-                                onclick="return confirm('Apakah Anda yakin ingin menghapus kolaborasi ini?');">
-                                🗑️ Hapus Kolaborasi
-                            </button>
-                        </form>
-                    </div>
                 @endif
-            @else
+            @endauth
+
+            {{-- BUTTON EDIT & HAPUS --}}
+            @if($isLeader || $isOwner)
+                <div class="flex flex-wrap gap-3 mb-6">
+                    @if($isLeader)
+                        <a href="{{ route('kolaborasi.ide.edit', $kolaborasi->id) }}" 
+                           class="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition">
+                            ✏️ Edit Kolaborasi
+                        </a>
+                    @endif
+                    <form action="{{ route('kolaborasi.ide.destroy', $kolaborasi->id) }}" method="POST" class="inline-block">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit"
+                            class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+                            onclick="return confirm('Apakah Anda yakin ingin menghapus kolaborasi ini?');">
+                            🗑️ Hapus Kolaborasi
+                        </button>
+                    </form>
+                </div>
+            @endif
+
+            {{-- Informasi bila belum aktif (tetap tampil sebagai pemberitahuan) --}}
+            @if(!$kolaborasi->is_active)
                 <div class="bg-yellow-50 p-4 rounded-lg text-yellow-700 border border-yellow-200 mb-6">
                     Kolaborasi belum aktif. Tim harus mencapai minimal <strong>4 anggota aktif</strong> untuk membuka fitur pembagian tugas dan progress.
                 </div>
