@@ -19,7 +19,7 @@ class DocumentController extends Controller
     public function store(Request $request, $kolaborasi_id)
     {
         $request->validate([
-            'file' => 'required|file|max:51200', // max 50MB
+            'file' => 'required|file|max:51200',
             'title' => 'nullable|string|max:255',
             'category' => 'nullable|string',
             'visibility' => 'nullable|in:public,member-only,owner-only',

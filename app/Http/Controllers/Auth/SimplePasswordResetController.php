@@ -42,7 +42,7 @@ class SimplePasswordResetController extends Controller
             'password' => Hash::make($request->password)
         ]);
 
-        // ✅ REDIRECT LANGSUNG KE LANDING PAGE
+        // REDIRECT LANGSUNG KE LANDING PAGE
         return redirect('/')
             ->with('password_reset_success', 'Kata sandi berhasil diubah! Silakan login dengan password baru Anda.');
     }

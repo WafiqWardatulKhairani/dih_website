@@ -29,7 +29,7 @@ class InnovationController extends Controller
         // Hanya inovasi milik user login
         $query = AcademicInnovation::where('user_id', Auth::id());
 
-        // Filter pencarian kata kunci
+        // Filter pencarian judul
         if ($request->filled('q')) {
             $search = $request->q;
             $query->where(function ($q) use ($search) {
