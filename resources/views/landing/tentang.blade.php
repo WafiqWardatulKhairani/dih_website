@@ -281,7 +281,7 @@
                     </div>
                     <h3 class="font-semibold text-gray-900 text-sm mb-1">Lokasi</h3>
                     <p class="text-gray-600 text-sm">Gedung Kementerian XYZ</p>
-                    <p class="text-gray-500 text-xs mt-1">Jl. Merdeka No. 123, Jakarta Pusat</p>
+                    <p class="text-gray-500 text-xs mt-1">Jl. Jendral Sudirman No. 123, Kota Pekanbaru</p>
                 </div>
             </div>
 

@@ -1,0 +1,289 @@
+<?php
+use Illuminate\Support\Facades\Route;
+
+$currentRoute = Route::currentRouteName();
+$homeRoute = route('landing-page');
+
+// Tentukan menu
+if (in_array($currentRoute, ['landing-page','tentang'])) {
+$navItems = [
+['href' => route('landing-page'), 'label' => 'Beranda'],
+['href' => route('tentang'), 'label' => 'Tentang'],
+];
+} else {
+if (auth()->check()) {
+$homeRoute = match(auth()->user()->role) {
+'pemerintah' => route('pemerintah.index'),
+'akademisi' => route('akademisi.index'),
+'admin' => route('admin.index'),
+default => route('landing-page'),
+};
+
+
+$navItems = match(auth()->user()->role) {
+'pemerintah' => [
+['href' => route('pemerintah.index'), 'label' => 'Dashboard'],
+['href' => route('pemerintah.program'), 'label' => 'Program & Inovasi'],
+['href' => route('forum-diskusi.index'), 'label' => 'Forum Diskusi'],
+['href' => route('kolaborasi.index'), 'label' => 'Ruang Kolaborasi'],
+],
+'akademisi' => [
+['href' => route('akademisi.index'), 'label' => 'Dashboard'],
+['href' => route('akademisi.inovasi.index'), 'label' => 'Inovasi'],
+['href' => route('forum-diskusi.index'), 'label' => 'Forum Diskusi'],
+['href' => route('kolaborasi.index'), 'label' => 'Ruang Kolaborasi'],
+],
+'admin' => [
+['href' => route('admin.index'), 'label' => 'Dashboard'],
+['href' => route('admin.users.index'), 'label' => 'Manajemen User'],
+['href' => route('admin.moderasi-konten'), 'label' => 'Moderasi Konten'],
+['href' => route('admin.statistik'), 'label' => 'Statistik'],
+],
+default => [
+['href' => route('landing-page'), 'label' => 'Beranda'],
+['href' => route('tentang'), 'label' => 'Tentang'],
+],
+};
+} else {
+$navItems = [
+['href' => route('landing-page'), 'label' => 'Beranda'],
+['href' => route('tentang'), 'label' => 'Tentang'],
+];
+}
+
+}
+?>
+
+<nav class="bg-white/90 backdrop-blur-md shadow-md sticky top-0 z-50 -mt-1">
+    <div class="max-w-6xl mx-auto px-4 py-1.5 flex justify-between items-center">
+        
+        <div class="flex items-center ml-8 md:ml-12">
+            <a href="<?php echo e($homeRoute); ?>" class="flex items-center space-x-2">
+                <img src="<?php echo e(asset('images/logoKecil.png')); ?>"
+                    alt="Logo DIH"
+                    class="h-12 md:h-16 transition-transform duration-300 hover:scale-105">
+            </a>
+        </div>
+
+        
+        <div class="hidden md:flex items-center space-x-5">
+            <?php $__currentLoopData = $navItems; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <?php
+            $isActive = url()->current() === $item['href'];
+            ?>
+            <a href="<?php echo e($item['href']); ?>"
+                class="relative font-medium px-1 transition-colors
+                          <?php echo e($isActive ? 'text-blue-600 after:w-full' : 'text-gray-700 hover:text-blue-600 after:w-0 hover:after:w-full'); ?>
+
+                          after:content-[''] after:absolute after:left-0 after:-bottom-1 after:h-[2px] after:bg-blue-600
+                          after:transition-all after:duration-300">
+                <?php echo e($item['label']); ?>
+
+            </a>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+
+            
+            <?php if(auth()->guard()->check()): ?>
+            <div id="status-wrapper" class="ml-5">
+                <?php if(auth()->user()->status === 'pending'): ?>
+                <button id="verifyBtn"
+                    class="px-4 py-1 rounded-full border-2 border-gray-400 text-gray-400 font-semibold cursor-not-allowed"
+                    disabled>
+                    Akun Anda Sedang Diverifikasi
+                </button>
+                <?php else: ?>
+                <div id="avatar-block" class="relative">
+                    <button id="avatarBtn"
+                        class="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-300 focus:outline-none">
+                        <img src="<?php echo e(auth()->user()->avatar
+                                    ? asset('storage/'.auth()->user()->avatar)
+                                    : asset('images/default-avatar.png')); ?>"
+                            alt="Avatar"
+                            class="w-full h-full object-cover">
+                    </button>
+                    <div id="avatarDropdown"
+                        class="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg border hidden">
+                        <a href="<?php echo e(route('profile.edit')); ?>" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                            Profil Saya
+                        </a>
+                        <form method="POST" action="<?php echo e(route('logout')); ?>">
+                            <?php echo csrf_field(); ?>
+                            <button type="submit" class="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100">
+                                Logout
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                <?php endif; ?>
+            </div>
+            <?php endif; ?>
+
+            <?php if(auth()->guard()->guest()): ?>
+            <div class="flex items-center space-x-3 ml-5">
+                <button class="px-4 py-1 rounded-full border-2 border-blue-600 text-blue-600 font-semibold
+                                   hover:bg-blue-600 hover:text-white transition open-login-modal">
+                    Login
+                </button>
+                <a href="<?php echo e(route('user.register')); ?>"
+                    class="px-4 py-1 rounded-full bg-gradient-to-r from-blue-600 to-green-500
+                             text-white font-semibold shadow-md hover:opacity-90 transition">
+                    Register
+                </a>
+            </div>
+            <?php endif; ?>
+        </div>
+
+        
+        <button id="mobile-menu-toggle" class="md:hidden text-gray-700 focus:outline-none">
+            <i class="fas fa-bars text-2xl"></i>
+        </button>
+    </div>
+
+    
+    <div id="mobile-menu" class="hidden md:hidden bg-white border-t">
+        <?php $__currentLoopData = $navItems; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+        <?php
+        $isActiveMobile = url()->current() === $item['href'];
+        ?>
+        <a href="<?php echo e($item['href']); ?>"
+            class="block py-3 px-4 font-medium <?php echo e($isActiveMobile ? 'text-blue-600 bg-blue-50' : 'text-gray-700 hover:bg-gray-100'); ?>">
+            <?php echo e($item['label']); ?>
+
+        </a>
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+
+        
+        <?php if(auth()->guard()->check()): ?>
+        <div id="status-wrapper-mobile" class="border-t mt-2 p-4">
+            <?php if(auth()->user()->status === 'pending'): ?>
+            <button disabled class="w-full text-center px-4 py-2 rounded-lg border-2 border-gray-400 text-gray-400 font-semibold cursor-not-allowed">
+                Akun Anda Sedang Diverifikasi
+            </button>
+            <?php elseif(auth()->user()->status === 'verified'): ?>
+            <div class="flex items-center space-x-3 mb-2">
+                <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-300">
+                    <img src="<?php echo e(auth()->user()->avatar
+                                ? asset('storage/'.auth()->user()->avatar)
+                                : asset('images/default-avatar.png')); ?>"
+                        alt="Avatar" class="w-full h-full object-cover">
+                </div>
+                <div class="flex-1">
+                    <a href="<?php echo e(route('profile.edit')); ?>"
+                        class="block text-blue-600 font-medium hover:underline">
+                        Edit Profile
+                    </a>
+                </div>
+            </div>
+            <form method="POST" action="<?php echo e(route('logout')); ?>">
+                <?php echo csrf_field(); ?>
+                <button type="submit"
+                    class="w-full mt-2 px-4 py-2 rounded-lg border-2 border-red-600 text-red-600 font-semibold
+                                       hover:bg-red-600 hover:text-white transition">
+                    Logout
+                </button>
+            </form>
+            <?php elseif(auth()->user()->status === 'rejected'): ?>
+            <div class="w-full text-center px-4 py-2 rounded-lg bg-red-600 text-white font-semibold">
+                Akun Anda Ditolak
+            </div>
+            <?php endif; ?>
+        </div>
+        <?php endif; ?>
+
+        <?php if(auth()->guard()->guest()): ?>
+        <div class="border-t mt-2 p-4 flex flex-col space-y-2">
+            <button class="w-full text-center px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-green-500
+                               text-white font-semibold shadow-md hover:opacity-90 transition open-login-modal">
+                Login
+            </button>
+            <a href="<?php echo e(route('user.register')); ?>"
+                class="w-full text-center px-4 py-2 rounded-lg border-2 border-blue-600 text-blue-600 font-semibold
+                         hover:bg-blue-600 hover:text-white transition">
+                Register
+            </a>
+        </div>
+        <?php endif; ?>
+    </div>
+</nav>
+
+<!-- LOGIN MODAL -->
+<div id="loginModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-xl shadow-lg w-full max-w-md p-6 relative">
+        <button id="closeModal" class="absolute top-3 right-3 text-gray-500 hover:text-gray-800">&times;</button>
+        <h2 class="text-2xl font-bold mb-6 text-center text-blue-600">Login Akun</h2>
+
+        <form method="POST" action="<?php echo e(route('login')); ?>" class="space-y-4">
+            <?php echo csrf_field(); ?>
+            <input type="email" name="email" placeholder="Email" required
+                class="w-full border border-gray-300 px-4 py-3 rounded-lg">
+            <input type="password" name="password" placeholder="Password" required
+                class="w-full border border-gray-300 px-4 py-3 rounded-lg">
+            <div class="flex items-center justify-between">
+                <label class="flex items-center text-sm text-gray-600">
+                    <input type="checkbox" name="remember" class="mr-2 rounded"> Remember me
+                </label>
+                <a href="<?php echo e(route('simple.password.request')); ?>" class="text-sm text-blue-600 hover:underline">Reset password</a>
+            </div>
+            <button type="submit"
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold">
+                Login
+            </button>
+        </form>
+
+        <p class="text-center mt-4 text-gray-600">
+            Belum Punya Akun?
+            <a href="<?php echo e(route('user.register')); ?>" class="text-blue-600 font-medium hover:underline">
+                Daftar Sekarang
+            </a>
+        </p>
+    </div>
+</div>
+
+<script>
+    // Toggle mobile menu
+    document.getElementById('mobile-menu-toggle')
+        .addEventListener('click', () => {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        });
+
+    // Login modal
+    const modal = document.getElementById('loginModal');
+    const openButtons = document.querySelectorAll('.open-login-modal');
+    const closeBtn = document.getElementById('closeModal');
+
+    openButtons.forEach(btn => {
+        btn.addEventListener('click', e => {
+            e.preventDefault();
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        });
+    });
+
+    closeBtn.addEventListener('click', () => {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    });
+
+    window.addEventListener('click', e => {
+        if (e.target === modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+    });
+
+    // Avatar dropdown click toggle
+    const avatarBtn = document.getElementById('avatarBtn');
+    const avatarDropdown = document.getElementById('avatarDropdown');
+
+    if (avatarBtn) {
+        avatarBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            avatarDropdown.classList.toggle('hidden');
+        });
+        document.addEventListener('click', (e) => {
+            if (!avatarDropdown.classList.contains('hidden') && !avatarDropdown.contains(e.target)) {
+                avatarDropdown.classList.add('hidden');
+            }
+        });
+    }
+</script><?php /**PATH D:\laragon\www\dih_website\resources\views/components/layout/navigation.blade.php ENDPATH**/ ?>

@@ -156,7 +156,7 @@ class IdeController extends Controller
         $leader = $kolaborasi->members()->where('role', 'leader')->first();
 
         if ($leader?->user_id !== $userId) {
-            return back()->with('error', 'Akses ditolak.');
+            return back()->with('error', 'Anda Bukan Pengaju Kolaborasi.');
         }
 
         return view('kolaborasi.ide.edit', compact('kolaborasi'));
@@ -172,7 +172,7 @@ class IdeController extends Controller
         $leader = $kolaborasi->members()->where('role', 'leader')->first();
 
         if ($leader?->user_id !== $userId) {
-            return back()->with('error', 'Akses ditolak.');
+            return back()->with('error', 'Anda Bukan Pengaju Kolaborasi.');
         }
 
         $request->validate([
@@ -220,7 +220,7 @@ class IdeController extends Controller
         $leader = $kolaborasi->members()->where('role', 'leader')->first();
 
         if ($leader?->user_id !== $userId) {
-            return back()->with('error', 'Akses ditolak.');
+            return back()->with('error', 'Anda Bukan Pengaju Kolaborasi.');
         }
 
         DB::transaction(function() use ($kolaborasi) {
@@ -282,7 +282,7 @@ class IdeController extends Controller
                 ->exists();
 
         if (!$isPemilikIde) {
-            return response()->json(['status' => 'error', 'message' => 'Akses ditolak.'], 403);
+            return response()->json(['status' => 'error', 'message' => 'Anda Bukan Pengaju Kolaborasi.'], 403);
         }
 
         $totalAnggota = $kolaborasi->members->count();

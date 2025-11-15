@@ -53,7 +53,7 @@ tailwind.config = {
             <div class="bg-white/20 backdrop-blur-md p-3 rounded-lg max-w-2xl mx-auto shadow-lg">
                 <form action="{{ route('forum-diskusi.index') }}" method="GET" class="flex gap-2">
                     <input type="text" name="search" value="{{ request('search') }}"
-                           placeholder="Cari diskusi berdasarkan kata kunci..."
+                           placeholder="Cari diskusi berdasarkan judul..."
                            class="flex-1 p-2 rounded-lg border border-white/30 bg-white/10 placeholder-white/70 text-white focus:outline-none focus:border-white/50 focus:bg-white/20 transition text-xs">
                     <button type="submit"
                             class="px-3 py-2 bg-blue-600 text-white font-semibold rounded-lg flex items-center gap-1 text-xs hover:bg-blue-700 transition">

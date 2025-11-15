@@ -179,12 +179,8 @@ tailwind.config = {
                     <i class="fas fa-handshake text-5xl text-blue-400 mb-4"></i>
                     <h3 class="text-xl font-semibold text-gray-700 mb-2">Belum Ada Kolaborasi</h3>
                     <p class="text-gray-500 mb-6">
-                        Jadilah yang pertama untuk memulai ide kolaborasi antara Akademisi dan OPD Pekanbaru.
+                        Lihat halaman Forum Diskusi untuk Menemukan Ide Kolaborasi
                     </p>
-                    <a href="{{ route('kolaborasi.ide.create') }}"
-                       class="inline-block bg-blue-600 text-white px-5 py-2 rounded-lg font-semibold hover:bg-blue-700 transition">
-                        <i class="fas fa-plus"></i> Buat Ide Baru
-                    </a>
                 </div>
             @endforelse
         </div>

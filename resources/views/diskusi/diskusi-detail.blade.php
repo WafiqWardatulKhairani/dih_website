@@ -3,6 +3,7 @@
 
 @php
 use Carbon\Carbon;
+use App\Models\DiscussionComment;
 @endphp
 
 @push('styles')
@@ -76,7 +77,6 @@ use Carbon\Carbon;
         border-radius: 3px;
     }
     
-    /* Fix untuk source type badge */
     .source-badge {
         display: inline-flex;
         align-items: center;
@@ -129,7 +129,6 @@ use Carbon\Carbon;
                         <!-- Header Info -->
                         <div class="space-y-4">
                             <div class="flex items-center gap-3 flex-wrap">
-                                <!-- Source Type Badge - FIXED -->
                                 @php
                                     $sourceType = $innovation->source_type ?? $type ?? 'unknown';
                                     $sourceTypeColors = [
@@ -243,9 +242,6 @@ use Carbon\Carbon;
                                     <div class="space-y-2">
                                         <div class="flex justify-between items-center text-sm">
                                             <span class="text-gray-600">Level {{ $innovation->technology_readiness_level ?? 0 }} dari 9</span>
-                                            <span class="font-semibold text-orange-600">
-                                                {{ round(($innovation->technology_readiness_level ?? 0) / 9 * 100) }}%
-                                            </span>
                                         </div>
                                         <div class="progress-bar">
                                             <div class="progress-fill" 

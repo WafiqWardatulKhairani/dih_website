@@ -13,55 +13,54 @@ class SubcategorySeeder extends Seeder
      */
     public function run(): void
     {
-        // Daftar subkategori per kategori
-        $items = [
+        // Daftar subkategori berdasarkan kategori
+        $data = [
             'Teknologi' => [
                 'Artificial Intelligence',
                 'Internet of Things',
                 'Sistem Informasi Akademik',
                 'Robotics',
-                'Biotechnology'
+                'Biotechnology',
             ],
             'Sosial' => [
                 'Kewirausahaan Sosial',
                 'Pemberdayaan Masyarakat',
                 'Inklusi Sosial',
-                'Pengentasan Kemiskinan'
+                'Pengentasan Kemiskinan',
             ],
             'Pendidikan' => [
                 'EdTech',
                 'Metode Pembelajaran',
                 'Kurikulum',
-                'Assesmen Pendidikan'
+                'Assesmen Pendidikan',
             ],
             'Humaniora' => [
                 'Psikologi',
                 'Seni & Budaya',
                 'Filsafat',
                 'Sejarah',
-                'Antropologi'
+                'Antropologi',
             ],
         ];
 
-        foreach ($items as $categoryName => $subs) {
-            // Ambil category dari tabel categories atau buat baru jika belum ada
+        foreach ($data as $categoryName => $subNames) {
+            // Ambil atau buat kategori utama
             $category = Category::firstOrCreate(['name' => $categoryName]);
 
-            foreach ($subs as $subName) {
-                // Buat atau update subkategori berdasarkan name dan category_id
+            foreach ($subNames as $subName) {
+                // Hindari duplikasi, update jika sudah ada
                 Subcategory::updateOrCreate(
                     [
                         'name' => $subName,
-                        'category_id' => $category->id
+                        'category_id' => $category->id,
                     ],
                     [
-                        'name' => $subName,
-                        'category_id' => $category->id
+                        'category_id' => $category->id,
                     ]
                 );
             }
         }
 
-        $this->command->info('SubcategorySeeder berhasil dijalankan!');
+        $this->command->info('✅ SubcategorySeeder berhasil dijalankan!');
     }
 }

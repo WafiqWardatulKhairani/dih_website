@@ -129,7 +129,7 @@
             <div class="bg-white/20 backdrop-blur-md p-6 rounded-xl max-w-4xl mx-auto shadow-lg">
                 <form action="{{ route('akademisi.inovasi.index') }}" method="GET" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 gap-4">
                     <input type="text" name="q" value="{{ request('q') }}"
-                           placeholder="Cari inovasi berdasarkan kata kunci..."
+                           placeholder="Cari inovasi berdasarkan judul..."
                            class="w-full p-3 rounded-lg border border-white/30 bg-white/10 placeholder-white/70 text-white focus:outline-none focus:border-white/50 focus:bg-white/20 transition">
                     <div class="flex justify-center md:justify-start">
                         <button type="submit"
@@ -159,7 +159,7 @@
         @if(request('q'))
             <div class="mb-6 text-gray-700">
                 <p>
-                    Menampilkan hasil pencarian untuk kata kunci: <span class="font-semibold">{{ request('q') }}</span>
+                    Menampilkan hasil pencarian untuk judul: <span class="font-semibold">{{ request('q') }}</span>
                 </p>
             </div>
         @endif
@@ -201,7 +201,7 @@
                 <div class="bg-indigo-50 rounded-xl p-12 text-center border-2 border-dashed border-indigo-300 col-span-full">
                     <i class="fas fa-lightbulb text-5xl text-yellow-300 mb-4"></i>
                     @if(request('q'))
-                        <h3 class="text-xl font-semibold text-gray-700 mb-2">Tidak ditemukan inovasi dengan kata kunci:</h3>
+                        <h3 class="text-xl font-semibold text-gray-700 mb-2">Tidak ditemukan inovasi dengan judul:</h3>
                         <p class="text-gray-500 mb-6 font-semibold">{{ request('q') }}</p>
                     @else
                         <h3 class="text-xl font-semibold text-gray-700 mb-2">Belum Ada Inovasi</h3>
