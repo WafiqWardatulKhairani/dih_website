@@ -9,19 +9,23 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
 use Illuminate\Support\Facades\Storage;
+use App\ValueObjects\EmailAddress;
 
 class UserRegister extends Component
 {
     use WithFileUploads;
 
     public $name, $institution_name, $phone, $address,
-        $email, $password, $password_confirmation,
-        $role, $document, $avatar;
+           $email, $password, $password_confirmation,
+           $role, $document, $avatar;
 
     public $approvalType = 'manual';
     public $showCountdown = false;
     public $countdown = 180;
 
+    /**
+     * Validasi form register
+     */
     protected function rules()
     {
         return [
@@ -37,7 +41,9 @@ class UserRegister extends Component
         ];
     }
 
-    // ✅ PERBAIKAN: Ganti jadi updated hook
+    /**
+     * Hook Livewire saat properti diupdate
+     */
     public function updated($property)
     {
         if ($property === 'email') {
@@ -45,15 +51,26 @@ class UserRegister extends Component
         }
     }
 
-    // ✅ Method terpisah untuk cek email type
+    /**
+     * Cek tipe email (institusi atau umum) menggunakan VO EmailAddress
+     */
     public function checkEmailType()
     {
         if (!empty($this->email)) {
-            $user = new User(['email' => $this->email]);
-            $this->approvalType = $user->isInstitutionalEmail() ? 'auto' : 'manual';
+            $emailVO = new EmailAddress($this->email);
+
+            // Cek validitas dulu
+            if ($emailVO->isValid()) {
+                $this->approvalType = $emailVO->isInstitutional() ? 'auto' : 'manual';
+            } else {
+                $this->approvalType = 'manual';
+            }
         }
     }
 
+    /**
+     * Proses registrasi user
+     */
     public function register()
     {
         $validated = $this->validate($this->rules());
@@ -87,7 +104,7 @@ class UserRegister extends Component
                 'approval_type'    => $this->approvalType,
             ]);
 
-            // Auto approve untuk email institutional
+            // Auto approve jika email institusi
             if ($this->approvalType === 'auto') {
                 // Schedule auto approval setelah 3 menit
                 dispatch(function () use ($user) {
@@ -104,6 +121,7 @@ class UserRegister extends Component
                 $title = "Registrasi Berhasil - Menunggu Verifikasi";
             }
 
+            // Trigger swal untuk feedback
             $this->dispatch(
                 'swal:success',
                 title: $title,
@@ -113,6 +131,7 @@ class UserRegister extends Component
             );
 
         } catch (\Exception $e) {
+            // Hapus file jika terjadi error
             if (isset($avatarPath)) Storage::disk('public')->delete($avatarPath);
             if (isset($documentPath)) Storage::disk('public')->delete($documentPath);
 
@@ -124,6 +143,9 @@ class UserRegister extends Component
         }
     }
 
+    /**
+     * Render Livewire view
+     */
     public function render()
     {
         return view('livewire.auth.user-register')

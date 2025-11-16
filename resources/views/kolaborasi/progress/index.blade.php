@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Progress Kolaborasi')
+@section('title', 'To Do List')
 
 @push('styles')
 <script src="https://cdn.tailwindcss.com"></script>
@@ -121,7 +121,7 @@ Swal.fire({
         {{-- HEADER --}}
         <div class="flex justify-between items-center mb-4">
             <div>
-                <h1 class="text-3xl font-bold text-primary">Progress Kolaborasi</h1>
+                <h1 class="text-3xl font-bold text-primary">To Do List</h1>
                 <p class="text-gray-600">
                     Kolaborasi: 
                     <span class="font-semibold text-secondary">

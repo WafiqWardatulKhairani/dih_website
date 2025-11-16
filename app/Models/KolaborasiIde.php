@@ -40,56 +40,47 @@ class KolaborasiIde extends Model
      |  RELATIONSHIPS
      |============================================================ */
 
-    /** Pemilik ide (leader) */
     public function owner()
     {
         return $this->belongsTo(User::class, 'user_id')
             ->withDefault(['name' => 'Tidak Diketahui']);
     }
 
-    /** Member kolaborasi */
     public function members()
     {
         return $this->hasMany(KolaborasiMember::class, 'kolaborasi_id');
     }
 
-    /** Tugas */
     public function tasks()
     {
         return $this->hasMany(KolaborasiTask::class, 'kolaborasi_id');
     }
 
-    /** Progress */
     public function progress()
     {
         return $this->hasMany(KolaborasiProgress::class, 'kolaborasi_id');
     }
 
-    /** Dokumen */
     public function documents()
     {
         return $this->hasMany(KolaborasiDocument::class, 'kolaborasi_id');
     }
 
-    /** Review */
     public function reviews()
     {
         return $this->hasMany(KolaborasiReview::class, 'kolaborasi_id');
     }
 
-    /** Inovasi akademik */
     public function academicInnovation()
     {
         return $this->belongsTo(AcademicInnovation::class, 'innovation_id');
     }
 
-    /** Inovasi OPD */
     public function opdInnovation()
     {
         return $this->belongsTo(OpdInnovation::class, 'innovation_id');
     }
 
-    /** Polimorfik inovasi (langsung return model instance) */
     public function innovation()
     {
         return $this->innovation_type === 'academic'
@@ -186,13 +177,38 @@ class KolaborasiIde extends Model
 
         return $query->where(function ($q) use ($keyword) {
             $q->where('judul', 'like', "%{$keyword}%")
-                ->orWhere('deskripsi_singkat', 'like', "%{$keyword}%");
+              ->orWhere('deskripsi_singkat', 'like', "%{$keyword}%");
         });
     }
 
     /* ============================================================
-     |  CUSTOM HELPERS (DAPAT DIPAKAI NAVIGASI UI)
+     |  AGGREGATE METHODS / BUSINESS RULES
      |============================================================ */
+
+    /** Hitung jumlah anggota aktif termasuk owner jika belum leader */
+    public function activeMembersCount(): int
+    {
+        $count = $this->members()->where('status', 'active')->count();
+
+        $ownerId = $this->innovation_type === 'academic'
+            ? $this->academicInnovation?->user_id
+            : $this->opdInnovation?->user_id;
+
+        $leaderId = $this->members()->where('role', 'leader')->value('user_id');
+
+        if ($ownerId && $ownerId != $leaderId) $count += 1;
+
+        return $count;
+    }
+
+    /** Hitung progress (%) kolaborasi */
+    public function progressPercent(): float
+    {
+        $total = $this->tasks()->count();
+        $done  = $this->tasks()->where('status', 'done')->count();
+
+        return $total > 0 ? ($done / $total) * 100 : 0;
+    }
 
     /** Cek apakah user pemilik inovasi */
     public function isOwnedByUser($userId): bool
@@ -214,7 +230,7 @@ class KolaborasiIde extends Model
         return $this->members()->where('user_id', $userId)->exists();
     }
 
-    /** Cek apakah user boleh join */
+    /** Cek apakah user boleh join kolaborasi */
     public function canJoin($userId): bool
     {
         return !$this->isLeader($userId) &&

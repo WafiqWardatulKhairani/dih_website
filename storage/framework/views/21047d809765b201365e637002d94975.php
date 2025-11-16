@@ -76,6 +76,38 @@
         color: white;
         font-size: 14px;
     }
+    .scroll-nav {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .scroll-btn {
+        background: #3b82f6;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    .scroll-btn:hover {
+        background: #2563eb;
+        transform: scale(1.05);
+    }
+    .scroll-btn:disabled {
+        background: #9ca3af;
+        cursor: not-allowed;
+    }
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
 </style>
 <?php $__env->stopPush(); ?>
 
@@ -119,93 +151,57 @@
 
             
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-                <?php if (isset($component)) { $__componentOriginal527fae77f4db36afc8c8b7e9f5f81682 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal527fae77f4db36afc8c8b7e9f5f81682 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.stat-card','data' => ['title' => 'Inovasi Saya','value' => ''.e($stat['inovasi']).'','icon' => 'fa-lightbulb','color' => 'yellow']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('stat-card'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['title' => 'Inovasi Saya','value' => ''.e($stat['inovasi']).'','icon' => 'fa-lightbulb','color' => 'yellow']); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal527fae77f4db36afc8c8b7e9f5f81682)): ?>
-<?php $attributes = $__attributesOriginal527fae77f4db36afc8c8b7e9f5f81682; ?>
-<?php unset($__attributesOriginal527fae77f4db36afc8c8b7e9f5f81682); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal527fae77f4db36afc8c8b7e9f5f81682)): ?>
-<?php $component = $__componentOriginal527fae77f4db36afc8c8b7e9f5f81682; ?>
-<?php unset($__componentOriginal527fae77f4db36afc8c8b7e9f5f81682); ?>
-<?php endif; ?>
-                <?php if (isset($component)) { $__componentOriginal527fae77f4db36afc8c8b7e9f5f81682 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal527fae77f4db36afc8c8b7e9f5f81682 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.stat-card','data' => ['title' => 'Ide Kolaborasi','value' => ''.e($stat['kolaborasi_ide']).'','icon' => 'fa-users-gear','color' => 'blue']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('stat-card'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['title' => 'Ide Kolaborasi','value' => ''.e($stat['kolaborasi_ide']).'','icon' => 'fa-users-gear','color' => 'blue']); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal527fae77f4db36afc8c8b7e9f5f81682)): ?>
-<?php $attributes = $__attributesOriginal527fae77f4db36afc8c8b7e9f5f81682; ?>
-<?php unset($__attributesOriginal527fae77f4db36afc8c8b7e9f5f81682); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal527fae77f4db36afc8c8b7e9f5f81682)): ?>
-<?php $component = $__componentOriginal527fae77f4db36afc8c8b7e9f5f81682; ?>
-<?php unset($__componentOriginal527fae77f4db36afc8c8b7e9f5f81682); ?>
-<?php endif; ?>
-                <?php if (isset($component)) { $__componentOriginal527fae77f4db36afc8c8b7e9f5f81682 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal527fae77f4db36afc8c8b7e9f5f81682 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.stat-card','data' => ['title' => 'Kolaborasi Diikuti','value' => ''.e($stat['kolaborasi_member']).'','icon' => 'fa-people-group','color' => 'indigo']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('stat-card'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['title' => 'Kolaborasi Diikuti','value' => ''.e($stat['kolaborasi_member']).'','icon' => 'fa-people-group','color' => 'indigo']); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal527fae77f4db36afc8c8b7e9f5f81682)): ?>
-<?php $attributes = $__attributesOriginal527fae77f4db36afc8c8b7e9f5f81682; ?>
-<?php unset($__attributesOriginal527fae77f4db36afc8c8b7e9f5f81682); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal527fae77f4db36afc8c8b7e9f5f81682)): ?>
-<?php $component = $__componentOriginal527fae77f4db36afc8c8b7e9f5f81682; ?>
-<?php unset($__componentOriginal527fae77f4db36afc8c8b7e9f5f81682); ?>
-<?php endif; ?>
-                <?php if (isset($component)) { $__componentOriginal527fae77f4db36afc8c8b7e9f5f81682 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal527fae77f4db36afc8c8b7e9f5f81682 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.stat-card','data' => ['title' => 'Tugas Kolaborasi','value' => ''.e($stat['kolaborasi_task']).'','icon' => 'fa-list-check','color' => 'emerald']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('stat-card'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['title' => 'Tugas Kolaborasi','value' => ''.e($stat['kolaborasi_task']).'','icon' => 'fa-list-check','color' => 'emerald']); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal527fae77f4db36afc8c8b7e9f5f81682)): ?>
-<?php $attributes = $__attributesOriginal527fae77f4db36afc8c8b7e9f5f81682; ?>
-<?php unset($__attributesOriginal527fae77f4db36afc8c8b7e9f5f81682); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal527fae77f4db36afc8c8b7e9f5f81682)): ?>
-<?php $component = $__componentOriginal527fae77f4db36afc8c8b7e9f5f81682; ?>
-<?php unset($__componentOriginal527fae77f4db36afc8c8b7e9f5f81682); ?>
-<?php endif; ?>
+                <div class="stat-card rounded-xl p-5">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600">Inovasi Saya</p>
+                            <p class="text-2xl font-bold text-gray-800"><?php echo e($stat['inovasi'] ?? 0); ?></p>
+                        </div>
+                        <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-lightbulb text-yellow-600 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-card rounded-xl p-5">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600">Ide Kolaborasi</p>
+                            <p class="text-2xl font-bold text-gray-800"><?php echo e($stat['kolaborasi_ide'] ?? 0); ?></p>
+                        </div>
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-users-gear text-blue-600 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-card rounded-xl p-5">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600">Kolaborasi Diikuti</p>
+                            <p class="text-2xl font-bold text-gray-800"><?php echo e($stat['kolaborasi_member'] ?? 0); ?></p>
+                        </div>
+                        <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-people-group text-indigo-600 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-card rounded-xl p-5">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600">Tugas Kolaborasi</p>
+                            <p class="text-2xl font-bold text-gray-800"><?php echo e($stat['kolaborasi_task'] ?? 0); ?></p>
+                        </div>
+                        <div class="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-list-check text-emerald-600 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
                 
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                    <h2 class="text-lg font-semibold text-blue-900 mb-3">Tren Inovasi & Kolaborasi Bulanan</h2>
+                    <h2 class="text-lg font-semibold text-blue-900 mb-3">Tren Inovasi & Kolaborasi 6 Bulan Terakhir</h2>
                     <canvas id="trendAllChart" height="150"></canvas>
                 </div>
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
@@ -230,22 +226,41 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
                 
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                    <h2 class="text-lg font-semibold text-blue-900 mb-3">Progress Kolaborasi Aktif</h2>
+                    <div class="flex justify-between items-center mb-3">
+                        <h2 class="text-lg font-semibold text-blue-900">Program Pemerintah Terbaru</h2>
+                        <a href="<?php echo e(route('pemerintah.program') ?? '#'); ?>" class="text-sm text-blue-600 hover:underline font-medium">Lihat Semua</a>
+                    </div>
                     <div class="space-y-4">
-                        <?php $__empty_1 = true; $__currentLoopData = $progressKolaborasi; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $progress): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                        <a href="<?php echo e(route('kolaborasi.ide.show', $progress->id)); ?>" class="block progress-link">
-                            <div>
+                        <?php $__empty_1 = true; $__currentLoopData = $programPemerintah ?? []; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $program): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                        <a href="<?php echo e(route('pemerintah.program.store', $program->id) ?? '#'); ?>" target="_blank" class="block progress-link">
+                            <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h3 class="font-medium text-gray-800"><?php echo e($program->title ?? 'Program Pemerintah'); ?></h3>
+                                    <span class="text-xs px-2 py-1 rounded-full 
+                                        <?php echo e(($program->status ?? '') == 'ongoing' ? 'bg-green-100 text-green-700' : 
+                                           (($program->status ?? '') == 'planning' ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100 text-gray-700')); ?>">
+                                        <?php if(($program->status ?? '') == 'ongoing'): ?> 🚀 Berjalan
+                                        <?php elseif(($program->status ?? '') == 'planning'): ?> 📅 Perencanaan
+                                        <?php else: ?> ✅ Selesai
+                                        <?php endif; ?>
+                                    </span>
+                                </div>
+                                <p class="text-sm text-gray-600 mb-2"><?php echo e($program->opd_name ?? 'OPD'); ?></p>
                                 <div class="flex justify-between text-sm mb-1">
-                                    <span class="font-medium text-gray-700"><?php echo e($progress->judul); ?></span>
-                                    <span class="text-blue-600"><?php echo e($progress->progress); ?>%</span>
+                                    <span class="text-gray-500">Progress</span>
+                                    <span class="text-blue-600"><?php echo e($program->progress ?? 0); ?>%</span>
                                 </div>
                                 <div class="w-full bg-gray-200 rounded-full h-2">
-                                    <div class="bg-green-500 h-2 rounded-full" style="width: <?php echo e($progress->progress); ?>%"></div>
+                                    <div class="bg-green-500 h-2 rounded-full" style="width: <?php echo e($program->progress ?? 0); ?>%"></div>
+                                </div>
+                                <div class="flex justify-between text-xs text-gray-500 mt-2">
+                                    <span>Mulai: <?php echo e(isset($program->start_date) ? \Carbon\Carbon::parse($program->start_date)->format('d M Y') : '-'); ?></span>
+                                    <span>Selesai: <?php echo e(isset($program->end_date) ? \Carbon\Carbon::parse($program->end_date)->format('d M Y') : '-'); ?></span>
                                 </div>
                             </div>
                         </a>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                        <p class="text-gray-500 text-sm">Tidak ada kolaborasi aktif</p>
+                        <p class="text-gray-500 text-sm">Tidak ada program pemerintah</p>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -254,13 +269,13 @@
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                     <h2 class="text-lg font-semibold text-blue-900 mb-3">Aktivitas Terbaru</h2>
                     <div class="space-y-3">
-                        <?php $__empty_1 = true; $__currentLoopData = $aktivitasTerbaru; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $aktivitas): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                        <a href="<?php echo e($aktivitas->link ?? '#'); ?>" class="block activity-link p-2 rounded-lg transition">
+                        <?php $__empty_1 = true; $__currentLoopData = $aktivitasTerbaru ?? []; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $aktivitas): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                        <a href="<?php echo e($aktivitas['link'] ?? '#'); ?>" class="block activity-link p-2 rounded-lg transition">
                             <div class="flex items-start space-x-3">
                                 <div class="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
                                 <div class="flex-1">
-                                    <p class="text-sm text-gray-700"><?php echo e($aktivitas->deskripsi); ?></p>
-                                    <p class="text-xs text-gray-500"><?php echo e($aktivitas->waktu); ?></p>
+                                    <p class="text-sm text-gray-700"><?php echo e($aktivitas['deskripsi'] ?? 'Aktivitas terbaru'); ?></p>
+                                    <p class="text-xs text-gray-500"><?php echo e($aktivitas['waktu'] ?? now()->format('d M Y')); ?></p>
                                 </div>
                             </div>
                         </a>
@@ -277,11 +292,21 @@
                 <div>
                     <div class="flex justify-between items-center mb-3">
                         <h2 class="text-xl font-semibold text-blue-900">Inovasi Saya</h2>
-                        <a href="<?php echo e(route('akademisi.inovasi.index')); ?>" class="text-sm text-blue-600 hover:underline font-medium">Lihat Semua</a>
+                        <div class="flex items-center gap-4">
+                            <div class="scroll-nav">
+                                <button class="scroll-btn scroll-left" data-target="inovasi-scroll">
+                                    <i class="fas fa-chevron-left text-xs"></i>
+                                </button>
+                                <button class="scroll-btn scroll-right" data-target="inovasi-scroll">
+                                    <i class="fas fa-chevron-right text-xs"></i>
+                                </button>
+                            </div>
+                            <a href="<?php echo e(route('akademisi.inovasi.index') ?? '#'); ?>" class="text-sm text-blue-600 hover:underline font-medium">Lihat Semua</a>
+                        </div>
                     </div>
-                    <div class="scrolling-wrapper pb-2">
-                        <?php $__empty_1 = true; $__currentLoopData = $inovasiSaya; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                            <a href="<?php echo e(route('akademisi.inovasi.show', $item->id)); ?>" class="card-link">
+                    <div class="scrolling-wrapper pb-2" id="inovasi-scroll">
+                        <?php $__empty_1 = true; $__currentLoopData = $inovasiSaya ?? []; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                            <a href="<?php echo e(route('akademisi.inovasi.show', $item->id) ?? '#'); ?>" class="card-link">
                                 <div class="min-w-[280px] bg-white rounded-xl shadow-sm p-4 card-shadow border border-gray-100">
                                     
                                     <?php if($item->image_path): ?>
@@ -293,15 +318,15 @@
                                     <?php endif; ?>
                                     
                                     <div class="flex items-center justify-between mb-2">
-                                        <span class="text-xs font-medium px-2 py-1 bg-blue-100 text-blue-700 rounded-full"><?php echo e($item->kategori ?? 'Umum'); ?></span>
-                                        <span class="text-xs text-gray-500"><?php echo e($item->created_at); ?></span>
+                                        <span class="text-xs font-medium px-2 py-1 bg-blue-100 text-blue-700 rounded-full"><?php echo e($item->category ?? 'Umum'); ?></span>
+                                        <span class="text-xs text-gray-500"><?php echo e($item->created_at->format('d M Y')); ?></span>
                                     </div>
                                     <h3 class="font-semibold text-gray-800 mb-2 line-clamp-2"><?php echo e($item->title); ?></h3>
-                                    <p class="text-sm text-gray-500 mb-3"><?php echo e($item->author_name); ?></p>
+                                    <p class="text-sm text-gray-500 mb-3"><?php echo e($item->author_name ?? Auth::user()->name); ?></p>
                                     <div class="mt-2">
-                                        <p class="text-xs text-gray-600 mb-1">TKT: <?php echo e($item->technology_readiness_level); ?></p>
+                                        <p class="text-xs text-gray-600 mb-1">TKT: <?php echo e($item->technology_readiness_level ?? 1); ?></p>
                                         <div class="w-full bg-gray-200 rounded-full h-2">
-                                            <div class="bg-blue-600 h-2 rounded-full" style="width: <?php echo e(($item->technology_readiness_level ?? 0) * 10); ?>%"></div>
+                                            <div class="bg-blue-600 h-2 rounded-full" style="width: <?php echo e((($item->technology_readiness_level ?? 1) / 9) * 100); ?>%"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -309,7 +334,7 @@
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                             <div class="min-w-[280px] bg-gray-50 rounded-xl p-6 text-center border border-gray-200">
                                 <p class="text-gray-500 text-sm">Belum ada inovasi yang diposting.</p>
-                                <a href="<?php echo e(route('akademisi.inovasi.index')); ?>" class="text-blue-600 text-sm font-medium mt-2 inline-block">Buat Inovasi Pertamamu</a>
+                                <a href="<?php echo e(route('akademisi.inovasi.create') ?? '#'); ?>" class="text-blue-600 text-sm font-medium mt-2 inline-block">Buat Inovasi Pertamamu</a>
                             </div>
                         <?php endif; ?>
                     </div>
@@ -319,17 +344,25 @@
                 <div>
                     <div class="flex justify-between items-center mb-3">
                         <h2 class="text-xl font-semibold text-blue-900">Diskusi Terpopuler</h2>
-                        <a href="<?php echo e(route('forum-diskusi.index')); ?>" class="text-sm text-blue-600 hover:underline font-medium">Lihat Semua</a>
+                        <div class="flex items-center gap-4">
+                            <div class="scroll-nav">
+                                <button class="scroll-btn scroll-left" data-target="diskusi-scroll">
+                                    <i class="fas fa-chevron-left text-xs"></i>
+                                </button>
+                                <button class="scroll-btn scroll-right" data-target="diskusi-scroll">
+                                    <i class="fas fa-chevron-right text-xs"></i>
+                                </button>
+                            </div>
+                            <a href="<?php echo e(route('forum-diskusi.index') ?? '#'); ?>" class="text-sm text-blue-600 hover:underline font-medium">Lihat Semua</a>
+                        </div>
                     </div>
-                    <div class="scrolling-wrapper pb-2">
-                        <?php $__empty_1 = true; $__currentLoopData = $diskusiTerpopuler; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $diskusi): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                            <a href="<?php echo e(route('forum-diskusi.detail', ['type' => $diskusi->type, 'id' => $diskusi->id])); ?>" class="card-link">
+                    <div class="scrolling-wrapper pb-2" id="diskusi-scroll">
+                        <?php $__empty_1 = true; $__currentLoopData = $diskusiTerpopuler ?? []; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $diskusi): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                            <a href="<?php echo e(route('forum-diskusi.detail', ['type' => $diskusi->type ?? 'academic', 'id' => $diskusi->id]) ?? '#'); ?>" class="card-link">
                                 <div class="min-w-[280px] bg-white rounded-xl shadow-sm p-4 card-shadow border border-gray-100">
                                     
                                     <?php if($diskusi->image_path): ?>
                                         <img src="<?php echo e(asset('storage/' . $diskusi->image_path)); ?>" alt="<?php echo e($diskusi->title); ?>" class="innovation-image">
-                                    <?php elseif($diskusi->image): ?>
-                                        <img src="<?php echo e(asset('storage/' . $diskusi->image)); ?>" alt="<?php echo e($diskusi->title); ?>" class="innovation-image">
                                     <?php else: ?>
                                         <div class="default-image">
                                             <span>No Image</span>
@@ -337,15 +370,15 @@
                                     <?php endif; ?>
                                     
                                     <div class="flex items-center justify-between mb-2">
-                                        <span class="text-xs font-medium px-2 py-1 bg-purple-100 text-purple-700 rounded-full"><?php echo e(ucfirst($diskusi->type)); ?></span>
-                                        <span class="text-xs text-gray-500"><?php echo e($diskusi->created_at); ?></span>
+                                        <span class="text-xs font-medium px-2 py-1 bg-purple-100 text-purple-700 rounded-full"><?php echo e(ucfirst($diskusi->type ?? 'academic')); ?></span>
+                                        <span class="text-xs text-gray-500"><?php echo e($diskusi->formatted_created_at ?? $diskusi->created_at->format('d M Y')); ?></span>
                                     </div>
                                     <h3 class="font-semibold text-gray-800 mb-2 line-clamp-2"><?php echo e($diskusi->title); ?></h3>
-                                    <p class="text-sm text-gray-500 mb-1"><?php echo e($diskusi->author_name); ?></p>
+                                    <p class="text-sm text-gray-500 mb-1"><?php echo e($diskusi->author_name ?? 'Anonymous'); ?></p>
                                     <div class="flex items-center justify-between mt-3">
                                         <span class="text-xs text-gray-600">
                                             <i class="fas fa-comment mr-1"></i>
-                                            <?php echo e($diskusi->jumlah_komentar); ?> Komentar
+                                            <?php echo e($diskusi->jumlah_komentar ?? 0); ?> Komentar
                                         </span>
                                     </div>
                                 </div>
@@ -362,30 +395,49 @@
                 <div>
                     <div class="flex justify-between items-center mb-3">
                         <h2 class="text-xl font-semibold text-blue-900">Kolaborasi Berjalan</h2>
-                        <a href="<?php echo e(route('kolaborasi.index')); ?>" class="text-sm text-blue-600 hover:underline font-medium">Lihat Semua</a>
+                        <div class="flex items-center gap-4">
+                            <div class="scroll-nav">
+                                <button class="scroll-btn scroll-left" data-target="kolaborasi-scroll">
+                                    <i class="fas fa-chevron-left text-xs"></i>
+                                </button>
+                                <button class="scroll-btn scroll-right" data-target="kolaborasi-scroll">
+                                    <i class="fas fa-chevron-right text-xs"></i>
+                                </button>
+                            </div>
+                            <a href="<?php echo e(route('kolaborasi.index') ?? '#'); ?>" class="text-sm text-blue-600 hover:underline font-medium">Lihat Semua</a>
+                        </div>
                     </div>
-                    <div class="scrolling-wrapper pb-2">
-                        <?php $__empty_1 = true; $__currentLoopData = $kolaborasiBerjalan; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $kolab): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                            <a href="<?php echo e(route('kolaborasi.ide.show', $kolab->id)); ?>" class="card-link">
+                    <div class="scrolling-wrapper pb-2" id="kolaborasi-scroll">
+                        <?php $__empty_1 = true; $__currentLoopData = $kolaborasiBerjalan ?? []; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $kolab): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                            <a href="<?php echo e(route('kolaborasi.ide.show', $kolab->id) ?? '#'); ?>" class="card-link">
                                 <div class="min-w-[280px] bg-white rounded-xl shadow-sm p-4 card-shadow border border-gray-100">
+                                    
+                                    <?php if($kolab->image_path): ?>
+                                        <img src="<?php echo e(asset('storage/' . $kolab->image_path)); ?>" alt="<?php echo e($kolab->judul); ?>" class="innovation-image">
+                                    <?php else: ?>
+                                        <div class="default-image">
+                                            <span>No Image</span>
+                                        </div>
+                                    <?php endif; ?>
+                                    
                                     <div class="flex items-center justify-between mb-2">
                                         <span class="text-xs font-medium px-2 py-1 
                                             <?php echo e($kolab->status == 'active' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'); ?> rounded-full">
                                             <?php echo e(ucfirst($kolab->status)); ?>
 
                                         </span>
-                                        <span class="text-xs text-gray-500"><?php echo e($kolab->deadline ? 'Selesai: '.$kolab->deadline : 'Tanpa deadline'); ?></span>
+                                        <span class="text-xs text-gray-500"><?php echo e($kolab->formatted_created_at ?? $kolab->created_at->format('d M Y')); ?></span>
                                     </div>
-                                    <h3 class="font-semibold text-gray-800 mb-2"><?php echo e($kolab->judul); ?></h3>
-                                    <p class="text-sm text-gray-500 mb-3"><?php echo e($kolab->deskripsi_singkat); ?></p>
+                                    <h3 class="font-semibold text-gray-800 mb-2 line-clamp-2"><?php echo e($kolab->judul); ?></h3>
+                                    <p class="text-sm text-gray-500 mb-3 line-clamp-2"><?php echo e($kolab->deskripsi_singkat ?? $kolab->deskripsi); ?></p>
                                     <div class="flex items-center justify-between">
                                         <span class="text-xs text-gray-600">
                                             <i class="fas fa-users mr-1"></i>
-                                            <?php echo e($kolab->jumlah_anggota); ?> Anggota
+                                            <?php echo e($kolab->members_count ?? 0); ?> Anggota
                                         </span>
                                         <span class="text-xs text-gray-600">
                                             <i class="fas fa-tasks mr-1"></i>
-                                            <?php echo e($kolab->jumlah_tugas); ?> Tugas
+                                            <?php echo e($kolab->tasks_count ?? 0); ?> Tugas
                                         </span>
                                     </div>
                                 </div>
@@ -393,7 +445,7 @@
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                             <div class="min-w-[280px] bg-gray-50 rounded-xl p-6 text-center border border-gray-200">
                                 <p class="text-gray-500 text-sm">Belum ada kolaborasi berjalan.</p>
-                                <a href="<?php echo e(route('kolaborasi.index')); ?>" class="text-blue-600 text-sm font-medium mt-2 inline-block">Temukan Kolaborasi</a>
+                                <a href="<?php echo e(route('kolaborasi.ide.create') ?? '#'); ?>" class="text-blue-600 text-sm font-medium mt-2 inline-block">Buat Kolaborasi</a>
                             </div>
                         <?php endif; ?>
                     </div>
@@ -408,7 +460,7 @@
                 <div class="bg-white rounded-2xl shadow-sm p-6 mb-6 border border-gray-100">
                     <h2 class="text-xl font-semibold text-blue-900 mb-5">Akses Cepat</h2>
                     <div class="space-y-4">
-                        <a href="<?php echo e(route('akademisi.inovasi.create')); ?>" 
+                        <a href="<?php echo e(route('akademisi.inovasi.create') ?? '#'); ?>" 
                            class="quick-action-card block p-4 rounded-lg border-l-4 border-blue-500">
                             <div class="flex items-center">
                                 <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
@@ -421,7 +473,7 @@
                             </div>
                         </a>
 
-                        <a href="<?php echo e(route('forum-diskusi.index')); ?>" 
+                        <a href="<?php echo e(route('forum-diskusi.index') ?? '#'); ?>" 
                            class="quick-action-card block p-4 rounded-lg border-l-4 border-indigo-500">
                             <div class="flex items-center">
                                 <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center mr-3">
@@ -434,7 +486,7 @@
                             </div>
                         </a>
 
-                        <a href="<?php echo e(route('kolaborasi.index')); ?>" 
+                        <a href="<?php echo e(route('kolaborasi.ide.create') ?? '#'); ?>" 
                            class="quick-action-card block p-4 rounded-lg border-l-4 border-emerald-500">
                             <div class="flex items-center">
                                 <div class="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center mr-3">
@@ -447,7 +499,7 @@
                             </div>
                         </a>
 
-                        <a href="<?php echo e(route('akademisi.profil-akademik')); ?>" 
+                        <a href="<?php echo e(route('akademisi.profil-akademik') ?? '#'); ?>" 
                            class="quick-action-card block p-4 rounded-lg border-l-4 border-purple-500">
                             <div class="flex items-center">
                                 <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
@@ -468,7 +520,7 @@
                     <div class="space-y-4">
                         <div class="flex items-center justify-between">
                             <span class="text-sm text-gray-600">Inovasi Dibuat</span>
-                            <span class="font-semibold text-blue-600"><?php echo e($stat['inovasi']); ?></span>
+                            <span class="font-semibold text-blue-600"><?php echo e($stat['inovasi'] ?? 0); ?></span>
                         </div>
                         <div class="flex items-center justify-between">
                             <span class="text-sm text-gray-600">Kolaborasi Aktif</span>
@@ -487,115 +539,190 @@
 
 
 <script>
-    // Chart untuk seluruh user
-    const trendAllCtx = document.getElementById('trendAllChart');
-    new Chart(trendAllCtx, {
-        type: 'line',
-        data: {
-            labels: <?php echo json_encode($trendAllLabels, 15, 512) ?>,
-            datasets: [
-                {
-                    label: 'Inovasi',
-                    data: <?php echo json_encode($trendAllInovasi, 15, 512) ?>,
-                    borderColor: '#2563eb',
-                    backgroundColor: 'rgba(37,99,235,0.1)',
-                    tension: 0.3,
-                    fill: true
+    document.addEventListener('DOMContentLoaded', function() {
+        // Chart untuk seluruh user - 6 bulan terakhir
+        const trendAllCtx = document.getElementById('trendAllChart');
+        if (trendAllCtx) {
+            new Chart(trendAllCtx, {
+                type: 'bar',
+                data: {
+                    labels: <?php echo json_encode($trendAllLabels ?? [], 15, 512) ?>,
+                    datasets: [
+                        {
+                            label: 'Inovasi',
+                            data: <?php echo json_encode($trendAllInovasi ?? [], 15, 512) ?>,
+                            backgroundColor: '#3b82f6',
+                            borderColor: '#2563eb',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Kolaborasi',
+                            data: <?php echo json_encode($trendAllKolaborasi ?? [], 15, 512) ?>,
+                            backgroundColor: '#10b981',
+                            borderColor: '#059669',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Program Pemerintah',
+                            data: <?php echo json_encode($trendAllProgram ?? [], 15, 512) ?>,
+                            backgroundColor: '#8b5cf6',
+                            borderColor: '#7c3aed',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Diskusi',
+                            data: <?php echo json_encode($trendAllDiskusi ?? [], 15, 512) ?>,
+                            backgroundColor: '#f59e0b',
+                            borderColor: '#d97706',
+                            borderWidth: 1
+                        }
+                    ]
                 },
-                {
-                    label: 'Kolaborasi',
-                    data: <?php echo json_encode($trendAllKolaborasi, 15, 512) ?>,
-                    borderColor: '#10b981',
-                    backgroundColor: 'rgba(16,185,129,0.1)',
-                    tension: 0.3,
-                    fill: true
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            plugins: { legend: { display: true } },
-            scales: { y: { beginAtZero: true } }
-        }
-    });
-
-    // Bar chart untuk kategori seluruh user
-    const kategoriAllCtx = document.getElementById('kategoriAllChart');
-    new Chart(kategoriAllCtx, {
-        type: 'bar',
-        data: {
-            labels: <?php echo json_encode($kategoriAllLabels, 15, 512) ?>,
-            datasets: [{
-                label: 'Jumlah Inovasi',
-                data: <?php echo json_encode($kategoriAllCounts, 15, 512) ?>,
-                backgroundColor: '#3b82f6',
-                borderColor: '#2563eb',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: { 
-                legend: { 
-                    display: false 
-                } 
-            },
-            scales: { 
-                y: { 
-                    beginAtZero: true,
-                    ticks: {
-                        stepSize: 1
+                options: {
+                    responsive: true,
+                    plugins: { 
+                        legend: { 
+                            display: true,
+                            position: 'top'
+                        } 
+                    },
+                    scales: { 
+                        y: { 
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        } 
                     }
-                } 
-            }
-        }
-    });
-
-    // Chart untuk user yang login
-    const trendMyCtx = document.getElementById('trendMyChart');
-    new Chart(trendMyCtx, {
-        type: 'line',
-        data: {
-            labels: <?php echo json_encode($trendMyLabels, 15, 512) ?>,
-            datasets: [
-                {
-                    label: 'Inovasi Saya',
-                    data: <?php echo json_encode($trendMyInovasi, 15, 512) ?>,
-                    borderColor: '#8b5cf6',
-                    backgroundColor: 'rgba(139,92,246,0.1)',
-                    tension: 0.3,
-                    fill: true
-                },
-                {
-                    label: 'Kolaborasi Saya',
-                    data: <?php echo json_encode($trendMyKolaborasi, 15, 512) ?>,
-                    borderColor: '#f59e0b',
-                    backgroundColor: 'rgba(245,158,11,0.1)',
-                    tension: 0.3,
-                    fill: true
                 }
-            ]
-        },
-        options: {
-            responsive: true,
-            plugins: { legend: { display: true } },
-            scales: { y: { beginAtZero: true } }
+            });
         }
-    });
 
-    const kategoriMyCtx = document.getElementById('kategoriMyChart');
-    new Chart(kategoriMyCtx, {
-        type: 'doughnut',
-        data: {
-            labels: <?php echo json_encode($kategoriMyLabels, 15, 512) ?>,
-            datasets: [{
-                data: <?php echo json_encode($kategoriMyCounts, 15, 512) ?>,
-                backgroundColor: ['#8b5cf6', '#a78bfa', '#c4b5fd', '#ddd6fe', '#f3f4f6']
-            }]
-        },
-        options: {
-            plugins: { legend: { position: 'bottom' } }
+        // Bar chart untuk kategori seluruh user
+        const kategoriAllCtx = document.getElementById('kategoriAllChart');
+        if (kategoriAllCtx) {
+            new Chart(kategoriAllCtx, {
+                type: 'bar',
+                data: {
+                    labels: <?php echo json_encode($kategoriAllLabels ?? [], 15, 512) ?>,
+                    datasets: [{
+                        label: 'Jumlah Inovasi',
+                        data: <?php echo json_encode($kategoriAllCounts ?? [], 15, 512) ?>,
+                        backgroundColor: [
+                            '#3b82f6',
+                            '#ef4444',
+                            '#10b981',
+                            '#f59e0b'
+                        ],
+                        borderColor: [
+                            '#2563eb',
+                            '#dc2626',
+                            '#059669',
+                            '#d97706'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { 
+                        legend: { 
+                            display: false 
+                        } 
+                    },
+                    scales: { 
+                        y: { 
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        } 
+                    }
+                }
+            });
         }
+
+        // Chart untuk user yang login
+        const trendMyCtx = document.getElementById('trendMyChart');
+        if (trendMyCtx) {
+            new Chart(trendMyCtx, {
+                type: 'line',
+                data: {
+                    labels: <?php echo json_encode($trendMyLabels ?? [], 15, 512) ?>,
+                    datasets: [
+                        {
+                            label: 'Inovasi Saya',
+                            data: <?php echo json_encode($trendMyInovasi ?? [], 15, 512) ?>,
+                            borderColor: '#8b5cf6',
+                            backgroundColor: 'rgba(139,92,246,0.1)',
+                            tension: 0.3,
+                            fill: true
+                        },
+                        {
+                            label: 'Kolaborasi Saya',
+                            data: <?php echo json_encode($trendMyKolaborasi ?? [], 15, 512) ?>,
+                            borderColor: '#f59e0b',
+                            backgroundColor: 'rgba(245,158,11,0.1)',
+                            tension: 0.3,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: true } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+        }
+
+        const kategoriMyCtx = document.getElementById('kategoriMyChart');
+        if (kategoriMyCtx) {
+            new Chart(kategoriMyCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: <?php echo json_encode($kategoriMyLabels ?? [], 15, 512) ?>,
+                    datasets: [{
+                        data: <?php echo json_encode($kategoriMyCounts ?? [], 15, 512) ?>,
+                        backgroundColor: ['#8b5cf6', '#a78bfa', '#c4b5fd', '#ddd6fe', '#f3f4f6']
+                    }]
+                },
+                options: {
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+        }
+
+        // Scroll functionality for cards
+        const scrollContainers = ['inovasi-scroll', 'diskusi-scroll', 'kolaborasi-scroll'];
+        
+        scrollContainers.forEach(containerId => {
+            const container = document.getElementById(containerId);
+            const leftBtn = document.querySelector(`.scroll-left[data-target="${containerId}"]`);
+            const rightBtn = document.querySelector(`.scroll-right[data-target="${containerId}"]`);
+            
+            if (container && leftBtn && rightBtn) {
+                const scrollAmount = 300;
+                
+                leftBtn.addEventListener('click', () => {
+                    container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+                });
+                
+                rightBtn.addEventListener('click', () => {
+                    container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+                });
+                
+                // Update button states based on scroll position
+                container.addEventListener('scroll', () => {
+                    leftBtn.disabled = container.scrollLeft <= 0;
+                    rightBtn.disabled = container.scrollLeft + container.clientWidth >= container.scrollWidth;
+                });
+                
+                // Initial state
+                leftBtn.disabled = container.scrollLeft <= 0;
+                rightBtn.disabled = container.scrollLeft + container.clientWidth >= container.scrollWidth;
+            }
+        });
     });
 </script>
 <?php $__env->stopSection(); ?>

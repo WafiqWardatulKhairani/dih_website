@@ -5,8 +5,6 @@ namespace App\Http\Controllers\Kolaborasi;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\KolaborasiIde;
-use App\Models\KolaborasiMember;
-use App\Models\KolaborasiTask;
 use App\Models\AcademicInnovation;
 use App\Models\OpdInnovation;
 use Illuminate\Support\Facades\Auth;
@@ -33,7 +31,6 @@ class KolaborasiController extends Controller
             $search = trim($request->input('search', ''));
 
             $query = KolaborasiIde::with(['owner'])
-                ->withCount('tasks')
                 ->orderBy('created_at', 'desc');
 
             if (!empty($search)) {
@@ -49,50 +46,16 @@ class KolaborasiController extends Controller
             $kolaborasis = $query->paginate(9)->appends($request->query());
 
             // ==================================================
-            // 🔥 Perhitungan custom: members_count + progress
-            // Menggunakan ->each() (AMAN, tidak ubah object)
+            // 🔥 Gunakan method aggregate di model
             // ==================================================
             $kolaborasis->getCollection()->each(function ($k) {
-
-                // -------------------------------
-                // Hitung anggota aktif
-                // -------------------------------
-                $membersCount = $k->members()->where('status', 'active')->count();
-
-                // Owner inovasi (academic / opd)
-                $ownerId = null;
-
-                if ($k->innovation_type === 'academic') {
-                    $ownerId = AcademicInnovation::where('id', $k->innovation_id)->value('user_id');
-                } elseif ($k->innovation_type === 'opd') {
-                    $ownerId = OpdInnovation::where('id', $k->innovation_id)->value('user_id');
-                }
-
-                // Leader kolaborasi
-                $leaderId = $k->members()->where('role', 'leader')->value('user_id');
-
-                // Tambahkan owner inovasi sebagai anggota tambahan
-                if ($ownerId && $ownerId != $leaderId) {
-                    $membersCount += 1;
-                }
-
-                // Pasang atribut
-                $k->setAttribute('members_count', $membersCount);
-
-                // -------------------------------
-                // Hitung progress
-                // -------------------------------
-                $total = $k->tasks()->count();
-                $done  = $k->tasks()->where('status', 'done')->count();
-                $progress = $total > 0 ? ($done / $total) * 100 : 0;
-
-                $k->setAttribute('progress', $progress);
+                $k->setAttribute('members_count', $k->activeMembersCount());
+                $k->setAttribute('progress', $k->progressPercent());
             });
 
             return view('kolaborasi.index', compact('kolaborasis', 'search'));
 
         } catch (\Throwable $e) {
-
             Log::error('Error di KolaborasiController@index: ' . $e->getMessage());
 
             // fallback paginator kosong
@@ -119,28 +82,26 @@ class KolaborasiController extends Controller
                 'tasks'
             ])->findOrFail($id);
 
-            $user = Auth::user();
+            // Tambahkan attribute aggregate
+            $kolaborasi->setAttribute('members_count', $kolaborasi->activeMembersCount());
+            $kolaborasi->setAttribute('progress', $kolaborasi->progressPercent());
 
-            $isOwner = false;
-            $isMember = false;
-            $isLeader = false;
+            $user = Auth::user();
+            $isOwner = $isMember = $isLeader = false;
 
             if ($user) {
-
-                // Owner Academic Innovation
+                // Cek ownership
                 $isAcademicOwner = AcademicInnovation::where('id', $kolaborasi->innovation_id)
                     ->where('user_id', $user->id)
                     ->exists();
 
-                // Owner OPD Innovation
                 $isOpdOwner = OpdInnovation::where('id', $kolaborasi->innovation_id)
                     ->where('user_id', $user->id)
                     ->exists();
 
-                // Salah satu benar -> User adalah pemilik ide
                 $isOwner = $isAcademicOwner || $isOpdOwner;
 
-                // Cek apakah user adalah anggota aktif
+                // Cek anggota aktif & leader
                 $memberRecord = $kolaborasi->members()
                     ->where('user_id', $user->id)
                     ->where('status', 'active')
@@ -160,15 +121,12 @@ class KolaborasiController extends Controller
             ));
 
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-
             Log::warning("Kolaborasi tidak ditemukan: kolaborasi_id={$id}");
             return redirect()->route('kolaborasi.index')->with('error', 'Kolaborasi tidak ditemukan.');
 
         } catch (\Throwable $e) {
-
             Log::error('Error di KolaborasiController@detail: ' . $e->getMessage());
             return redirect()->route('kolaborasi.index')->with('error', 'Terjadi kesalahan saat memuat detail kolaborasi.');
         }
     }
 }
-

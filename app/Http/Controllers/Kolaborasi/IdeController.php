@@ -28,6 +28,12 @@ class IdeController extends Controller
             ->latest()
             ->paginate(12);
 
+        // Tambahkan attribute aggregate
+        $ides->getCollection()->each(function ($k) {
+            $k->setAttribute('members_count', $k->activeMembersCount());
+            $k->setAttribute('progress', $k->progressPercent());
+        });
+
         return view('kolaborasi.index', compact('ides'));
     }
 
@@ -130,6 +136,10 @@ class IdeController extends Controller
             'documents.uploader',
             'reviews.reviewer',
         ])->findOrFail($id);
+
+        // Tambahkan attribute aggregate
+        $kolaborasi->setAttribute('members_count', $kolaborasi->activeMembersCount());
+        $kolaborasi->setAttribute('progress', $kolaborasi->progressPercent());
 
         $user = Auth::user();
 
@@ -251,11 +261,7 @@ class IdeController extends Controller
         $kolaborasi = KolaborasiIde::findOrFail($id);
         $userId = Auth::id();
 
-        $alreadyMember = KolaborasiMember::where('kolaborasi_id', $id)
-            ->where('user_id', $userId)
-            ->exists();
-
-        if ($alreadyMember) {
+        if (!$kolaborasi->canJoin($userId)) {
             return back()->with('info', 'Anda sudah tergabung atau menunggu persetujuan.');
         }
 
@@ -277,10 +283,8 @@ class IdeController extends Controller
         $member = KolaborasiMember::with('kolaborasi')->findOrFail($memberId);
         $kolaborasi = $member->kolaborasi;
 
-        $userId = Auth::id();
-
         $leader = $kolaborasi->members()->where('role', 'leader')->first();
-        if ($leader?->user_id !== $userId) {
+        if ($leader?->user_id !== Auth::id()) {
             return response()->json(['status' => 'error', 'message' => 'Anda bukan leader.'], 403);
         }
 

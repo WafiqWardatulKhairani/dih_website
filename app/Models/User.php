@@ -5,11 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\ValueObjects\EmailAddress;
 
 class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
+    /**
+     * Atribut yang bisa diisi massal
+     */
     protected $fillable = [
         'name',
         'email',
@@ -25,41 +29,44 @@ class User extends Authenticatable
         'approval_type',
     ];
 
+    /**
+     * Atribut yang disembunyikan
+     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
+    /**
+     * Cast atribut ke tipe data tertentu
+     */
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
         'approved_at' => 'datetime',
     ];
 
-    // Method untuk cek email institusi
-    public function isInstitutionalEmail()
+    /**
+     * Mengembalikan objek Value Object EmailAddress
+     */
+    public function emailVO(): EmailAddress
     {
-        $institutionalDomains = [
-            'ac.id',           // Universitas
-            'edu',             // Pendidikan internasional
-            'sch.id',          // Sekolah
-            'go.id',           // Pemerintah
-            'yahoo.com',       // Pemerintah
-        ];
-
-        $emailDomain = strtolower(explode('@', $this->email)[1] ?? '');
-
-        foreach ($institutionalDomains as $domain) {
-            if (str_ends_with($emailDomain, $domain)) {
-                return true;
-            }
-        }
-
-        return false;
+        return new EmailAddress($this->email);
     }
 
-    // Method untuk auto approve
-    public function approve()
+    /**
+     * Cek apakah email merupakan email institusi.
+     * Delegasi ke VO EmailAddress
+     */
+    public function isInstitutionalEmail(): bool
+    {
+        return $this->emailVO()->isInstitutional();
+    }
+
+    /**
+     * Method untuk auto approve user
+     */
+    public function approve(): void
     {
         $this->update([
             'status' => 'verified',
