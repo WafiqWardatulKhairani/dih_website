@@ -4,6 +4,7 @@
 @php
 use Carbon\Carbon;
 use App\Models\DiscussionComment;
+use App\Models\KolaborasiIde;
 @endphp
 
 @push('styles')
@@ -429,6 +430,7 @@ use App\Models\DiscussionComment;
                     <div class="space-y-4">
                         @foreach($sidebarInnovations as $item)
                             @php
+                                // FIX: Mengambil komentar berdasarkan innovation_id tanpa memperdulikan tipe
                                 $commentsCount = \App\Models\DiscussionComment::where('innovation_id', $item->id)->count();
                                 $itemSourceType = $item->source_type ?? 'unknown';
                                 $itemType = $itemSourceType != 'unknown' ? $itemSourceType : ($type ?? 'unknown');
@@ -457,43 +459,67 @@ use App\Models\DiscussionComment;
                         <i class="fas fa-handshake text-green-500 mr-2"></i>Kolaborasi
                     </h3>
                     @php
-                        use App\Models\KolaborasiIde;
                         $userId = auth()->id();
-                        $collaboration = KolaborasiIde::where('innovation_id', $innovation->id)->first();
+                        
+                        // FIX: Query yang benar berdasarkan struktur tabel
+                        $collaboration = KolaborasiIde::where('innovation_id', $innovation->id)
+                            ->where('user_id', $userId)
+                            ->first();
+                            
                         $isOwner = $userId === ($innovation->user_id ?? null);
-                        $isApplicant = $collaboration && $userId === $collaboration->user_id;
+                        $hasCollaboration = KolaborasiIde::where('innovation_id', $innovation->id)->exists();
+                        
+                        // Ambil data kolaborasi untuk inovasi ini (untuk tombol "Lihat Kolaborasi")
+                        $existingCollaboration = KolaborasiIde::where('innovation_id', $innovation->id)->first();
                     @endphp
                     
                     <div class="space-y-4">
-                        @if(!$collaboration)
+                        @if(!$hasCollaboration)
                             <p class="text-gray-600 text-sm">Belum ada pengajuan kolaborasi.</p>
-                            <a href="{{ route('kolaborasi.ide.create', ['innovation_id'=>$innovation->id]) }}" 
-                               class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition duration-200 font-medium">
-                                <i class="fas fa-plus"></i>
-                                Ajukan Kolaborasi
-                            </a>
-                        @else
-                            @if($isOwner)
-                                <p class="text-green-600 text-sm font-medium">📬 Ada pengajuan kolaborasi masuk!</p>
-                                <a href="{{ route('kolaborasi.ide.show', ['id'=>$collaboration->id]) }}" 
-                                   class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition duration-200 font-medium">
-                                    <i class="fas fa-eye"></i>
-                                    Lihat Pengajuan
-                                </a>
-                            @elseif($isApplicant)
-                                <p class="text-amber-600 text-sm font-medium">⏳ Menunggu persetujuan pemilik ide.</p>
-                                <a href="{{ route('kolaborasi.ide.show', ['id'=>$collaboration->id]) }}" 
-                                   class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition duration-200 font-medium">
-                                    <i class="fas fa-edit"></i>
-                                    Edit Pengajuan
+                            @if(!$isOwner)
+                                <a href="{{ route('kolaborasi.ide.create', ['innovation_id'=>$innovation->id]) }}" 
+                                   class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition duration-200 font-medium">
+                                    <i class="fas fa-plus"></i>
+                                    Ajukan Kolaborasi
                                 </a>
                             @else
+                                <p class="text-blue-600 text-sm font-medium">Ini adalah inovasi Anda.</p>
+                            @endif
+                        @else
+                            @if($collaboration)
+                                @if($isOwner)
+                                    <p class="text-green-600 text-sm font-medium">📬 Ada pengajuan kolaborasi masuk!</p>
+                                    <a href="{{ route('kolaborasi.ide.show', ['id'=>$collaboration->id]) }}" 
+                                       class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition duration-200 font-medium">
+                                        <i class="fas fa-eye"></i>
+                                        Lihat Pengajuan
+                                    </a>
+                                @else
+                                    <a href="{{ route('kolaborasi.ide.show', ['id'=>$collaboration->id]) }}" 
+                                       class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition duration-200 font-medium">
+                                        <i class="fas fa-edit"></i>
+                                        Edit Pengajuan
+                                    </a>
+                                @endif
+                            @else
                                 <p class="text-purple-600 text-sm font-medium">👥 Sudah ada kolaborasi berjalan.</p>
-                                <a href="{{ route('kolaborasi.ide.show', ['id'=>$collaboration->id]) }}" 
-                                   class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition duration-200 font-medium">
-                                    <i class="fas fa-users"></i>
-                                    Lihat Kolaborasi
-                                </a>
+                                @if($isOwner)
+                                    <a href="{{ route('kolaborasi.ide.index') }}?innovation_id={{ $innovation->id }}" 
+                                       class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition duration-200 font-medium">
+                                        <i class="fas fa-users"></i>
+                                        Kelola Kolaborasi
+                                    </a>
+                                @else
+                                    <p class="text-gray-600 text-sm">Kolaborasi sudah diajukan oleh pengguna lain.</p>
+                                    <!-- TAMBAHAN: Tombol Lihat Kolaborasi -->
+                                    @if($existingCollaboration)
+                                        <a href="{{ route('kolaborasi.ide.show', ['id' => $existingCollaboration->id]) }}" 
+                                           class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition duration-200 font-medium">
+                                            <i class="fas fa-eye mr-2"></i>
+                                            Lihat Kolaborasi
+                                        </a>
+                                    @endif
+                                @endif
                             @endif
                         @endif
                     </div>

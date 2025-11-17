@@ -63,7 +63,7 @@ Swal.fire({
 @endpush
 
 @section('content')
-<div class="max-w-7xl mx-auto px-4 py-8">
+<div class="max-w-7xl mx-auto mt-10 mb-12 px-4 sm:px-6 lg:px-8">
 
     @if(!isset($kolaborasi))
         <div class="text-center py-20 text-red-600 font-semibold">
@@ -71,84 +71,98 @@ Swal.fire({
         </div>
     @else
 
-    {{-- HERO / GAMBAR KOLABORASI --}}
-    <div class="w-full relative h-80 border-b border-gray-200 mb-8 rounded-xl overflow-hidden">
-        @if($kolaborasi->image_path)
-            <img src="{{ asset('storage/' . $kolaborasi->image_path) }}" 
-                 alt="{{ $kolaborasi->title ?? 'Kolaborasi' }}" 
-                 class="w-full h-full object-cover">
-        @else
-            <div class="w-full h-full bg-gradient-to-r from-[rgba(30,64,175,0.85)] to-[rgba(30,58,138,0.9)] flex items-center justify-center">
-                <i class="fas fa-file-alt fa-3x text-blue-100 opacity-70"></i>
-            </div>
-        @endif
-        <div class="absolute inset-0 bg-gradient-to-t from-[rgba(30,64,175,0.85)] to-[rgba(30,58,138,0.9)] mix-blend-multiply"></div>
-    </div>
+    {{-- ==================== HALAMAN DETAIL - SAMA SEPERTI DI SHOW.BLADE.PHP ==================== --}}
+    <div class="bg-white border border-white rounded-2xl shadow-xl overflow-hidden">
 
-    <div class="page-border p-6 space-y-8">
-
-        {{-- HEADER --}}
-        <div class="flex justify-between items-center mb-4">
-            <div>
-                <h1 class="text-3xl font-bold text-primary">Lampiran Kolaborasi</h1>
-                <p class="text-gray-600">
-                    Kolaborasi: 
-                    <span class="font-semibold text-secondary">
-                        {{ $kolaborasi->title ?? 'Tanpa Judul' }}
-                    </span>
-                </p>
-            </div>
+        {{-- Gambar Kolaborasi - SAMA SEPERTI DI SHOW.BLADE.PHP --}}
+        <div class="w-full relative h-80 border-b border-gray-200 bg-gradient-to-br from-blue-50 to-indigo-100">
+            @if($kolaborasi->image_path)
+                <img src="{{ asset('storage/' . $kolaborasi->image_path) }}" 
+                     alt="{{ $kolaborasi->judul }}" 
+                     class="w-full h-full object-cover">
+            @else
+                <div class="w-full h-full flex flex-col items-center justify-center text-center p-8">
+                    <div class="mb-4">
+                        <i class="fas fa-hands-helping fa-4x text-gradient"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-700 mb-2">Kolaborasi Inovasi</h3>
+                    <p class="text-gray-500 max-w-md">Bersama mewujudkan ide menjadi kenyataan melalui kolaborasi yang sinergis</p>
+                </div>
+            @endif
         </div>
 
-        {{-- BUTTON KE HALAMAN UTAMA --}}
-        <div class="flex flex-wrap items-center gap-3 mb-8">
-            <a href="{{ route('kolaborasi.detail', $kolaborasi->id) }}" 
-               class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-                <i class="fas fa-home"></i> Halaman Utama Kolaborasi
-            </a>
-        </div>
+        {{-- KONTEN UTAMA - GABUNG DALAM SATU DIV SEPERTI DI SHOW.BLADE.PHP --}}
+        <div class="p-8">
 
-        {{-- TABEL DOKUMEN --}}
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-blue-50 text-gray-800">
-                    <tr>
-                        <th class="px-4 py-3 text-left text-sm font-semibold table-no">No</th>
-                        <th class="px-4 py-3 text-left text-sm font-semibold table-title">Judul Dokumen</th>
-                        <th class="px-4 py-3 text-left text-sm font-semibold table-uploader">Uploader</th>
-                        <th class="px-4 py-3 text-left text-sm font-semibold table-file">File</th>
-                        <th class="px-4 py-3 text-left text-sm font-semibold table-category">Kategori</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-100 bg-graylight/40">
-                    @forelse($kolaborasi->documents->sortBy('category')->sortBy('title') as $doc)
-                        @php
-                            // Judul rapi: jika title kosong, ambil nama file tanpa extension
-                            $title = $doc->title ?: pathinfo($doc->file_path, PATHINFO_FILENAME);
-                            // Tambahkan prefix kategori
-                            $displayTitle = '[' . ucfirst($doc->category) . '] ' . $title;
-                        @endphp
-                        <tr class="hover:bg-graylight transition">
-                            <td class="px-4 py-4">{{ $loop->iteration }}</td>
-                            <td class="px-4 py-4">{{ \Illuminate\Support\Str::limit($displayTitle, 50, '...') }}</td>
-                            <td class="px-4 py-4">{{ $doc->uploader->name ?? '-' }}</td>
-                            <td class="px-4 py-4">
-                                <a href="{{ asset('storage/' . $doc->file_path) }}" target="_blank" class="text-blue-600 underline">
-                                    Lihat Lampiran
-                                </a>
-                            </td>
-                            <td class="px-4 py-4">{{ ucfirst($doc->category) }}</td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="5" class="text-center py-6 text-gray-500">Belum ada dokumen yang diunggah.</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
+            {{-- ==================== WRAPPER UTAMA DOKUMEN ==================== --}}
+            <div class="page-border p-6 space-y-8">
 
-    </div>
+                {{-- HEADER --}}
+                <div class="flex justify-between items-center mb-4">
+                    <div>
+                        <h1 class="text-3xl font-bold text-primary">Lampiran Kolaborasi</h1>
+                        <p class="text-gray-600">
+                            Kolaborasi: 
+                            <span class="font-semibold text-secondary">
+                                {{ $kolaborasi->judul ?? 'Tanpa Judul' }}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+
+                {{-- BUTTON KE HALAMAN UTAMA --}}
+                <div class="flex flex-wrap items-center gap-3 mb-8">
+                    <a href="{{ route('kolaborasi.detail', $kolaborasi->id) }}" 
+                       class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                        <i class="fas fa-home"></i> Halaman Utama Kolaborasi
+                    </a>
+                </div>
+
+                {{-- TABEL DOKUMEN --}}
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-blue-50 text-gray-800">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-sm font-semibold table-no">No</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold table-title">Judul Dokumen</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold table-uploader">Uploader</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold table-file">File</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold table-category">Kategori</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100 bg-graylight/40">
+                            @forelse($kolaborasi->documents->sortBy('category')->sortBy('title') as $doc)
+                                @php
+                                    // Judul rapi: jika title kosong, ambil nama file tanpa extension
+                                    $title = $doc->title ?: pathinfo($doc->file_path, PATHINFO_FILENAME);
+                                    // Tambahkan prefix kategori
+                                    $displayTitle = '[' . ucfirst($doc->category) . '] ' . $title;
+                                @endphp
+                                <tr class="hover:bg-graylight transition">
+                                    <td class="px-4 py-4">{{ $loop->iteration }}</td>
+                                    <td class="px-4 py-4">{{ \Illuminate\Support\Str::limit($displayTitle, 50, '...') }}</td>
+                                    <td class="px-4 py-4">{{ $doc->uploader->name ?? '-' }}</td>
+                                    <td class="px-4 py-4">
+                                        <a href="{{ asset('storage/' . $doc->file_path) }}" target="_blank" class="text-blue-600 underline">
+                                            Lihat Lampiran
+                                        </a>
+                                    </td>
+                                    <td class="px-4 py-4">{{ ucfirst($doc->category) }}</td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="text-center py-6 text-gray-500">Belum ada dokumen yang diunggah.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+
+            </div> {{-- end page-border --}}
+
+        </div> {{-- end p-8 --}}
+
+    </div> {{-- end bg-white border --}}
     @endif
 
 </div>

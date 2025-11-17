@@ -3,6 +3,7 @@
 <?php
 use Carbon\Carbon;
 use App\Models\DiscussionComment;
+use App\Models\KolaborasiIde;
 ?>
 
 <?php $__env->startPush('styles'); ?>
@@ -435,6 +436,7 @@ use App\Models\DiscussionComment;
                     <div class="space-y-4">
                         <?php $__currentLoopData = $sidebarInnovations; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <?php
+                                // FIX: Mengambil komentar berdasarkan innovation_id tanpa memperdulikan tipe
                                 $commentsCount = \App\Models\DiscussionComment::where('innovation_id', $item->id)->count();
                                 $itemSourceType = $item->source_type ?? 'unknown';
                                 $itemType = $itemSourceType != 'unknown' ? $itemSourceType : ($type ?? 'unknown');
@@ -464,43 +466,67 @@ use App\Models\DiscussionComment;
                         <i class="fas fa-handshake text-green-500 mr-2"></i>Kolaborasi
                     </h3>
                     <?php
-                        use App\Models\KolaborasiIde;
                         $userId = auth()->id();
-                        $collaboration = KolaborasiIde::where('innovation_id', $innovation->id)->first();
+                        
+                        // FIX: Query yang benar berdasarkan struktur tabel
+                        $collaboration = KolaborasiIde::where('innovation_id', $innovation->id)
+                            ->where('user_id', $userId)
+                            ->first();
+                            
                         $isOwner = $userId === ($innovation->user_id ?? null);
-                        $isApplicant = $collaboration && $userId === $collaboration->user_id;
+                        $hasCollaboration = KolaborasiIde::where('innovation_id', $innovation->id)->exists();
+                        
+                        // Ambil data kolaborasi untuk inovasi ini (untuk tombol "Lihat Kolaborasi")
+                        $existingCollaboration = KolaborasiIde::where('innovation_id', $innovation->id)->first();
                     ?>
                     
                     <div class="space-y-4">
-                        <?php if(!$collaboration): ?>
+                        <?php if(!$hasCollaboration): ?>
                             <p class="text-gray-600 text-sm">Belum ada pengajuan kolaborasi.</p>
-                            <a href="<?php echo e(route('kolaborasi.ide.create', ['innovation_id'=>$innovation->id])); ?>" 
-                               class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition duration-200 font-medium">
-                                <i class="fas fa-plus"></i>
-                                Ajukan Kolaborasi
-                            </a>
-                        <?php else: ?>
-                            <?php if($isOwner): ?>
-                                <p class="text-green-600 text-sm font-medium">📬 Ada pengajuan kolaborasi masuk!</p>
-                                <a href="<?php echo e(route('kolaborasi.ide.show', ['id'=>$collaboration->id])); ?>" 
-                                   class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition duration-200 font-medium">
-                                    <i class="fas fa-eye"></i>
-                                    Lihat Pengajuan
-                                </a>
-                            <?php elseif($isApplicant): ?>
-                                <p class="text-amber-600 text-sm font-medium">⏳ Menunggu persetujuan pemilik ide.</p>
-                                <a href="<?php echo e(route('kolaborasi.ide.show', ['id'=>$collaboration->id])); ?>" 
-                                   class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition duration-200 font-medium">
-                                    <i class="fas fa-edit"></i>
-                                    Edit Pengajuan
+                            <?php if(!$isOwner): ?>
+                                <a href="<?php echo e(route('kolaborasi.ide.create', ['innovation_id'=>$innovation->id])); ?>" 
+                                   class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition duration-200 font-medium">
+                                    <i class="fas fa-plus"></i>
+                                    Ajukan Kolaborasi
                                 </a>
                             <?php else: ?>
+                                <p class="text-blue-600 text-sm font-medium">Ini adalah inovasi Anda.</p>
+                            <?php endif; ?>
+                        <?php else: ?>
+                            <?php if($collaboration): ?>
+                                <?php if($isOwner): ?>
+                                    <p class="text-green-600 text-sm font-medium">📬 Ada pengajuan kolaborasi masuk!</p>
+                                    <a href="<?php echo e(route('kolaborasi.ide.show', ['id'=>$collaboration->id])); ?>" 
+                                       class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition duration-200 font-medium">
+                                        <i class="fas fa-eye"></i>
+                                        Lihat Pengajuan
+                                    </a>
+                                <?php else: ?>
+                                    <a href="<?php echo e(route('kolaborasi.ide.show', ['id'=>$collaboration->id])); ?>" 
+                                       class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition duration-200 font-medium">
+                                        <i class="fas fa-edit"></i>
+                                        Edit Pengajuan
+                                    </a>
+                                <?php endif; ?>
+                            <?php else: ?>
                                 <p class="text-purple-600 text-sm font-medium">👥 Sudah ada kolaborasi berjalan.</p>
-                                <a href="<?php echo e(route('kolaborasi.ide.show', ['id'=>$collaboration->id])); ?>" 
-                                   class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition duration-200 font-medium">
-                                    <i class="fas fa-users"></i>
-                                    Lihat Kolaborasi
-                                </a>
+                                <?php if($isOwner): ?>
+                                    <a href="<?php echo e(route('kolaborasi.ide.index')); ?>?innovation_id=<?php echo e($innovation->id); ?>" 
+                                       class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition duration-200 font-medium">
+                                        <i class="fas fa-users"></i>
+                                        Kelola Kolaborasi
+                                    </a>
+                                <?php else: ?>
+                                    <p class="text-gray-600 text-sm">Kolaborasi sudah diajukan oleh pengguna lain.</p>
+                                    <!-- TAMBAHAN: Tombol Lihat Kolaborasi -->
+                                    <?php if($existingCollaboration): ?>
+                                        <a href="<?php echo e(route('kolaborasi.ide.show', ['id' => $existingCollaboration->id])); ?>" 
+                                           class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition duration-200 font-medium">
+                                            <i class="fas fa-eye mr-2"></i>
+                                            Lihat Kolaborasi
+                                        </a>
+                                    <?php endif; ?>
+                                <?php endif; ?>
                             <?php endif; ?>
                         <?php endif; ?>
                     </div>
@@ -510,5 +536,4 @@ use App\Models\DiscussionComment;
     </div>
 </div>
 <?php $__env->stopSection(); ?>
-
 <?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH D:\laragon\www\dih_website\resources\views/diskusi/diskusi-detail.blade.php ENDPATH**/ ?>

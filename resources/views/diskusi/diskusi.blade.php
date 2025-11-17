@@ -4,6 +4,133 @@
 
 @push('styles')
 <script src="https://cdn.tailwindcss.com"></script>
+<style>
+    .innovation-card {
+        background: white;
+        border-radius: 0.75rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        overflow: hidden;
+        transition: all 0.3s ease;
+        border: 1px solid #e2e8f0;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+    
+    .innovation-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+    
+    .card-image {
+        height: 120px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .card-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+    
+    .innovation-card:hover .card-image img {
+        transform: scale(1.05);
+    }
+    
+    .source-badge {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.375rem;
+        font-size: 0.6rem;
+        font-weight: 600;
+        backdrop-filter: blur(4px);
+    }
+    
+    .card-content {
+        padding: 0.75rem;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .card-title {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #1f2937;
+        line-height: 1.2;
+        min-height: 2.4rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    .badge {
+        padding: 0.2rem 0.4rem;
+        border-radius: 0.375rem;
+        font-size: 0.6rem;
+        font-weight: 500;
+    }
+    
+    .trl-bar {
+        width: 100%;
+        height: 4px;
+        background: #e5e7eb;
+        border-radius: 2px;
+        overflow: hidden;
+    }
+    
+    .trl-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #f59e0b, #f97316);
+        border-radius: 2px;
+        transition: width 0.3s ease;
+    }
+    
+    .user-info, .comment-count {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        font-size: 0.65rem;
+        color: #6b7280;
+    }
+    
+    .user-info i, .comment-count i {
+        font-size: 0.6rem;
+    }
+    
+    .card-meta {
+        margin-top: auto;
+    }
+    
+    .pagination {
+        margin-top: 2rem;
+        display: flex;
+        justify-content: center;
+    }
+    
+    .pagination .flex {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+    
+    .hero-text-shadow {
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+</style>
 <script>
     tailwind.config = {
         theme: {
@@ -119,9 +246,11 @@
                         </div>
 
                         @php
+                        // FIX: Query yang benar untuk menghitung komentar berdasarkan innovation_type dan innovation_id
                         $commentCount = \DB::table('discussion_comments')
-                        ->where('innovation_id', $innovation->id)
-                        ->count();
+                            ->where('innovation_id', $innovation->id)
+                            ->where('innovation_type', $innovation->source_type)
+                            ->count();
                         @endphp
                         <div class="comment-count">
                             <i class="fas fa-comment"></i>

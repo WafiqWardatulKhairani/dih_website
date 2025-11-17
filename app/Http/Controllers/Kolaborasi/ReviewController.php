@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\KolaborasiReview;
 use App\Models\KolaborasiMember;
 use App\Models\KolaborasiTask;
-use App\Models\KolaborasiIde; // <-- tambahkan model
+use App\Models\KolaborasiIde;
 
 class ReviewController extends Controller
 {
@@ -25,7 +25,7 @@ class ReviewController extends Controller
         $user = Auth::user();
         $role = $this->getUserRole($kolaborasi_id, $user->id);
 
-        // Ambil judul kolaborasi dari tabel kolaborasi_ideas
+        // Ambil data kolaborasi dari tabel kolaborasi_ideas
         $kolaborasi = KolaborasiIde::findOrFail($kolaborasi_id);
         $kolaborasi_judul = $kolaborasi->judul;
 
@@ -68,9 +68,10 @@ class ReviewController extends Controller
             'reviews',
             'role',
             'kolaborasi_id',
-            'kolaborasi_judul',  // <-- kirim ke view
+            'kolaborasi_judul',
             'kolaborasi_owner_id',
-            'kolaborasi_owner_name'
+            'kolaborasi_owner_name',
+            'kolaborasi' // <-- TAMBAHKAN INI
         ));
     }
 

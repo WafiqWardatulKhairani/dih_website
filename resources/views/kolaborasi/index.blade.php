@@ -66,6 +66,17 @@ tailwind.config = {
     text-transform: uppercase;
 }
 
+.status-badge {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.375rem;
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
 .badge {
     display: inline-block;
     font-size: 0.65rem;
@@ -211,6 +222,10 @@ tailwind.config = {
                     $tasks = $k->tasks->count();
                     $doneTasks = $k->tasks->where('status', 'done')->count();
                     $progressPercent = $tasks > 0 ? round(($doneTasks / $tasks) * 100) : 0;
+
+                    // Tentukan status kolaborasi
+                    $status = $k->is_active ? 'Aktif' : 'Mencari Anggota';
+                    $statusColor = $k->is_active ? 'bg-success' : 'bg-warning';
                 @endphp
 
                 <div class="kolaborasi-card">
@@ -225,6 +240,10 @@ tailwind.config = {
                         @endif
                         <span class="source-badge bg-blue-500">
                             Kolaborasi
+                        </span>
+                        <!-- STATUS BADGE -->
+                        <span class="status-badge {{ $statusColor }} text-white">
+                            {{ $status }}
                         </span>
                     </div>
 
@@ -274,19 +293,11 @@ tailwind.config = {
                     </div>
                 </div>
             @empty
-<<<<<<< HEAD
                 <div class="bg-indigo-50 rounded-xl p-12 text-center border-2 border-dashed border-indigo-300 col-span-full">
                     <i class="fas fa-handshake text-5xl text-blue-400 mb-4"></i>
                     <h3 class="text-xl font-semibold text-gray-700 mb-2">Belum Ada Kolaborasi</h3>
                     <p class="text-gray-500 mb-6">
-                        Lihat halaman Forum Diskusi untuk Menemukan Ide Kolaborasi
-=======
-                <div class="bg-blue-50 rounded-lg p-6 text-center border-2 border-dashed border-blue-200 col-span-full">
-                    <i class="fas fa-handshake text-3xl text-blue-400 mb-2"></i>
-                    <h3 class="text-base font-semibold text-gray-700 mb-1">Belum Ada Kolaborasi</h3>
-                    <p class="text-gray-500 text-xs">
                         Mulai kolaborasi antara Akademisi dan OPD Pekanbaru.
->>>>>>> 2db0d8c (Update Page : Ruang Kolaborasi)
                     </p>
                 </div>
             @endforelse

@@ -88,17 +88,20 @@
     <div class="bg-white border border-white rounded-2xl shadow-xl overflow-hidden">
 
         {{-- Gambar Kolaborasi --}}
-        <div class="w-full relative h-80 border-b border-gray-200">
+        <div class="w-full relative h-80 border-b border-gray-200 bg-gradient-to-br from-blue-50 to-indigo-100">
             @if($kolaborasi->image_path)
                 <img src="{{ asset('storage/' . $kolaborasi->image_path) }}" 
                      alt="{{ $kolaborasi->judul }}" 
                      class="w-full h-full object-cover">
             @else
-                <div class="w-full h-full bg-gradient-to-r from-[rgba(30,64,175,0.85)] to-[rgba(30,58,138,0.9)] flex items-center justify-center">
-                    <i class="fas fa-lightbulb fa-3x text-blue-100 opacity-70"></i>
+                <div class="w-full h-full flex flex-col items-center justify-center text-center p-8">
+                    <div class="mb-4">
+                        <i class="fas fa-hands-helping fa-4x text-gradient"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-700 mb-2">Kolaborasi Inovasi</h3>
+                    <p class="text-gray-500 max-w-md">Bersama mewujudkan ide menjadi kenyataan melalui kolaborasi yang sinergis</p>
                 </div>
             @endif
-            <div class="absolute inset-0 bg-gradient-to-t from-[rgba(30,64,175,0.85)] to-[rgba(30,58,138,0.9)] mix-blend-multiply"></div>
         </div>
 
         <div class="p-8">
@@ -241,7 +244,7 @@
                 </div>
             @endif
 
-            {{-- BUTTON “BERGABUNG KE KOLABORASI” --}}
+            {{-- BUTTON "BERGABUNG KE KOLABORASI" --}}
             @auth
                 {{-- Tampilkan tombol join TERLEPAS dari apakah kolaborasi aktif atau belum --}}
                 @if(!$isOwner && !$isLeader)
@@ -316,7 +319,7 @@ h1, h6 { line-height: 1.3; }
 }
 .btn-tab:hover { filter:brightness(0.9); }
 
-/* Efek popup “mekar” */
+/* Efek popup "mekar" */
 #progressPopup.show {
     display: flex !important;
 }
@@ -327,6 +330,14 @@ h1, h6 { line-height: 1.3; }
 #progressPopup.hide #popupContent {
     transform: scale(0.2);
     opacity: 0;
+}
+
+/* Gradient untuk ikon kolaborasi */
+.text-gradient {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 </style>
 @endpush

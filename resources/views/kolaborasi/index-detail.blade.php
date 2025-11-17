@@ -155,7 +155,7 @@ if ($user && isset($kolaborasi->id)) {
     <section class="hero-header">
         <div class="relative z-10">
             <h1>Detail Kolaborasi</h1>
-            <p>Eksplor setiap aspek kolaborasi — dari ide, tim, hingga progres dan review akhir.</p>
+            <p>Eksplor setiap aspek kolaborasi mulai dari ide, tim, hingga progres dan review akhir.</p>
         </div>
     </section>
 
