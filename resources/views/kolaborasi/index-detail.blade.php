@@ -203,14 +203,14 @@ if ($user && isset($kolaborasi->id)) {
             @if($isMemberOrPengaju)
                 <div class="menu-card">
                     <i class="fas fa-chart-line"></i>
-                    <h3>To Do List</h3>
+                    <h3>Tugas Kolaborasi</h3>
                     <p>Pantau perkembangan setiap tahap pelaksanaan tugas untuk ide inovasi secara real-time.</p>
                     <a href="{{ route('kolaborasi.progress.index', $kolaborasi->id) }}">Buka</a>
                 </div>
             @else
                 <div class="menu-card opacity-60 cursor-not-allowed">
                     <i class="fas fa-chart-line"></i>
-                    <h3>To Do List</h3>
+                    <h3>Tugas Kolaborasi</h3>
                     <p>Hanya dapat diakses oleh anggota aktif kolaborasi.</p>
                     <button disabled class="bg-gray-400 text-white font-semibold rounded-md px-4 py-2 cursor-not-allowed">
                         Tidak Tersedia
@@ -221,8 +221,8 @@ if ($user && isset($kolaborasi->id)) {
             <!-- Dokumen Lampiran Kolaborasi -->
             <div class="menu-card">
                 <i class="fas fa-folder-open"></i>
-                <h3>Dokumen Lampiran Kolaborasi</h3>
-                <p>Akses seluruh dokumen pendukung seperti laporan, foto kegiatan, atau file PDF yang diunggah oleh pihak terkait.</p>
+                <h3>Lampiran Kolaborasi</h3>
+                <p>Akses seluruh lampiran pendukung seperti laporan, foto kegiatan, atau file PDF yang diunggah oleh pihak terkait.</p>
                 <a href="{{ route('kolaborasi.documents.index', $kolaborasi->id) }}">Buka</a>
             </div>
 

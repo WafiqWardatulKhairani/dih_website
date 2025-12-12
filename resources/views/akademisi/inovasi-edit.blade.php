@@ -43,11 +43,10 @@ use App\Models\AcademicInnovation;
                         <select name="category" id="category" required
                                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-600 focus:ring-blue-600">
                             <option value="">Pilih Kategori</option>
-                            @foreach($categories as $category)
-                                <option value="{{ $category }}" {{ old('category', $innovation->category) == $category ? 'selected' : '' }}>
-                                    {{ $category }}
-                                </option>
-                            @endforeach
+                            <option value="Teknologi" {{ old('category', $innovation->category) == 'Teknologi' ? 'selected' : '' }}>Teknologi</option>
+                            <option value="Sosial" {{ old('category', $innovation->category) == 'Sosial' ? 'selected' : '' }}>Sosial</option>
+                            <option value="Pendidikan" {{ old('category', $innovation->category) == 'Pendidikan' ? 'selected' : '' }}>Pendidikan</option>
+                            <option value="Humaniora" {{ old('category', $innovation->category) == 'Humaniora' ? 'selected' : '' }}>Humaniora</option>
                         </select>
                     </div>
                     <div>
@@ -198,45 +197,81 @@ use App\Models\AcademicInnovation;
                     </button>
                 </div>
 
-
             </form>
         </div>
 
     </div>
 </div>
 
-<!-- JS: TRL Slider + Subcategory fetch + Preview file -->
+<!-- JS: TRL Slider + Subcategory manual + Preview file -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Data subkategori manual (sama seperti di halaman create)
+    const subcategories = {
+        'Teknologi': [
+            'Artificial Intelligence',
+            'Internet of Things',
+            'Sistem Informasi Akademik',
+            'Robotics',
+            'Biotechnology',
+        ],
+        'Sosial': [
+            'Kewirausahaan Sosial',
+            'Pemberdayaan Masyarakat',
+            'Inklusi Sosial',
+            'Pengentasan Kemiskinan',
+        ],
+        'Pendidikan': [
+            'EdTech',
+            'Metode Pembelajaran',
+            'Kurikulum',
+            'Assesmen Pendidikan',
+        ],
+        'Humaniora': [
+            'Psikologi',
+            'Seni & Budaya',
+            'Filsafat',
+            'Sejarah',
+            'Antropologi',
+        ]
+    };
+
     // TRL slider
     const trl = document.getElementById('trl');
     const trlValue = document.getElementById('trlValue');
     trl.addEventListener('input', () => trlValue.textContent = trl.value);
 
-    // Subcategory fetch
+    // Subcategory manual
     const categorySelect = document.getElementById('category');
     const subcategorySelect = document.getElementById('subcategory');
     const currentSubcategory = "{{ old('subcategory', $innovation->subcategory) }}";
 
-    if (categorySelect.value) loadSubcategories(categorySelect.value, currentSubcategory);
-    categorySelect.addEventListener('change', () => loadSubcategories(categorySelect.value));
-
+    // Load subcategories berdasarkan kategori yang dipilih
     function loadSubcategories(category, selectedValue = '') {
-        if (!category) {
-            subcategorySelect.innerHTML = '<option value="">Pilih Subkategori</option>';
-            return;
-        }
-        fetch("{{ route('akademisi.inovasi.subcategories') }}?category=" + encodeURIComponent(category))
-            .then(res => res.json())
-            .then(data => {
-                let options = '<option value="">Pilih Subkategori</option>';
-                data.forEach(sub => {
-                    const selected = sub === selectedValue ? 'selected' : '';
-                    options += `<option value="${sub}" ${selected}>${sub}</option>`;
-                });
-                subcategorySelect.innerHTML = options;
+        subcategorySelect.innerHTML = '<option value="">Pilih Subkategori</option>';
+        
+        if (category && subcategories[category]) {
+            subcategories[category].forEach(sub => {
+                const option = document.createElement('option');
+                option.value = sub;
+                option.textContent = sub;
+                if (sub === selectedValue) {
+                    option.selected = true;
+                }
+                subcategorySelect.appendChild(option);
             });
+        }
     }
+
+    // Inisialisasi subkategori saat halaman dimuat
+    if (categorySelect.value) {
+        loadSubcategories(categorySelect.value, currentSubcategory);
+    }
+
+    // Event listener untuk perubahan kategori
+    categorySelect.addEventListener('change', function() {
+        loadSubcategories(this.value);
+    });
 
     // Preview gambar
     const imageInput = document.getElementById('image_path');

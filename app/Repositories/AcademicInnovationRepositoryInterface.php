@@ -14,7 +14,17 @@ interface AcademicInnovationRepositoryInterface
 
     public function findById(int $id);
 
+    public function update($id, array $data);
+
+    public function delete($id);
+
+    public function find($id);
+
     public function modelClass(): string;
 
     public function validStatuses(): array;
+
+    public function getAllCategories();
+
+    public function getSubcategoriesByCategory(string $category);
 }

@@ -6,12 +6,14 @@
 <style>
     body {
         background-color: #f9fafb;
+        overflow-x: hidden;
     }
     .scrolling-wrapper {
         display: flex;
         overflow-x: auto;
         gap: 1rem;
         scroll-behavior: smooth;
+        padding-bottom: 0.5rem;
     }
     .scrolling-wrapper::-webkit-scrollbar {
         height: 6px;
@@ -24,6 +26,7 @@
         display: block; 
         text-decoration: none; 
         color: inherit; 
+        flex-shrink: 0;
     }
     .card-link:hover .card-shadow {
         box-shadow: 0 10px 25px rgba(0,0,0,0.12);
@@ -59,14 +62,14 @@
     }
     .innovation-image {
         width: 100%;
-        height: 120px;
+        height: 180px;
         object-fit: cover;
         border-radius: 8px;
         margin-bottom: 12px;
     }
     .default-image {
         width: 100%;
-        height: 120px;
+        height: 180px;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         border-radius: 8px;
         margin-bottom: 12px;
@@ -108,23 +111,95 @@
         -webkit-box-orient: vertical;
         overflow: hidden;
     }
+    /* FIX: Chart container styles */
+    .chart-container {
+        position: relative;
+        height: 200px;
+        width: 100%;
+    }
+    .chart-container-sm {
+        position: relative;
+        height: 180px;
+        width: 100%;
+    }
+    /* Portrait card styles */
+    .portrait-card {
+        min-width: 200px;
+        max-width: 200px;
+        height: 320px;
+        display: flex;
+        flex-direction: column;
+    }
+    .portrait-image {
+        width: 100%;
+        height: 140px;
+        object-fit: cover;
+        border-radius: 8px 8px 0 0;
+    }
+    .portrait-default-image {
+        width: 100%;
+        height: 140px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 8px 8px 0 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 12px;
+    }
+    .portrait-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 12px;
+    }
+    @media (max-width: 1024px) {
+        .lg-sidebar {
+            width: 100%;
+            margin-top: 2rem;
+        }
+        .chart-container {
+            height: 180px;
+        }
+        .chart-container-sm {
+            height: 160px;
+        }
+        .portrait-card {
+            min-width: 180px;
+            max-width: 180px;
+            height: 300px;
+        }
+    }
+    @media (max-width: 768px) {
+        .chart-container {
+            height: 160px;
+        }
+        .chart-container-sm {
+            height: 140px;
+        }
+        .portrait-card {
+            min-width: 160px;
+            max-width: 160px;
+            height: 280px;
+        }
+    }
 </style>
 <?php $__env->stopPush(); ?>
 
 <?php $__env->startSection('content'); ?>
-<div class="max-w-7xl mx-auto px-6 py-10">
+<div class="w-full px-4 py-8 mx-auto max-w-7xl">
     <div class="flex flex-col lg:flex-row gap-8">
         
         
-        <div class="flex-1">
+        <div class="flex-1 w-full lg:w-3/4">
             
-            <div class="bg-white rounded-2xl shadow-sm p-6 mb-8 gradient-bg text-white">
+            <div class="bg-white rounded-2xl shadow-sm p-6 mb-8 gradient-bg text-white w-full">
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between">
-                    <div>
-                        <h1 class="text-3xl font-bold mb-2">
+                    <div class="w-full">
+                        <h1 class="text-2xl lg:text-3xl font-bold mb-2">
                             Selamat Datang, <?php echo e(Auth::user()->name ?? 'Akademisi'); ?> 👋
                         </h1>
-                        <p class="text-blue-100 opacity-90">
+                        <p class="text-blue-100 opacity-90 text-sm lg:text-base">
                             Berikut ringkasan aktivitas, inovasi, dan kolaborasi akademikmu di Digital Innovation Hub.
                         </p>
                         <div class="mt-3 flex flex-wrap gap-2">
@@ -140,102 +215,110 @@
                             <?php endif; ?>
                         </div>
                     </div>
-                    <div class="mt-4 sm:mt-0">
-                        <div class="text-right">
+                    <div class="mt-4 sm:mt-0 w-full sm:w-auto">
+                        <div class="text-left sm:text-right">
                             <p class="text-blue-100 text-sm">Hari Ini</p>
-                            <p class="text-xl font-semibold"><?php echo e(now()->format('d F Y')); ?></p>
+                            <p class="text-lg lg:text-xl font-semibold"><?php echo e(now()->format('d F Y')); ?></p>
                         </div>
                     </div>
                 </div>
             </div>
 
             
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-                <div class="stat-card rounded-xl p-5">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 w-full">
+                <div class="stat-card rounded-xl p-4 w-full">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-sm text-gray-600">Inovasi Saya</p>
-                            <p class="text-2xl font-bold text-gray-800"><?php echo e($stat['inovasi'] ?? 0); ?></p>
+                            <p class="text-xs lg:text-sm text-gray-600">Inovasi Saya</p>
+                            <p class="text-xl lg:text-2xl font-bold text-gray-800"><?php echo e($stat['inovasi'] ?? 0); ?></p>
                         </div>
-                        <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-lightbulb text-yellow-600 text-xl"></i>
+                        <div class="w-10 h-10 lg:w-12 lg:h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-lightbulb text-yellow-600 text-lg"></i>
                         </div>
                     </div>
                 </div>
-                <div class="stat-card rounded-xl p-5">
+                <div class="stat-card rounded-xl p-4 w-full">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-sm text-gray-600">Ide Kolaborasi</p>
-                            <p class="text-2xl font-bold text-gray-800"><?php echo e($stat['kolaborasi_ide'] ?? 0); ?></p>
+                            <p class="text-xs lg:text-sm text-gray-600">Ide Kolaborasi</p>
+                            <p class="text-xl lg:text-2xl font-bold text-gray-800"><?php echo e($stat['kolaborasi_ide'] ?? 0); ?></p>
                         </div>
-                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-users-gear text-blue-600 text-xl"></i>
+                        <div class="w-10 h-10 lg:w-12 lg:h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-users-gear text-blue-600 text-lg"></i>
                         </div>
                     </div>
                 </div>
-                <div class="stat-card rounded-xl p-5">
+                <div class="stat-card rounded-xl p-4 w-full">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-sm text-gray-600">Kolaborasi Diikuti</p>
-                            <p class="text-2xl font-bold text-gray-800"><?php echo e($stat['kolaborasi_member'] ?? 0); ?></p>
+                            <p class="text-xs lg:text-sm text-gray-600">Kolaborasi Diikuti</p>
+                            <p class="text-xl lg:text-2xl font-bold text-gray-800"><?php echo e($stat['kolaborasi_member'] ?? 0); ?></p>
                         </div>
-                        <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-people-group text-indigo-600 text-xl"></i>
+                        <div class="w-10 h-10 lg:w-12 lg:h-12 bg-indigo-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-people-group text-indigo-600 text-lg"></i>
                         </div>
                     </div>
                 </div>
-                <div class="stat-card rounded-xl p-5">
+                <div class="stat-card rounded-xl p-4 w-full">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-sm text-gray-600">Tugas Kolaborasi</p>
-                            <p class="text-2xl font-bold text-gray-800"><?php echo e($stat['kolaborasi_task'] ?? 0); ?></p>
+                            <p class="text-xs lg:text-sm text-gray-600">Tugas Kolaborasi</p>
+                            <p class="text-xl lg:text-2xl font-bold text-gray-800"><?php echo e($stat['kolaborasi_task'] ?? 0); ?></p>
                         </div>
-                        <div class="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-list-check text-emerald-600 text-xl"></i>
+                        <div class="w-10 h-10 lg:w-12 lg:h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-list-check text-emerald-600 text-lg"></i>
                         </div>
                     </div>
                 </div>
             </div>
 
             
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 w-full">
                 
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                    <h2 class="text-lg font-semibold text-blue-900 mb-3">Tren Inovasi & Kolaborasi 6 Bulan Terakhir</h2>
-                    <canvas id="trendAllChart" height="150"></canvas>
+                <div class="bg-white p-4 lg:p-6 rounded-2xl shadow-sm border border-gray-100 w-full">
+                    <h2 class="text-base lg:text-lg font-semibold text-blue-900 mb-3">Tren Inovasi & Kolaborasi 6 Bulan Terakhir</h2>
+                    <div class="chart-container">
+                        <canvas id="trendAllChart"></canvas>
+                    </div>
                 </div>
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                    <h2 class="text-lg font-semibold text-blue-900 mb-3">Kategori Inovasi</h2>
-                    <canvas id="kategoriAllChart" height="150"></canvas>
-                </div>
-            </div>
-
-            
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                    <h2 class="text-lg font-semibold text-blue-900 mb-3">Tren Inovasi & Kolaborasi Bulanan Saya</h2>
-                    <canvas id="trendMyChart" height="150"></canvas>
-                </div>
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                    <h2 class="text-lg font-semibold text-blue-900 mb-3">Kategori Inovasi Terfavorit Saya</h2>
-                    <canvas id="kategoriMyChart" height="150"></canvas>
+                <div class="bg-white p-4 lg:p-6 rounded-2xl shadow-sm border border-gray-100 w-full">
+                    <h2 class="text-base lg:text-lg font-semibold text-blue-900 mb-3">Kategori Inovasi</h2>
+                    <div class="chart-container">
+                        <canvas id="kategoriAllChart"></canvas>
+                    </div>
                 </div>
             </div>
 
             
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 w-full">
+                <div class="bg-white p-4 lg:p-6 rounded-2xl shadow-sm border border-gray-100 w-full">
+                    <h2 class="text-base lg:text-lg font-semibold text-blue-900 mb-3">Tren Inovasi & Kolaborasi Bulanan Saya</h2>
+                    <div class="chart-container">
+                        <canvas id="trendMyChart"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white p-4 lg:p-6 rounded-2xl shadow-sm border border-gray-100 w-full">
+                    <h2 class="text-base lg:text-lg font-semibold text-blue-900 mb-3">Kategori Inovasi Terfavorit Saya</h2>
+                    <div class="chart-container-sm">
+                        <canvas id="kategoriMyChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 w-full">
                 
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <div class="bg-white p-4 lg:p-6 rounded-2xl shadow-sm border border-gray-100 w-full">
                     <div class="flex justify-between items-center mb-3">
-                        <h2 class="text-lg font-semibold text-blue-900">Program Pemerintah Terbaru</h2>
-                        <a href="<?php echo e(route('pemerintah.program') ?? '#'); ?>" class="text-sm text-blue-600 hover:underline font-medium">Lihat Semua</a>
+                        <h2 class="text-base lg:text-lg font-semibold text-blue-900">Program Pemerintah Terbaru</h2>
+                        <a href="<?php echo e(route('pemerintah.program') ?? '#'); ?>" class="text-xs lg:text-sm text-blue-600 hover:underline font-medium">Lihat Semua</a>
                     </div>
                     <div class="space-y-4">
                         <?php $__empty_1 = true; $__currentLoopData = $programPemerintah ?? []; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $program): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                         <a href="<?php echo e(route('pemerintah.program.store', $program->id) ?? '#'); ?>" target="_blank" class="block progress-link">
-                            <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition">
+                            <div class="border border-gray-200 rounded-lg p-3 lg:p-4 hover:bg-gray-50 transition">
                                 <div class="flex justify-between items-start mb-2">
-                                    <h3 class="font-medium text-gray-800"><?php echo e($program->title ?? 'Program Pemerintah'); ?></h3>
+                                    <h3 class="font-medium text-gray-800 text-sm lg:text-base"><?php echo e($program->title ?? 'Program Pemerintah'); ?></h3>
                                     <span class="text-xs px-2 py-1 rounded-full 
                                         <?php echo e(($program->status ?? '') == 'ongoing' ? 'bg-green-100 text-green-700' : 
                                            (($program->status ?? '') == 'planning' ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100 text-gray-700')); ?>">
@@ -245,8 +328,8 @@
                                         <?php endif; ?>
                                     </span>
                                 </div>
-                                <p class="text-sm text-gray-600 mb-2"><?php echo e($program->opd_name ?? 'OPD'); ?></p>
-                                <div class="flex justify-between text-sm mb-1">
+                                <p class="text-xs lg:text-sm text-gray-600 mb-2"><?php echo e($program->opd_name ?? 'OPD'); ?></p>
+                                <div class="flex justify-between text-xs mb-1">
                                     <span class="text-gray-500">Progress</span>
                                     <span class="text-blue-600"><?php echo e($program->progress ?? 0); ?>%</span>
                                 </div>
@@ -266,8 +349,8 @@
                 </div>
 
                 
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                    <h2 class="text-lg font-semibold text-blue-900 mb-3">Aktivitas Terbaru</h2>
+                <div class="bg-white p-4 lg:p-6 rounded-2xl shadow-sm border border-gray-100 w-full">
+                    <h2 class="text-base lg:text-lg font-semibold text-blue-900 mb-3">Aktivitas Terbaru</h2>
                     <div class="space-y-3">
                         <?php $__empty_1 = true; $__currentLoopData = $aktivitasTerbaru ?? []; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $aktivitas): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                         <a href="<?php echo e($aktivitas['link'] ?? '#'); ?>" class="block activity-link p-2 rounded-lg transition">
@@ -287,11 +370,11 @@
             </div>
 
             
-            <div class="space-y-10">
+            <div class="space-y-8 w-full">
                 
-                <div>
+                <div class="w-full">
                     <div class="flex justify-between items-center mb-3">
-                        <h2 class="text-xl font-semibold text-blue-900">Inovasi Saya</h2>
+                        <h2 class="text-lg lg:text-xl font-semibold text-blue-900">Inovasi Saya</h2>
                         <div class="flex items-center gap-4">
                             <div class="scroll-nav">
                                 <button class="scroll-btn scroll-left" data-target="inovasi-scroll">
@@ -301,49 +384,53 @@
                                     <i class="fas fa-chevron-right text-xs"></i>
                                 </button>
                             </div>
-                            <a href="<?php echo e(route('akademisi.inovasi.index') ?? '#'); ?>" class="text-sm text-blue-600 hover:underline font-medium">Lihat Semua</a>
+                            <a href="<?php echo e(route('akademisi.inovasi.index') ?? '#'); ?>" class="text-xs lg:text-sm text-blue-600 hover:underline font-medium">Lihat Semua</a>
                         </div>
                     </div>
                     <div class="scrolling-wrapper pb-2" id="inovasi-scroll">
                         <?php $__empty_1 = true; $__currentLoopData = $inovasiSaya ?? []; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                             <a href="<?php echo e(route('akademisi.inovasi.show', $item->id) ?? '#'); ?>" class="card-link">
-                                <div class="min-w-[280px] bg-white rounded-xl shadow-sm p-4 card-shadow border border-gray-100">
+                                <div class="portrait-card bg-white rounded-xl shadow-sm card-shadow border border-gray-100 overflow-hidden">
                                     
                                     <?php if($item->image_path): ?>
-                                        <img src="<?php echo e(asset('storage/' . $item->image_path)); ?>" alt="<?php echo e($item->title); ?>" class="innovation-image">
+                                        <img src="<?php echo e(asset('storage/' . $item->image_path)); ?>" alt="<?php echo e($item->title); ?>" class="portrait-image">
                                     <?php else: ?>
-                                        <div class="default-image">
+                                        <div class="portrait-default-image">
                                             <span>No Image</span>
                                         </div>
                                     <?php endif; ?>
                                     
-                                    <div class="flex items-center justify-between mb-2">
-                                        <span class="text-xs font-medium px-2 py-1 bg-blue-100 text-blue-700 rounded-full"><?php echo e($item->category ?? 'Umum'); ?></span>
-                                        <span class="text-xs text-gray-500"><?php echo e($item->created_at->format('d M Y')); ?></span>
-                                    </div>
-                                    <h3 class="font-semibold text-gray-800 mb-2 line-clamp-2"><?php echo e($item->title); ?></h3>
-                                    <p class="text-sm text-gray-500 mb-3"><?php echo e($item->author_name ?? Auth::user()->name); ?></p>
-                                    <div class="mt-2">
-                                        <p class="text-xs text-gray-600 mb-1">TKT: <?php echo e($item->technology_readiness_level ?? 1); ?></p>
-                                        <div class="w-full bg-gray-200 rounded-full h-2">
-                                            <div class="bg-blue-600 h-2 rounded-full" style="width: <?php echo e((($item->technology_readiness_level ?? 1) / 9) * 100); ?>%"></div>
+                                    <div class="portrait-content">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <span class="text-xs font-medium px-2 py-1 bg-blue-100 text-blue-700 rounded-full"><?php echo e($item->category ?? 'Umum'); ?></span>
+                                            <span class="text-xs text-gray-500"><?php echo e($item->created_at->format('d M Y')); ?></span>
+                                        </div>
+                                        <h3 class="font-semibold text-gray-800 mb-2 line-clamp-2 text-sm"><?php echo e($item->title); ?></h3>
+                                        <p class="text-xs text-gray-500 mb-2 line-clamp-2"><?php echo e($item->author_name ?? Auth::user()->name); ?></p>
+                                        <div class="mt-auto">
+                                            <p class="text-xs text-gray-600 mb-1">TKT: <?php echo e($item->technology_readiness_level ?? 1); ?></p>
+                                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                                <div class="bg-blue-600 h-2 rounded-full" style="width: <?php echo e((($item->technology_readiness_level ?? 1) / 9) * 100); ?>%"></div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </a>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                            <div class="min-w-[280px] bg-gray-50 rounded-xl p-6 text-center border border-gray-200">
-                                <p class="text-gray-500 text-sm">Belum ada inovasi yang diposting.</p>
-                                <a href="<?php echo e(route('akademisi.inovasi.create') ?? '#'); ?>" class="text-blue-600 text-sm font-medium mt-2 inline-block">Buat Inovasi Pertamamu</a>
+                            <div class="portrait-card bg-gray-50 rounded-xl p-6 text-center border border-gray-200 flex items-center justify-center">
+                                <div>
+                                    <p class="text-gray-500 text-sm">Belum ada inovasi yang diposting.</p>
+                                    <a href="<?php echo e(route('akademisi.inovasi.create') ?? '#'); ?>" class="text-blue-600 text-sm font-medium mt-2 inline-block">Buat Inovasi Pertamamu</a>
+                                </div>
                             </div>
                         <?php endif; ?>
                     </div>
                 </div>
 
                 
-                <div>
+                <div class="w-full">
                     <div class="flex justify-between items-center mb-3">
-                        <h2 class="text-xl font-semibold text-blue-900">Diskusi Terpopuler</h2>
+                        <h2 class="text-lg lg:text-xl font-semibold text-blue-900">Diskusi Terpopuler</h2>
                         <div class="flex items-center gap-4">
                             <div class="scroll-nav">
                                 <button class="scroll-btn scroll-left" data-target="diskusi-scroll">
@@ -353,38 +440,46 @@
                                     <i class="fas fa-chevron-right text-xs"></i>
                                 </button>
                             </div>
-                            <a href="<?php echo e(route('forum-diskusi.index') ?? '#'); ?>" class="text-sm text-blue-600 hover:underline font-medium">Lihat Semua</a>
+                            <a href="<?php echo e(route('forum-diskusi.index') ?? '#'); ?>" class="text-xs lg:text-sm text-blue-600 hover:underline font-medium">Lihat Semua</a>
                         </div>
                     </div>
                     <div class="scrolling-wrapper pb-2" id="diskusi-scroll">
                         <?php $__empty_1 = true; $__currentLoopData = $diskusiTerpopuler ?? []; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $diskusi): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                             <a href="<?php echo e(route('forum-diskusi.detail', ['type' => $diskusi->type ?? 'academic', 'id' => $diskusi->id]) ?? '#'); ?>" class="card-link">
-                                <div class="min-w-[280px] bg-white rounded-xl shadow-sm p-4 card-shadow border border-gray-100">
+                                <div class="portrait-card bg-white rounded-xl shadow-sm card-shadow border border-gray-100 overflow-hidden">
                                     
                                     <?php if($diskusi->image_path): ?>
-                                        <img src="<?php echo e(asset('storage/' . $diskusi->image_path)); ?>" alt="<?php echo e($diskusi->title); ?>" class="innovation-image">
+                                        <img src="<?php echo e(asset('storage/' . $diskusi->image_path)); ?>" alt="<?php echo e($diskusi->title); ?>" class="portrait-image">
                                     <?php else: ?>
-                                        <div class="default-image">
+                                        <div class="portrait-default-image">
                                             <span>No Image</span>
                                         </div>
                                     <?php endif; ?>
                                     
-                                    <div class="flex items-center justify-between mb-2">
-                                        <span class="text-xs font-medium px-2 py-1 bg-purple-100 text-purple-700 rounded-full"><?php echo e(ucfirst($diskusi->type ?? 'academic')); ?></span>
-                                        <span class="text-xs text-gray-500"><?php echo e($diskusi->formatted_created_at ?? $diskusi->created_at->format('d M Y')); ?></span>
-                                    </div>
-                                    <h3 class="font-semibold text-gray-800 mb-2 line-clamp-2"><?php echo e($diskusi->title); ?></h3>
-                                    <p class="text-sm text-gray-500 mb-1"><?php echo e($diskusi->author_name ?? 'Anonymous'); ?></p>
-                                    <div class="flex items-center justify-between mt-3">
-                                        <span class="text-xs text-gray-600">
-                                            <i class="fas fa-comment mr-1"></i>
-                                            <?php echo e($diskusi->jumlah_komentar ?? 0); ?> Komentar
-                                        </span>
+                                    <div class="portrait-content">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <span class="text-xs font-medium px-2 py-1 bg-purple-100 text-purple-700 rounded-full"><?php echo e(ucfirst($diskusi->type ?? 'academic')); ?></span>
+                                            <span class="text-xs text-gray-500"><?php echo e($diskusi->formatted_created_at ?? $diskusi->created_at->format('d M Y')); ?></span>
+                                        </div>
+                                        <h3 class="font-semibold text-gray-800 mb-2 line-clamp-2 text-sm"><?php echo e($diskusi->title); ?></h3>
+                                        <p class="text-xs text-gray-500 mb-2 line-clamp-2"><?php echo e($diskusi->author_name ?? 'Anonymous'); ?></p>
+                                        <div class="mt-auto flex items-center justify-between">
+                                            <span class="text-xs text-gray-600">
+                                                <i class="fas fa-comment mr-1"></i>
+                                                <?php echo e($diskusi->jumlah_komentar ?? 0); ?>
+
+                                            </span>
+                                            <span class="text-xs text-gray-600">
+                                                <i class="fas fa-eye mr-1"></i>
+                                                <?php echo e($diskusi->views ?? 0); ?>
+
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                             </a>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                            <div class="min-w-[280px] bg-gray-50 rounded-xl p-6 text-center border border-gray-200">
+                            <div class="portrait-card bg-gray-50 rounded-xl p-6 text-center border border-gray-200 flex items-center justify-center">
                                 <p class="text-gray-500 text-sm">Belum ada diskusi populer.</p>
                             </div>
                         <?php endif; ?>
@@ -392,9 +487,9 @@
                 </div>
 
                 
-                <div>
+                <div class="w-full">
                     <div class="flex justify-between items-center mb-3">
-                        <h2 class="text-xl font-semibold text-blue-900">Kolaborasi Berjalan</h2>
+                        <h2 class="text-lg lg:text-xl font-semibold text-blue-900">Kolaborasi Berjalan</h2>
                         <div class="flex items-center gap-4">
                             <div class="scroll-nav">
                                 <button class="scroll-btn scroll-left" data-target="kolaborasi-scroll">
@@ -404,48 +499,54 @@
                                     <i class="fas fa-chevron-right text-xs"></i>
                                 </button>
                             </div>
-                            <a href="<?php echo e(route('kolaborasi.index') ?? '#'); ?>" class="text-sm text-blue-600 hover:underline font-medium">Lihat Semua</a>
+                            <a href="<?php echo e(route('kolaborasi.index') ?? '#'); ?>" class="text-xs lg:text-sm text-blue-600 hover:underline font-medium">Lihat Semua</a>
                         </div>
                     </div>
                     <div class="scrolling-wrapper pb-2" id="kolaborasi-scroll">
                         <?php $__empty_1 = true; $__currentLoopData = $kolaborasiBerjalan ?? []; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $kolab): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                            <?php if($kolab->is_active == 1): ?>
                             <a href="<?php echo e(route('kolaborasi.ide.show', $kolab->id) ?? '#'); ?>" class="card-link">
-                                <div class="min-w-[280px] bg-white rounded-xl shadow-sm p-4 card-shadow border border-gray-100">
+                                <div class="portrait-card bg-white rounded-xl shadow-sm card-shadow border border-gray-100 overflow-hidden">
                                     
                                     <?php if($kolab->image_path): ?>
-                                        <img src="<?php echo e(asset('storage/' . $kolab->image_path)); ?>" alt="<?php echo e($kolab->judul); ?>" class="innovation-image">
+                                        <img src="<?php echo e(asset('storage/' . $kolab->image_path)); ?>" alt="<?php echo e($kolab->judul); ?>" class="portrait-image">
                                     <?php else: ?>
-                                        <div class="default-image">
+                                        <div class="portrait-default-image">
                                             <span>No Image</span>
                                         </div>
                                     <?php endif; ?>
                                     
-                                    <div class="flex items-center justify-between mb-2">
-                                        <span class="text-xs font-medium px-2 py-1 
-                                            <?php echo e($kolab->status == 'active' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'); ?> rounded-full">
-                                            <?php echo e(ucfirst($kolab->status)); ?>
+                                    <div class="portrait-content">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <span class="text-xs font-medium px-2 py-1 bg-green-100 text-green-700 rounded-full">
+                                                Aktif
+                                            </span>
+                                            <span class="text-xs text-gray-500"><?php echo e($kolab->formatted_created_at ?? $kolab->created_at->format('d M Y')); ?></span>
+                                        </div>
+                                        <h3 class="font-semibold text-gray-800 mb-2 line-clamp-2 text-sm"><?php echo e($kolab->judul); ?></h3>
+                                        <p class="text-xs text-gray-500 mb-2 line-clamp-2"><?php echo e($kolab->deskripsi_singkat ?? $kolab->deskripsi); ?></p>
+                                        <div class="mt-auto flex items-center justify-between">
+                                            <span class="text-xs text-gray-600">
+                                                <i class="fas fa-users mr-1"></i>
+                                                <?php echo e($kolab->members_count ?? 0); ?>
 
-                                        </span>
-                                        <span class="text-xs text-gray-500"><?php echo e($kolab->formatted_created_at ?? $kolab->created_at->format('d M Y')); ?></span>
-                                    </div>
-                                    <h3 class="font-semibold text-gray-800 mb-2 line-clamp-2"><?php echo e($kolab->judul); ?></h3>
-                                    <p class="text-sm text-gray-500 mb-3 line-clamp-2"><?php echo e($kolab->deskripsi_singkat ?? $kolab->deskripsi); ?></p>
-                                    <div class="flex items-center justify-between">
-                                        <span class="text-xs text-gray-600">
-                                            <i class="fas fa-users mr-1"></i>
-                                            <?php echo e($kolab->members_count ?? 0); ?> Anggota
-                                        </span>
-                                        <span class="text-xs text-gray-600">
-                                            <i class="fas fa-tasks mr-1"></i>
-                                            <?php echo e($kolab->tasks_count ?? 0); ?> Tugas
-                                        </span>
+                                            </span>
+                                            <span class="text-xs text-gray-600">
+                                                <i class="fas fa-tasks mr-1"></i>
+                                                <?php echo e($kolab->tasks_count ?? 0); ?>
+
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                             </a>
+                            <?php endif; ?>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                            <div class="min-w-[280px] bg-gray-50 rounded-xl p-6 text-center border border-gray-200">
-                                <p class="text-gray-500 text-sm">Belum ada kolaborasi berjalan.</p>
-                                <a href="<?php echo e(route('kolaborasi.ide.create') ?? '#'); ?>" class="text-blue-600 text-sm font-medium mt-2 inline-block">Buat Kolaborasi</a>
+                            <div class="portrait-card bg-gray-50 rounded-xl p-6 text-center border border-gray-200 flex items-center justify-center">
+                                <div>
+                                    <p class="text-gray-500 text-sm">Belum ada kolaborasi berjalan.</p>
+                                    <a href="<?php echo e(route('kolaborasi.ide.create') ?? '#'); ?>" class="text-blue-600 text-sm font-medium mt-2 inline-block">Buat Kolaborasi</a>
+                                </div>
                             </div>
                         <?php endif; ?>
                     </div>
@@ -454,60 +555,60 @@
         </div>
 
         
-        <div class="lg:w-80">
+        <div class="lg:w-1/4 lg-sidebar">
             <div class="sidebar-sticky">
                 
-                <div class="bg-white rounded-2xl shadow-sm p-6 mb-6 border border-gray-100">
-                    <h2 class="text-xl font-semibold text-blue-900 mb-5">Akses Cepat</h2>
+                <div class="bg-white rounded-2xl shadow-sm p-4 lg:p-6 mb-6 border border-gray-100 w-full">
+                    <h2 class="text-lg lg:text-xl font-semibold text-blue-900 mb-5">Akses Cepat</h2>
                     <div class="space-y-4">
                         <a href="<?php echo e(route('akademisi.inovasi.create') ?? '#'); ?>" 
-                           class="quick-action-card block p-4 rounded-lg border-l-4 border-blue-500">
+                           class="quick-action-card block p-3 lg:p-4 rounded-lg border-l-4 border-blue-500">
                             <div class="flex items-center">
-                                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-                                    <i class="fas fa-plus text-blue-600"></i>
+                                <div class="w-8 h-8 lg:w-10 lg:h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fas fa-plus text-blue-600 text-sm lg:text-base"></i>
                                 </div>
                                 <div>
-                                    <h3 class="font-semibold text-gray-800">Tambah Inovasi</h3>
-                                    <p class="text-sm text-gray-500">Buat inovasi baru</p>
+                                    <h3 class="font-semibold text-gray-800 text-sm lg:text-base">Tambah Inovasi</h3>
+                                    <p class="text-xs lg:text-sm text-gray-500">Buat inovasi baru</p>
                                 </div>
                             </div>
                         </a>
 
                         <a href="<?php echo e(route('forum-diskusi.index') ?? '#'); ?>" 
-                           class="quick-action-card block p-4 rounded-lg border-l-4 border-indigo-500">
+                           class="quick-action-card block p-3 lg:p-4 rounded-lg border-l-4 border-indigo-500">
                             <div class="flex items-center">
-                                <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center mr-3">
-                                    <i class="fas fa-comments text-indigo-600"></i>
+                                <div class="w-8 h-8 lg:w-10 lg:h-10 bg-indigo-100 rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fas fa-comments text-indigo-600 text-sm lg:text-base"></i>
                                 </div>
                                 <div>
-                                    <h3 class="font-semibold text-gray-800">Bergabung Diskusi</h3>
-                                    <p class="text-sm text-gray-500">Diskusi terbaru</p>
+                                    <h3 class="font-semibold text-gray-800 text-sm lg:text-base">Bergabung Diskusi</h3>
+                                    <p class="text-xs lg:text-sm text-gray-500">Diskusi terbaru</p>
                                 </div>
                             </div>
                         </a>
 
                         <a href="<?php echo e(route('kolaborasi.ide.create') ?? '#'); ?>" 
-                           class="quick-action-card block p-4 rounded-lg border-l-4 border-emerald-500">
+                           class="quick-action-card block p-3 lg:p-4 rounded-lg border-l-4 border-emerald-500">
                             <div class="flex items-center">
-                                <div class="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center mr-3">
-                                    <i class="fas fa-users text-emerald-600"></i>
+                                <div class="w-8 h-8 lg:w-10 lg:h-10 bg-emerald-100 rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fas fa-users text-emerald-600 text-sm lg:text-base"></i>
                                 </div>
                                 <div>
-                                    <h3 class="font-semibold text-gray-800">Buat Kolaborasi</h3>
-                                    <p class="text-sm text-gray-500">Kolaborasi baru</p>
+                                    <h3 class="font-semibold text-gray-800 text-sm lg:text-base">Buat Kolaborasi</h3>
+                                    <p class="text-xs lg:text-sm text-gray-500">Kolaborasi baru</p>
                                 </div>
                             </div>
                         </a>
 
                         <a href="<?php echo e(route('akademisi.profil-akademik') ?? '#'); ?>" 
-                           class="quick-action-card block p-4 rounded-lg border-l-4 border-purple-500">
+                           class="quick-action-card block p-3 lg:p-4 rounded-lg border-l-4 border-purple-500">
                             <div class="flex items-center">
-                                <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
-                                    <i class="fas fa-user text-purple-600"></i>
+                                <div class="w-8 h-8 lg:w-10 lg:h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fas fa-user text-purple-600 text-sm lg:text-base"></i>
                                 </div>
                                 <div>
-                                    <h3 class="font-semibold text-gray-800">Profil Saya</h3>
-                                    <p class="text-sm text-gray-500">Kelola profil</p>
+                                    <h3 class="font-semibold text-gray-800 text-sm lg:text-base">Profil Saya</h3>
+                                    <p class="text-xs lg:text-sm text-gray-500">Kelola profil</p>
                                 </div>
                             </div>
                         </a>
@@ -515,19 +616,19 @@
                 </div>
 
                 
-                <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
-                    <h2 class="text-xl font-semibold text-blue-900 mb-4">Pencapaian</h2>
+                <div class="bg-white rounded-2xl shadow-sm p-4 lg:p-6 border border-gray-100 w-full">
+                    <h2 class="text-lg lg:text-xl font-semibold text-blue-900 mb-4">Pencapaian</h2>
                     <div class="space-y-4">
                         <div class="flex items-center justify-between">
-                            <span class="text-sm text-gray-600">Inovasi Dibuat</span>
+                            <span class="text-xs lg:text-sm text-gray-600">Inovasi Dibuat</span>
                             <span class="font-semibold text-blue-600"><?php echo e($stat['inovasi'] ?? 0); ?></span>
                         </div>
                         <div class="flex items-center justify-between">
-                            <span class="text-sm text-gray-600">Kolaborasi Aktif</span>
+                            <span class="text-xs lg:text-sm text-gray-600">Kolaborasi Aktif</span>
                             <span class="font-semibold text-green-600"><?php echo e($stat['kolaborasi_aktif'] ?? 0); ?></span>
                         </div>
                         <div class="flex items-center justify-between">
-                            <span class="text-sm text-gray-600">Diskusi Diikuti</span>
+                            <span class="text-xs lg:text-sm text-gray-600">Diskusi Diikuti</span>
                             <span class="font-semibold text-purple-600"><?php echo e($stat['diskusi_diikuti'] ?? 0); ?></span>
                         </div>
                     </div>
@@ -580,6 +681,7 @@
                 },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false,
                     plugins: { 
                         legend: { 
                             display: true,
@@ -625,6 +727,7 @@
                 },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false,
                     plugins: { 
                         legend: { 
                             display: false 
@@ -670,6 +773,7 @@
                 },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false,
                     plugins: { legend: { display: true } },
                     scales: { y: { beginAtZero: true } }
                 }
@@ -688,6 +792,8 @@
                     }]
                 },
                 options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
                     plugins: { legend: { position: 'bottom' } }
                 }
             });

@@ -75,9 +75,10 @@
                                     <label class="block font-medium mb-1">Kategori *</label>
                                     <select name="category" id="category" required class="w-full border rounded-lg px-4 py-2 bg-white focus:ring-2 focus:ring-blue-400 focus:border-blue-500 transition">
                                         <option value="">Pilih Kategori</option>
-                                        <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $cat): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                            <option value="<?php echo e($cat); ?>"><?php echo e($cat); ?></option>
-                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                        <option value="Teknologi">Teknologi</option>
+                                        <option value="Sosial">Sosial</option>
+                                        <option value="Pendidikan">Pendidikan</option>
+                                        <option value="Humaniora">Humaniora</option>
                                     </select>
                                 </div>
 
@@ -232,6 +233,36 @@
 let currentStep = 1;
 const totalSteps = 4;
 
+// Data subkategori manual
+const subcategories = {
+    'Teknologi': [
+        'Artificial Intelligence',
+        'Internet of Things',
+        'Sistem Informasi Akademik',
+        'Robotics',
+        'Biotechnology',
+    ],
+    'Sosial': [
+        'Kewirausahaan Sosial',
+        'Pemberdayaan Masyarakat',
+        'Inklusi Sosial',
+        'Pengentasan Kemiskinan',
+    ],
+    'Pendidikan': [
+        'EdTech',
+        'Metode Pembelajaran',
+        'Kurikulum',
+        'Assesmen Pendidikan',
+    ],
+    'Humaniora': [
+        'Psikologi',
+        'Seni & Budaya',
+        'Filsafat',
+        'Sejarah',
+        'Antropologi',
+    ]
+};
+
 function goToStep(step) {
     document.querySelector(`.step-section[data-step="${currentStep}"]`).classList.add('hidden');
     document.querySelector(`.step-section[data-step="${step}"]`).classList.remove('hidden');
@@ -279,41 +310,38 @@ function populateReview() {
     document.getElementById('reviewContact').textContent = document.querySelector('[name="contact"]').value;
 }
 
+// Event listener untuk kategori
+document.getElementById('category').addEventListener('change', function(){
+    const subcategorySelect = document.getElementById('subcategory');
+    const selectedCategory = this.value;
+    
+    // Reset subkategori
+    subcategorySelect.innerHTML = '<option value="">Pilih Subkategori</option>';
+    subcategorySelect.disabled = true;
+    
+    if (selectedCategory && subcategories[selectedCategory]) {
+        // Isi subkategori berdasarkan kategori yang dipilih
+        subcategories[selectedCategory].forEach(sub => {
+            const option = document.createElement('option');
+            option.value = sub;
+            option.textContent = sub;
+            subcategorySelect.appendChild(option);
+        });
+        subcategorySelect.disabled = false;
+    } else {
+        subcategorySelect.innerHTML = '<option value="">Pilih kategori terlebih dahulu</option>';
+        subcategorySelect.disabled = true;
+    }
+});
+
+// Event listener untuk TRL slider
 document.getElementById('technology_readiness_level').addEventListener('input', function(){
     document.getElementById('trlValue').textContent = this.value;
 });
 
-document.getElementById('category').addEventListener('change', function(){
-    const sub = document.getElementById('subcategory');
-    sub.disabled = true;
-    sub.innerHTML = '<option>Memuat...</option>';
-
-    fetch(`<?php echo e(route('akademisi.inovasi.subcategories')); ?>?category=${encodeURIComponent(this.value)}`)
-        .then(res => res.json())
-        .then(data=>{
-            sub.innerHTML = '<option value="">Pilih Subkategori</option>';
-            if(Array.isArray(data) && data.length > 0){
-                data.forEach(s=>{
-                    const opt = document.createElement('option');
-                    opt.value = s;
-                    opt.textContent = s;
-                    sub.appendChild(opt);
-                });
-            } else {
-                sub.innerHTML = '<option value="">Tidak ada subkategori</option>';
-            }
-            sub.disabled = false;
-        })
-        .catch(err=>{
-            console.error(err);
-            sub.innerHTML = '<option value="">Gagal memuat</option>';
-            sub.disabled = true;
-        });
-});
-
+// Inisialisasi
 updateProgress();
 highlightStep();
 </script>
 <?php $__env->stopPush(); ?>
-
 <?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH D:\laragon\www\dih_website\resources\views/akademisi/inovasi.blade.php ENDPATH**/ ?>

@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\AcademicInnovation;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class EloquentAcademicInnovationRepository implements AcademicInnovationRepositoryInterface
 {
@@ -55,6 +56,57 @@ class EloquentAcademicInnovationRepository implements AcademicInnovationReposito
         return AcademicInnovation::findOrFail($id);
     }
 
+    public function update($id, array $data)
+    {
+        $innovation = AcademicInnovation::findOrFail($id);
+
+        // Handle file uploads
+        if (isset($data['image_path']) && $data['image_path'] instanceof \Illuminate\Http\UploadedFile) {
+            // Delete old image if exists
+            if ($innovation->image_path) {
+                Storage::delete('public/' . $innovation->image_path);
+            }
+            $data['image_path'] = $data['image_path']->store('innovations/images', 'public');
+        } else {
+            unset($data['image_path']);
+        }
+
+        if (isset($data['document_path']) && $data['document_path'] instanceof \Illuminate\Http\UploadedFile) {
+            // Delete old document if exists
+            if ($innovation->document_path) {
+                Storage::delete('public/' . $innovation->document_path);
+            }
+            $data['document_path'] = $data['document_path']->store('innovations/documents', 'public');
+        } else {
+            unset($data['document_path']);
+        }
+
+        // Update the innovation
+        $innovation->update($data);
+
+        return $innovation;
+    }
+
+    public function delete($id)
+    {
+        $innovation = AcademicInnovation::findOrFail($id);
+        
+        // Delete associated files
+        if ($innovation->image_path) {
+            Storage::delete('public/' . $innovation->image_path);
+        }
+        if ($innovation->document_path) {
+            Storage::delete('public/' . $innovation->document_path);
+        }
+        
+        return $innovation->delete();
+    }
+
+    public function find($id)
+    {
+        return $this->findById($id);
+    }
+
     public function modelClass(): string
     {
         return AcademicInnovation::class;
@@ -63,5 +115,49 @@ class EloquentAcademicInnovationRepository implements AcademicInnovationReposito
     public function validStatuses(): array
     {
         return AcademicInnovation::statuses();
+    }
+
+    public function getAllCategories()
+    {
+        return [
+            'Teknologi',
+            'Sosial', 
+            'Pendidikan',
+            'Humaniora'
+        ];
+    }
+
+    public function getSubcategoriesByCategory(string $category)
+    {
+        $subcategories = [
+            'Teknologi' => [
+                'Artificial Intelligence',
+                'Internet of Things',
+                'Sistem Informasi Akademik',
+                'Robotics',
+                'Biotechnology',
+            ],
+            'Sosial' => [
+                'Kewirausahaan Sosial',
+                'Pemberdayaan Masyarakat',
+                'Inklusi Sosial',
+                'Pengentasan Kemiskinan',
+            ],
+            'Pendidikan' => [
+                'EdTech',
+                'Metode Pembelajaran',
+                'Kurikulum',
+                'Assesmen Pendidikan',
+            ],
+            'Humaniora' => [
+                'Psikologi',
+                'Seni & Budaya',
+                'Filsafat',
+                'Sejarah',
+                'Antropologi',
+            ]
+        ];
+
+        return $subcategories[$category] ?? [];
     }
 }

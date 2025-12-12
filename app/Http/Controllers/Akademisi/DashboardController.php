@@ -11,6 +11,7 @@ use App\Models\KolaborasiMember;
 use App\Models\KolaborasiTask;
 use App\Models\DiscussionComment;
 use App\Models\OpdProgram;
+use App\Models\OpdInnovation;
 use Carbon\Carbon;
 
 class DashboardController extends Controller
@@ -30,9 +31,12 @@ class DashboardController extends Controller
             'kolaborasi_task'   => KolaborasiTask::whereHas('kolaborasi.members', function ($q) use ($userId) {
                 $q->where('user_id', $userId);
             })->count(),
-            'kolaborasi_aktif'  => KolaborasiMember::where('user_id', $userId)
-                ->whereHas('kolaborasi', function ($q) {
-                    $q->where('status', 'active');
+            'kolaborasi_aktif'  => KolaborasiIde::where('is_active', 1)
+                ->where(function($query) use ($userId) {
+                    $query->where('user_id', $userId)
+                          ->orWhereHas('members', function($q) use ($userId) {
+                              $q->where('user_id', $userId);
+                          });
                 })->count(),
             'diskusi_diikuti'   => DiscussionComment::where('user_id', $userId)
                 ->distinct('innovation_id')
@@ -43,32 +47,33 @@ class DashboardController extends Controller
         // SEMUA DATA MENGGUNAKAN ELOQUENT MODELS
         // ===========================
 
-        // PROGRAM PEMERINTAH TERBARU
+        // PROGRAM PEMERINTAH TERBARU - TIDAK PERLU LINK
         $programPemerintah = OpdProgram::where(function($query) {
                 $query->where('status', 'ongoing')
                       ->orWhere('status', 'planning');
             })
             ->select('id', 'title', 'description', 'opd_name', 'category', 'status', 'start_date', 'end_date', 'budget', 'progress', 'image', 'created_at')
             ->orderBy('created_at', 'desc')
-            ->take(5)
+            ->take(3)
             ->get();
 
         // INOVASI SAYA
         $inovasiSaya = AcademicInnovation::where('user_id', $userId)
             ->select('id', 'title', 'author_name', 'category', 'technology_readiness_level', 'created_at', 'image_path')
             ->orderBy('created_at', 'desc')
-            ->take(5)
+            ->take(6)
             ->get();
 
-        // DISKUSI TERPOPULER
-        $diskusiTerpopuler = AcademicInnovation::select(
+        // DISKUSI TERPOPULER - GABUNGAN DARI academic_innovations DAN opd_innovations
+        $diskusiAcademic = AcademicInnovation::select(
                 'academic_innovations.id',
                 'academic_innovations.title',
                 'academic_innovations.author_name',
                 'academic_innovations.category',
                 'academic_innovations.created_at',
                 'academic_innovations.image_path',
-                DB::raw('COUNT(discussion_comments.id) as jumlah_komentar')
+                DB::raw('COUNT(discussion_comments.id) as jumlah_komentar'),
+                DB::raw("'academic' as type")
             )
             ->leftJoin('discussion_comments', 'academic_innovations.id', '=', 'discussion_comments.innovation_id')
             ->groupBy(
@@ -78,29 +83,46 @@ class DashboardController extends Controller
                 'academic_innovations.category',
                 'academic_innovations.created_at',
                 'academic_innovations.image_path'
+            );
+
+        $diskusiOpd = OpdInnovation::select(
+                'opd_innovations.id',
+                'opd_innovations.title',
+                'opd_innovations.author_name',
+                'opd_innovations.category',
+                'opd_innovations.created_at',
+                'opd_innovations.image as image_path', // Gunakan 'image' sebagai 'image_path'
+                DB::raw('COUNT(discussion_comments.id) as jumlah_komentar'),
+                DB::raw("'opd' as type")
             )
+            ->leftJoin('discussion_comments', 'opd_innovations.id', '=', 'discussion_comments.innovation_id')
+            ->groupBy(
+                'opd_innovations.id',
+                'opd_innovations.title',
+                'opd_innovations.author_name',
+                'opd_innovations.category',
+                'opd_innovations.created_at',
+                'opd_innovations.image'
+            );
+
+        // Gabungkan kedua query dan ambil 6 terpopuler
+        $diskusiTerpopuler = $diskusiAcademic->union($diskusiOpd)
             ->orderByDesc('jumlah_komentar')
-            ->limit(5)
+            ->limit(6)
             ->get();
 
         // Tambahkan custom attributes untuk diskusi
         $diskusiTerpopuler->each(function ($item) {
-            $item->type = 'academic';
             $item->formatted_created_at = $this->formatDate($item->created_at, 'd M Y');
+            $item->views = 0; // Default value karena kolom tidak ada
         });
 
-        // KOLABORASI BERJALAN
-        $kolaborasiBerjalan = KolaborasiIde::where(function($query) use ($userId) {
-                $query->where('user_id', $userId)
-                      ->orWhereHas('members', function($q) use ($userId) {
-                          $q->where('user_id', $userId);
-                      });
-            })
-            ->where('status', 'active')
-            ->select('id', 'judul', 'deskripsi', 'status', 'deadline', 'image_path', 'created_at')
+        // KOLABORASI BERJALAN - SEMUA KOLABORASI AKTIF TANPA FILTER USER
+        $kolaborasiBerjalan = KolaborasiIde::where('is_active', 1)
+            ->select('id', 'judul', 'deskripsi', 'status', 'deadline', 'image_path', 'created_at', 'is_active', 'user_id')
             ->withCount(['members', 'tasks'])
             ->orderBy('created_at', 'desc')
-            ->take(5)
+            ->take(6)
             ->get();
 
         // Tambahkan custom attributes untuk kolaborasi
@@ -121,7 +143,7 @@ class DashboardController extends Controller
         $inovasiTerbaru = AcademicInnovation::where('user_id', $userId)
             ->select('id', 'title', 'created_at')
             ->orderBy('created_at', 'desc')
-            ->take(3)
+            ->take(2)
             ->get();
 
         foreach ($inovasiTerbaru as $inovasi) {
@@ -135,10 +157,12 @@ class DashboardController extends Controller
 
         // Aktivitas dari komentar terbaru
         $komentarTerbaru = DiscussionComment::where('user_id', $userId)
-            ->with('innovation:id,title')
+            ->with(['innovation' => function($query) {
+                $query->select('id', 'title');
+            }])
             ->select('id', 'innovation_id', 'content', 'created_at')
             ->orderBy('created_at', 'desc')
-            ->take(3)
+            ->take(2)
             ->get();
 
         foreach ($komentarTerbaru as $komentar) {
@@ -156,7 +180,7 @@ class DashboardController extends Controller
             ->with('kolaborasi:id,judul')
             ->select('id', 'kolaborasi_id', 'created_at')
             ->orderBy('created_at', 'desc')
-            ->take(3)
+            ->take(2)
             ->get();
 
         foreach ($kolaborasiTerbaru as $member) {
@@ -166,6 +190,22 @@ class DashboardController extends Controller
                 'waktu' => \Carbon\Carbon::parse($member->created_at)->diffForHumans(),
                 'timestamp' => \Carbon\Carbon::parse($member->created_at)->timestamp,
                 'link' => route('kolaborasi.ide.show', $member->kolaborasi_id),
+            ];
+        }
+
+        // Aktivitas dari pembuatan kolaborasi
+        $kolaborasiDibuat = KolaborasiIde::where('user_id', $userId)
+            ->select('id', 'judul', 'created_at')
+            ->orderBy('created_at', 'desc')
+            ->take(2)
+            ->get();
+
+        foreach ($kolaborasiDibuat as $kolab) {
+            $aktivitasTerbaru[] = [
+                'deskripsi' => "Membuat kolaborasi: {$kolab->judul}",
+                'waktu' => \Carbon\Carbon::parse($kolab->created_at)->diffForHumans(),
+                'timestamp' => \Carbon\Carbon::parse($kolab->created_at)->timestamp,
+                'link' => route('kolaborasi.ide.show', $kolab->id),
             ];
         }
 

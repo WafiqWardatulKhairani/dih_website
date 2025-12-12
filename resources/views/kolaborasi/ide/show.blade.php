@@ -113,10 +113,11 @@
                 </a>
             </div>
 
+            {{-- SweetAlert Alert Section --}}
+            <div id="alert-container"></div>
+
             {{-- Judul --}}
             <h1 class="text-3xl font-bold mb-4 text-gray-900">{{ $kolaborasi->judul }}</h1>
-
-            @include('components.alert-kolaborasi')
 
             {{-- STATUS + KATEGORI --}}
             <div class="flex flex-wrap items-center justify-between mb-6">
@@ -127,13 +128,6 @@
                         <span class="px-3 py-1 rounded-full bg-yellow-100 text-yellow-700">Belum Aktif</span>
                     @endif
 
-                    <span class="px-3 py-1 rounded-full 
-                        @if($kolaborasi->status === 'pending') bg-yellow-100 text-yellow-700 
-                        @elseif($kolaborasi->status === 'approved') bg-green-100 text-green-700 
-                        @elseif($kolaborasi->status === 'rejected') bg-red-100 text-red-700 
-                        @else bg-gray-100 text-gray-700 @endif">
-                        <strong>{{ ucfirst($kolaborasi->status ?? '') }}</strong>
-                    </span>
 
                 </div>
 
@@ -234,7 +228,6 @@
             <hr class="my-6">
 
             {{-- WORKSPACE (hanya tampilkan link workspace jika kolaborasi aktif) --}}
-            @if($kolaborasi->is_active)
                 <div class="flex flex-wrap gap-2 mb-4">
                     <a href="{{ route('kolaborasi.tasks.index', $kolaborasi->id) }}" class="btn-tab bg-blue-100 text-blue-700">Tugas</a>
                     <a href="{{ route('kolaborasi.progress.index', $kolaborasi->id) }}" class="btn-tab bg-indigo-100 text-indigo-700">Progress</a>
@@ -242,7 +235,6 @@
                     <a href="{{ route('kolaborasi.reviews.index', $kolaborasi->id) }}" class="btn-tab bg-pink-100 text-pink-700">Review</a>
                     <a href="{{ route('kolaborasi.members.index', $kolaborasi->id) }}" class="btn-tab bg-yellow-100 text-pink-700">Anggota</a>
                 </div>
-            @endif
 
             {{-- BUTTON "BERGABUNG KE KOLABORASI" --}}
             @auth
@@ -255,7 +247,7 @@
                                 Menunggu Persetujuan
                             </button>
                         @else
-                            <form action="{{ route('kolaborasi.requests.store', $kolaborasi->id) }}" method="POST" class="mb-6">
+                            <form action="{{ route('kolaborasi.requests.store', $kolaborasi->id) }}" method="POST" class="mb-6" id="joinForm">
                                 @csrf
                                 <input type="hidden" name="kolaborasi_id" value="{{ $kolaborasi->id }}">
                                 <button type="submit" 
@@ -283,12 +275,12 @@
                             ✏️ Edit Kolaborasi
                         </a>
                     @endif
-                    <form action="{{ route('kolaborasi.ide.destroy', $kolaborasi->id) }}" method="POST" class="inline-block">
+                    <form action="{{ route('kolaborasi.ide.destroy', $kolaborasi->id) }}" method="POST" class="inline-block" id="deleteForm">
                         @csrf
                         @method('DELETE')
-                        <button type="submit"
+                        <button type="button"
                             class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
-                            onclick="return confirm('Apakah Anda yakin ingin menghapus kolaborasi ini?');">
+                            onclick="confirmDelete()">
                             🗑️ Hapus Kolaborasi
                         </button>
                     </form>
@@ -343,6 +335,7 @@ h1, h6 { line-height: 1.3; }
 @endpush
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const toggleBtn = document.getElementById('progressToggle');
@@ -367,6 +360,108 @@ document.addEventListener('DOMContentLoaded', () => {
     popup.addEventListener('click', (e) => {
         if (e.target === popup) closeBtn.click();
     });
+
+    // Handle form submission dengan SweetAlert
+    const joinForm = document.getElementById('joinForm');
+    if (joinForm) {
+        joinForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            Swal.fire({
+                title: 'Bergabung ke Kolaborasi',
+                text: 'Apakah Anda yakin ingin bergabung ke kolaborasi ini?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Bergabung!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Tampilkan loading
+                    Swal.fire({
+                        title: 'Memproses...',
+                        text: 'Sedang mengirim permintaan bergabung',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    // Submit form
+                    this.submit();
+                }
+            });
+        });
+    }
+
+    // Check for session messages and show SweetAlert
+    @if(session('success'))
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil!',
+            text: '{{ session('success') }}',
+            timer: 3000,
+            showConfirmButton: false
+        });
+    @endif
+
+    @if(session('error'))
+        Swal.fire({
+            icon: 'error',
+            title: 'Gagal!',
+            text: '{{ session('error') }}',
+            timer: 4000,
+            showConfirmButton: true
+        });
+    @endif
+
+    @if(session('warning'))
+        Swal.fire({
+            icon: 'warning',
+            title: 'Peringatan!',
+            text: '{{ session('warning') }}',
+            timer: 3000,
+            showConfirmButton: false
+        });
+    @endif
+
+    @if($errors->any())
+        Swal.fire({
+            icon: 'error',
+            title: 'Terjadi Kesalahan!',
+            html: `{!! implode('<br>', $errors->all()) !!}`,
+            showConfirmButton: true
+        });
+    @endif
 });
+
+function confirmDelete() {
+    Swal.fire({
+        title: 'Hapus Kolaborasi?',
+        text: "Data yang dihapus tidak dapat dikembalikan!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Ya, Hapus!',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Tampilkan loading
+            Swal.fire({
+                title: 'Menghapus...',
+                text: 'Sedang menghapus kolaborasi',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            // Submit form
+            document.getElementById('deleteForm').submit();
+        }
+    });
+}
 </script>
 @endpush

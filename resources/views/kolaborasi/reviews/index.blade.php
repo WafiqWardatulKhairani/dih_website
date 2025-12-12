@@ -25,7 +25,7 @@
 .table-desc{ width:28%; }
 .table-rating{ width:10%; }
 .table-comment{ width:15%; }
-.table-aksi{ width:10%; }
+.table-aksi{ width:15%; }
 
 /* Gradient untuk ikon kolaborasi */
 .text-gradient {
@@ -33,6 +33,14 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+}
+
+/* Style untuk komentar */
+.comment-text {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 </style>
 @endpush
@@ -51,8 +59,13 @@ document.addEventListener('DOMContentLoaded', function(){
     function updateStars(selectedRating){
         const stars = document.querySelectorAll('#ratingStars span');
         stars.forEach((s,i)=>{
-            if(i < selectedRating) s.classList.remove('star-gray');
-            else s.classList.add('star-gray');
+            if(i < selectedRating) {
+                s.classList.remove('star-gray');
+                s.classList.add('star');
+            } else {
+                s.classList.remove('star');
+                s.classList.add('star-gray');
+            }
         });
     }
 
@@ -62,9 +75,14 @@ document.addEventListener('DOMContentLoaded', function(){
             const reviewId = this.dataset.review;
             const rating = this.dataset.rating || 0;
             const comment = this.dataset.comment || '';
+            const taskTitle = this.dataset.task || '';
 
             if(!reviewId || reviewId==0){
-                Swal.fire('Oops','Review belum tersedia untuk task ini','error');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Review belum tersedia untuk task ini'
+                });
                 return;
             }
 
@@ -73,6 +91,9 @@ document.addEventListener('DOMContentLoaded', function(){
             modalComment.value = comment;
             selectedRating = parseInt(rating);
             updateStars(selectedRating);
+
+            // Update modal title dengan task name
+            document.getElementById('modalTitle').textContent = 'Review Task: ' + taskTitle;
 
             modal.classList.add('show');
         });
@@ -96,11 +117,89 @@ document.addEventListener('DOMContentLoaded', function(){
     // Submit modal
     document.getElementById('submitRatingBtn').addEventListener('click', function(){
         if(selectedRating===0 && modalComment.value===''){
-            Swal.fire('Peringatan','Isi rating atau komentar terlebih dahulu','warning');
+            Swal.fire({
+                icon: 'warning',
+                title: 'Peringatan',
+                text: 'Isi rating atau komentar terlebih dahulu'
+            });
             return;
         }
         document.getElementById('ratingForm').submit();
     });
+
+    // Handle delete review dengan SweetAlert
+    document.querySelectorAll('.delete-review-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const form = this.closest('form');
+            
+            Swal.fire({
+                title: 'Hapus Review?',
+                text: "Data review akan dihapus permanen!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Tampilkan loading
+                    Swal.fire({
+                        title: 'Menghapus...',
+                        text: 'Sedang menghapus review',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    // Submit form
+                    form.submit();
+                }
+            });
+        });
+    });
+
+    // Check for session messages and show SweetAlert
+    @if(session('success'))
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil!',
+            text: '{{ session('success') }}',
+            timer: 3000,
+            showConfirmButton: false
+        });
+    @endif
+
+    @if(session('error'))
+        Swal.fire({
+            icon: 'error',
+            title: 'Gagal!',
+            text: '{{ session('error') }}',
+            timer: 4000,
+            showConfirmButton: true
+        });
+    @endif
+
+    @if(session('warning'))
+        Swal.fire({
+            icon: 'warning',
+            title: 'Peringatan!',
+            text: '{{ session('warning') }}',
+            timer: 3000,
+            showConfirmButton: false
+        });
+    @endif
+
+    @if($errors->any())
+        Swal.fire({
+            icon: 'error',
+            title: 'Terjadi Kesalahan!',
+            html: `{!! implode('<br>', $errors->all()) !!}`,
+            showConfirmButton: true
+        });
+    @endif
 
 });
 </script>
@@ -181,45 +280,62 @@ document.addEventListener('DOMContentLoaded', function(){
                                 $member_name = $task->assignee->name ?? $kolaborasi_owner_name ?? 'Belum ditugaskan';
                             @endphp
                             <tr class="hover:bg-graylight transition">
-                                <td class="px-4 py-4">{{ $index+1 }}</td>
+                                <td class="px-4 py-4 text-center">{{ $index+1 }}</td>
                                 <td class="px-4 py-4">{{ $member_name }}</td>
                                 <td class="px-4 py-4">{{ $task->title }}</td>
                                 <td class="px-4 py-4">{{ $task->description }}</td>
-                                <td class="px-4 py-4">
+                                <td class="px-4 py-4 text-center">
                                     @for($i=1;$i<=5;$i++)
-                                        <span class="star {{ $i <= $rating ? '' : 'star-gray' }}">&#9733;</span>
+                                        <span class="{{ $i <= $rating ? 'star' : 'star-gray' }}">&#9733;</span>
                                     @endfor
                                 </td>
                                 <td class="px-4 py-4">
-                                    @if($review_id)
-                                    <button type="button"
-                                        class="open-rating-modal px-2 py-1 rounded bg-gray-200 hover:bg-gray-300 text-sm"
-                                        data-review="{{ $review_id }}"
-                                        data-rating="{{ $rating }}"
-                                        data-comment="{{ $komentar }}">
-                                        Tambah
-                                    </button>
+                                    @if($komentar)
+                                        <div class="comment-text" title="{{ $komentar }}">
+                                            {{ $komentar }}
+                                        </div>
                                     @else
-                                    <span class="text-gray-400">Belum tersedia</span>
+                                        <span class="text-gray-400 italic">Tidak ada komentar</span>
                                     @endif
                                 </td>
                                 <td class="px-4 py-4 text-center">
-                                    @if($role==='Pengaju Kolaborasi' && $review_id)
-                                        <button type="button"
-                                            class="open-rating-modal px-2 py-1 rounded bg-success text-white text-xs mb-1"
-                                            data-review="{{ $review_id }}"
-                                            data-rating="{{ $rating }}"
-                                            data-comment="{{ $komentar }}">
-                                            Submit
-                                        </button>
-                                        <form action="{{ route('kolaborasi.reviews.destroy', $review_id) }}" method="POST" class="inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="px-2 py-1 rounded bg-red-500 text-white hover:bg-red-600 text-xs">Hapus</button>
-                                        </form>
-                                    @else
-                                        -
-                                    @endif
+                                    <div class="flex flex-col gap-2 items-center">
+                                        @if($role==='Pengaju Kolaborasi')
+                                            @if($review_id)
+                                                {{-- Tombol Edit/Submit --}}
+                                                <button type="button"
+                                                    class="open-rating-modal px-3 py-2 rounded bg-green-600 text-white text-sm hover:bg-green-700 transition w-full"
+                                                    data-review="{{ $review_id }}"
+                                                    data-rating="{{ $rating }}"
+                                                    data-comment="{{ $komentar }}"
+                                                    data-task="{{ $task->title }}">
+                                                    <i class="fas fa-edit mr-1"></i> Edit Review
+                                                </button>
+                                                
+                                                {{-- Tombol Hapus --}}
+                                                <form action="{{ route('kolaborasi.reviews.destroy', $review_id) }}" method="POST" class="w-full">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" 
+                                                            class="delete-review-btn px-3 py-2 rounded bg-red-600 text-white text-sm hover:bg-red-700 transition w-full">
+                                                        <i class="fas fa-trash mr-1"></i> Hapus
+                                                    </button>
+                                                </form>
+                                            @else
+                                                {{-- Tombol Tambah Review Baru --}}
+                                                <button type="button"
+                                                    class="open-rating-modal px-3 py-2 rounded bg-blue-600 text-white text-sm hover:bg-blue-700 transition w-full"
+                                                    data-review="0"
+                                                    data-rating="0"
+                                                    data-comment=""
+                                                    data-task="{{ $task->title }}">
+                                                    <i class="fas fa-plus mr-1"></i> Tambah Review
+                                                </button>
+                                            @endif
+                                        @else
+                                            <span class="text-gray-400 text-sm">-</span>
+                                        @endif
+                                    </div>
                                 </td>
                             </tr>
                             @empty
@@ -241,25 +357,25 @@ document.addEventListener('DOMContentLoaded', function(){
 {{-- Modal Pop-up Rating/Comment --}}
 <div id="ratingModal" class="modal">
     <div class="modal-content">
-        <h2 class="text-xl font-bold text-primary mb-4">Tambah Rating / Komentar</h2>
+        <h2 class="text-xl font-bold text-primary mb-4" id="modalTitle">Tambah Rating / Komentar</h2>
         <form id="ratingForm" action="{{ route('kolaborasi.reviews.store', $kolaborasi->id) }}" method="POST">
             @csrf
             <input type="hidden" name="review_id" id="modalReviewId" value="">
             <input type="hidden" name="rating" id="modalRating" value="0">
 
-            <label class="block mb-1">Pilih Rating</label>
-            <div id="ratingStars" class="flex gap-1 mb-3">
+            <label class="block mb-1 font-medium text-gray-700">Pilih Rating</label>
+            <div id="ratingStars" class="flex gap-1 mb-4">
                 @for($i=1;$i<=5;$i++)
-                    <span class="star star-gray">&#9733;</span>
+                    <span class="star-gray">&#9733;</span>
                 @endfor
             </div>
 
-            <label class="block mb-1">Komentar</label>
-            <textarea name="komentar" id="modalComment" rows="3" class="w-full border-gray-300 rounded p-2 mb-3"></textarea>
+            <label class="block mb-1 font-medium text-gray-700">Komentar</label>
+            <textarea name="komentar" id="modalComment" rows="3" class="w-full border border-gray-300 rounded-lg p-3 mb-4 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
 
             <div class="flex justify-end gap-3">
-                <button type="button" id="closeModalBtn" class="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400">Batal</button>
-                <button type="button" id="submitRatingBtn" class="px-4 py-2 rounded bg-success text-white">Submit</button>
+                <button type="button" id="closeModalBtn" class="px-4 py-2 rounded-lg bg-gray-300 hover:bg-gray-400 transition text-gray-700">Batal</button>
+                <button type="button" id="submitRatingBtn" class="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition">Submit Review</button>
             </div>
         </form>
     </div>

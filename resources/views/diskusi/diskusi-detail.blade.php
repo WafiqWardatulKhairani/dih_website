@@ -4,7 +4,6 @@
 @php
 use Carbon\Carbon;
 use App\Models\DiscussionComment;
-use App\Models\KolaborasiIde;
 @endphp
 
 @push('styles')
@@ -87,6 +86,29 @@ use App\Models\KolaborasiIde;
         font-size: 0.75rem;
         font-weight: 600;
         text-transform: capitalize;
+    }
+    
+    .comment-item {
+        display: none;
+    }
+    
+    .comment-item.show {
+        display: block;
+    }
+    
+    .view-comments-btn {
+        background: none;
+        border: none;
+        color: #3b82f6;
+        font-weight: 600;
+        cursor: pointer;
+        padding: 0.5rem 0;
+        transition: color 0.2s ease;
+    }
+    
+    .view-comments-btn:hover {
+        color: #1d4ed8;
+        text-decoration: underline;
     }
 </style>
 @endpush
@@ -372,14 +394,23 @@ use App\Models\KolaborasiIde;
                             @endauth
 
                             <!-- Daftar Komentar -->
-                            <div class="space-y-4">
+                            <div class="space-y-4" id="comments-container">
                                 @if($comments->count())
+                                    @php
+                                        $totalComments = $comments->count();
+                                        $visibleComments = min(5, $totalComments);
+                                        $commentIndex = 0;
+                                    @endphp
+                                    
                                     @foreach($comments as $comment)
                                     @php
                                         $commentCreatedAt = $comment->created_at instanceof Carbon ? $comment->created_at : Carbon::parse($comment->created_at ?? now());
                                         $avatar = $comment->avatar_url ?? $comment->user->avatar_url ?? asset('images/default-avatar.png');
+                                        $commentIndex++;
+                                        $isVisible = $commentIndex <= $visibleComments;
                                     @endphp
-                                    <div class="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md transition duration-200">
+                                    <div class="comment-item bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md transition duration-200 {{ $isVisible ? 'show' : '' }}" 
+                                         data-comment-index="{{ $commentIndex }}">
                                         <div class="flex items-start gap-4">
                                             <img src="{{ $avatar }}" class="comment-avatar">
                                             <div class="flex-1">
@@ -408,6 +439,15 @@ use App\Models\KolaborasiIde;
                                         </div>
                                     </div>
                                     @endforeach
+
+                                    <!-- Tombol Lihat Semua / Lihat Lebih Sedikit -->
+                                    @if($totalComments > 5)
+                                        <div class="text-center mt-4">
+                                            <button type="button" id="view-comments-toggle" class="view-comments-btn">
+                                                Lihat semua komentar ({{ $totalComments }})
+                                            </button>
+                                        </div>
+                                    @endif
                                 @else
                                     <div class="text-center py-8">
                                         <i class="fas fa-comments text-4xl text-gray-300 mb-3"></i>
@@ -430,7 +470,6 @@ use App\Models\KolaborasiIde;
                     <div class="space-y-4">
                         @foreach($sidebarInnovations as $item)
                             @php
-                                // FIX: Mengambil komentar berdasarkan innovation_id tanpa memperdulikan tipe
                                 $commentsCount = \App\Models\DiscussionComment::where('innovation_id', $item->id)->count();
                                 $itemSourceType = $item->source_type ?? 'unknown';
                                 $itemType = $itemSourceType != 'unknown' ? $itemSourceType : ($type ?? 'unknown');
@@ -459,67 +498,42 @@ use App\Models\KolaborasiIde;
                         <i class="fas fa-handshake text-green-500 mr-2"></i>Kolaborasi
                     </h3>
                     @php
+                        use App\Models\KolaborasiIde;
                         $userId = auth()->id();
-                        
-                        // FIX: Query yang benar berdasarkan struktur tabel
-                        $collaboration = KolaborasiIde::where('innovation_id', $innovation->id)
-                            ->where('user_id', $userId)
-                            ->first();
-                            
+                        $collaboration = KolaborasiIde::where('innovation_id', $innovation->id)->first();
                         $isOwner = $userId === ($innovation->user_id ?? null);
-                        $hasCollaboration = KolaborasiIde::where('innovation_id', $innovation->id)->exists();
-                        
-                        // Ambil data kolaborasi untuk inovasi ini (untuk tombol "Lihat Kolaborasi")
-                        $existingCollaboration = KolaborasiIde::where('innovation_id', $innovation->id)->first();
+                        $isApplicant = $collaboration && $userId === $collaboration->user_id;
                     @endphp
                     
                     <div class="space-y-4">
-                        @if(!$hasCollaboration)
+                        @if(!$collaboration)
                             <p class="text-gray-600 text-sm">Belum ada pengajuan kolaborasi.</p>
-                            @if(!$isOwner)
-                                <a href="{{ route('kolaborasi.ide.create', ['innovation_id'=>$innovation->id]) }}" 
-                                   class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition duration-200 font-medium">
-                                    <i class="fas fa-plus"></i>
-                                    Ajukan Kolaborasi
+                            <a href="{{ route('kolaborasi.ide.create', ['innovation_id'=>$innovation->id]) }}" 
+                               class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition duration-200 font-medium">
+                                <i class="fas fa-plus"></i>
+                                Ajukan Kolaborasi
+                            </a>
+                        @else
+                            @if($isOwner)
+                                <p class="text-green-600 text-sm font-medium">📬 Ada pengajuan kolaborasi masuk!</p>
+                                <a href="{{ route('kolaborasi.ide.show', ['id'=>$collaboration->id]) }}" 
+                                   class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition duration-200 font-medium">
+                                    <i class="fas fa-eye"></i>
+                                    Lihat Pengajuan
+                                </a>
+                            @elseif($isApplicant)
+                                <a href="{{ route('kolaborasi.ide.show', ['id'=>$collaboration->id]) }}" 
+                                   class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition duration-200 font-medium">
+                                    <i class="fas fa-edit"></i>
+                                    Edit Pengajuan
                                 </a>
                             @else
-                                <p class="text-blue-600 text-sm font-medium">Ini adalah inovasi Anda.</p>
-                            @endif
-                        @else
-                            @if($collaboration)
-                                @if($isOwner)
-                                    <p class="text-green-600 text-sm font-medium">📬 Ada pengajuan kolaborasi masuk!</p>
-                                    <a href="{{ route('kolaborasi.ide.show', ['id'=>$collaboration->id]) }}" 
-                                       class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition duration-200 font-medium">
-                                        <i class="fas fa-eye"></i>
-                                        Lihat Pengajuan
-                                    </a>
-                                @else
-                                    <a href="{{ route('kolaborasi.ide.show', ['id'=>$collaboration->id]) }}" 
-                                       class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition duration-200 font-medium">
-                                        <i class="fas fa-edit"></i>
-                                        Edit Pengajuan
-                                    </a>
-                                @endif
-                            @else
                                 <p class="text-purple-600 text-sm font-medium">👥 Sudah ada kolaborasi berjalan.</p>
-                                @if($isOwner)
-                                    <a href="{{ route('kolaborasi.ide.index') }}?innovation_id={{ $innovation->id }}" 
-                                       class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition duration-200 font-medium">
-                                        <i class="fas fa-users"></i>
-                                        Kelola Kolaborasi
-                                    </a>
-                                @else
-                                    <p class="text-gray-600 text-sm">Kolaborasi sudah diajukan oleh pengguna lain.</p>
-                                    <!-- TAMBAHAN: Tombol Lihat Kolaborasi -->
-                                    @if($existingCollaboration)
-                                        <a href="{{ route('kolaborasi.ide.show', ['id' => $existingCollaboration->id]) }}" 
-                                           class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition duration-200 font-medium">
-                                            <i class="fas fa-eye mr-2"></i>
-                                            Lihat Kolaborasi
-                                        </a>
-                                    @endif
-                                @endif
+                                <a href="{{ route('kolaborasi.ide.show', ['id'=>$collaboration->id]) }}" 
+                                   class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition duration-200 font-medium">
+                                    <i class="fas fa-users"></i>
+                                    Lihat Kolaborasi
+                                </a>
                             @endif
                         @endif
                     </div>
@@ -528,4 +542,40 @@ use App\Models\KolaborasiIde;
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const commentsToggle = document.getElementById('view-comments-toggle');
+    const commentItems = document.querySelectorAll('.comment-item');
+    const totalComments = {{ $comments->count() }};
+    
+    if (commentsToggle && totalComments > 5) {
+        let showingAll = false;
+        
+        commentsToggle.addEventListener('click', function() {
+            showingAll = !showingAll;
+            
+            if (showingAll) {
+                // Tampilkan semua komentar
+                commentItems.forEach(item => {
+                    item.classList.add('show');
+                });
+                commentsToggle.textContent = 'Lihat lebih sedikit';
+            } else {
+                // Tampilkan hanya 5 komentar pertama
+                commentItems.forEach(item => {
+                    const index = parseInt(item.getAttribute('data-comment-index'));
+                    if (index > 5) {
+                        item.classList.remove('show');
+                    }
+                });
+                commentsToggle.textContent = `Lihat semua komentar (${totalComments})`;
+            }
+        });
+    }
+});
+</script>
+@endpush
+
 @endsection

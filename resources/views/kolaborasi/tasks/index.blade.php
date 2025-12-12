@@ -116,7 +116,7 @@ tailwind.config = {
                 <!-- Header -->
                 <div class="flex justify-between items-center mb-4">
                     <div>
-                        <h1 class="text-3xl font-bold text-primary">Daftar Tugas Kolaborasi</h1>
+                        <h1 class="text-3xl font-bold text-primary">Daftar Penugasan Kolaborasi</h1>
                         <p class="text-gray-600">
                             Kolaborasi: 
                             <span class="font-semibold text-secondary">
